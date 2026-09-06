@@ -393,7 +393,7 @@ def build_move(m, prev, nxt, by, sched):
             f'</div><p class="pnote">{note}</p>')
 
     wk = int(sched['start'][m['num']] // RM.WEEK) + 1
-    all_moves = sorted(by.values(), key=lambda x: x['num'])
+    all_moves = sorted(by.values(), key=lambda x: int(x['num']))
     body = f"""{masthead(all_moves, 1)}
 {nav(1, '')}
 <div class="shell">

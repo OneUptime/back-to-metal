@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>110 · The inventory, the RMA loop and which rack unit - Back to Metal</title>
+<meta name="description" content="Holds serial, rack unit, bay and node name in one inventory with a funded return loop, because hardware nobody can find is hardware nobody can replace.">
+<meta name="theme-color" content="#0A0C0D">
+<link rel="stylesheet" href="../assets/style.css?v=0.1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="mast"><div class="mast-in"><a class="wordmark d" href="../index.html">Back to<br><em>Metal</em></a><div class="mast-sub"><p>A step-by-step roadmap off AWS, Google Cloud or Azure and onto Kubernetes you run on hardware you control. Every Move states its downtime, its risk and the way back.</p></div></div><div class="edition"><span>v0.1.0</span><span><b>122</b> Moves</span><span><b>7</b> Parts</span><span><b>975</b> person-days</span><span><b>242</b> weeks at 3</span><span><b>110</b> at zero downtime</span><span>AWS &middot; Google Cloud &middot; Azure</span><span><a href="https://oneuptime.com" style="color:inherit">By the makers of OneUptime</a></span></div></header>
+<nav class="nav"><a href="../index.html">Start here</a><a href="../roadmap.html">Roadmap</a><a href="../plan.html">Plan yours</a><a href="../kit.html">Kit</a><a href="../rollback.html">Rollback</a><a href="../replaces.html">What replaces what</a><a href="../about.html">About</a><a class="sp" href="../Back-to-Metal.pdf" download>PDF</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav>
+<div class="shell">
+<aside class="rail"><a href="../index.html#iron" style="--c:#474F57"><div class="r-n">Stage 1</div><div class="r-t">Work out what to buy</div><div class="r-w">01&ndash;20 &middot; Iron</div></a><a href="../index.html#site" style="--c:#6B5344"><div class="r-n">Stage 2</div><div class="r-t">Find somewhere to put it</div><div class="r-w">21&ndash;38 &middot; Site</div></a><a href="../index.html#cluster" style="--c:#1F4E79"><div class="r-n">Stage 3</div><div class="r-t">Build the cluster</div><div class="r-w">39&ndash;54 &middot; Cluster</div></a><a href="../index.html#platform" style="--c:#4B3F8F"><div class="r-n">Stage 4</div><div class="r-t">Make it fit to run production</div><div class="r-w">55&ndash;70 &middot; Platform</div></a><a href="../index.html#data" style="--c:#A32E1F"><div class="r-n">Stage 5</div><div class="r-t">Move the data</div><div class="r-w">71&ndash;90 &middot; Data</div></a><a href="../index.html#edge" style="--c:#14655A"><div class="r-n">Stage 6</div><div class="r-t">Move the traffic</div><div class="r-w">91&ndash;107 &middot; Edge</div></a><a class="on" href="../index.html#watch" style="--c:#8A6112"><div class="r-n">Stage 7</div><div class="r-t">Run it, and close the account</div><div class="r-w">108&ndash;122 &middot; Watch</div></a></aside>
+<main class="main" style="--c:#8A6112">
+  <div class="mv-head">
+    <div class="mv-n">110</div>
+    <h1 class="d">The inventory, the RMA loop and which rack unit</h1>
+    <div class="mv-spec">
+      <div><div class="k">Part</div><div class="v">
+        <span style="color:#8A6112"><svg class="ico" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.4" y="4.2" width="19.2" height="15.6" rx="1"/><path d="M5.4 14.4h2.6l1.8-4.6 2.4 6.4 2-3.4h4.4"/></svg></span>
+        WATCH</div></div>
+      <div><div class="k">Leaving</div><div class="v">The provider's capacity pool and its hardware-retirement notices</div></div>
+      <div><div class="k">Risk</div><div class="v">
+        <svg class="ico" viewBox="0 0 13.4 14" height="1em" width="1em" style="width:auto" aria-hidden="true"><rect x="0" y="4" width="3.4" height="6" fill="currentColor"/><rect x="5" y="2" width="3.4" height="10" fill="currentColor" fill-opacity="0.22"/><rect x="10" y="0" width="3.4" height="14" fill="currentColor" fill-opacity="0.22"/></svg>LOW</div></div>
+      <div><div class="k">Cutover</div><div class="v">0 MIN</div></div>
+      <div><div class="k">Back out for</div><div class="v">
+        IMMEDIATELY</div></div>
+      <div><div class="k">Roadmap</div><div class="v">WEEK 214</div></div>
+    </div>
+    <p class="hook">Holds serial, rack unit, bay and node name in one inventory with a funded return loop, because hardware nobody can find is hardware nobody can replace.</p>
+  </div>
+
+  <p class="blab">Leaving from</p>
+  <div class="orow"><span class="oc">AWS</span><span class="os">EC2 instance retirement notices</span><span class="on">a failing machine was replaced by somebody else and announced to you as an event.</span></div><div class="orow"><span class="oc">Google Cloud</span><span class="os">Compute Engine host maintenance events</span><span class="on">the same, mostly handled by migration before you noticed.</span></div><div class="orow"><span class="oc">Azure</span><span class="os">Virtual Machines planned and unplanned maintenance events</span><span class="on">again a notification rather than a part in your hand.</span></div>
+
+  <div class="two">
+  <div>
+    <p class="blab">Why this works</p>
+    <p class="why">This Move is logistics rather than engineering, and it is the difference between a two-hour repair and a two-week one. One inventory holds serial number, rack unit, bay and node name for every machine and every device, seeded from the as-built in Move 37 and the bill of materials in Move 20. Behind it sits a return loop that is funded and has a named contact, because a warranty claim with no owner is a warranty claim nobody files. Diagnosis is Move 111; the spares themselves were budgeted in Move 19. What is new here is being able to find the thing.</p>
+    <p class="blab">The runbook</p>
+    <ol class="steps"><li class="step"><button class="sdone" aria-label="Mark step 1 done">01</button><div class="stext">Choose an inventory system that models racks, rack units, bays and devices properly. A spreadsheet works for a single rack and stops working at the second.</div></li><li class="step"><button class="sdone" aria-label="Mark step 2 done">02</button><div class="stext">Seed it with a script from the as-built and the bill of materials. Serial number, position, node name, and the acceptance test result from Move 18 for each machine.</div></li><li class="step"><button class="sdone" aria-label="Mark step 3 done">03</button><div class="stext">Record the firmware baseline per machine while you are there, because Move 111 treats firmware as a data-loss concern and needs a starting point.</div></li><li class="step"><button class="sdone" aria-label="Mark step 4 done">04</button><div class="stext">Build the return loop: who raises a claim, with which supplier, under which contract, and what advance replacement does to your holdings. Advance replacement is worth paying for and it obliges you to return the failed part or be billed for it.</div></li><li class="step"><button class="sdone" aria-label="Mark step 5 done">05</button><div class="stext">Read the warranty terms for rented dedicated machines separately. They differ sharply from owned hardware, and the provider replaces the machine rather than the part, which changes what your inventory has to track.</div></li><li class="step"><button class="sdone" aria-label="Mark step 6 done">06</button><div class="stext">Establish a parts service level with a named contact and a telephone number, and test it once with a trivial claim while nothing is broken.</div></li><li class="step"><button class="sdone" aria-label="Mark step 7 done">07</button><div class="stext">Reconcile the inventory against reality monthly. Half a day a month keeps it true; a year of neglect makes it worse than nothing, because people trust it.</div></li></ol>
+    <div class="rollback"><b>Rollback</b><p>An inventory is corrected by correcting it and there is nothing here to reverse. The point of no return is the moment it stops matching reality, which happens quietly and is why the monthly reconciliation exists. Keep the inventory's data exported to source control periodically so a corrupted or lost system can be restored, and so that the physical estate can be reconstructed on paper if the system is unavailable during an incident.</p></div>
+    <p class="blab">Operator&rsquo;s notes</p>
+    <div class="notes"><div class="note"><b>Swap</b><p>For a single rack, a well-maintained document from Move 37 plus a spares list is enough. The inventory system earns its place at the second rack or the second site.</p></div><div class="note"><b>Do it faster</b><p>Seed it during the build in Move 36, when the serial numbers are visible and the machines are open. Reading a serial number off an installed machine is a torch-and-mirror job.</p></div><div class="note"><b>Watch out</b><p>A device replaced under warranty comes back with a different serial number. An inventory that is not updated at replacement time drifts immediately and silently.</p></div><div class="note"><b>Leftovers</b><p>The provider's retirement notification wiring — the event rules and the notifications behind it — can be removed when the old estate goes.</p></div></div>
+    <p class="blab">The numbers</p>
+    <div class="figs"><div><b>—</b><span>Was</span></div><div><b>—</b><span>Now</span></div><div><b>—</b><span>Saved</span></div><div><b>0 min</b><span>Cutover</span></div><div><b>1 week</b><span>Effort</span></div><div><b>—</b><span>Wait</span></div></div>
+    <p class="turnoff"><b>What you can turn off</b>The provider's retirement notification wiring, once the old estate is gone. This Move adds a small cost and removes a category of two-week repairs.</p>
+  </div>
+  <aside>
+    <p class="blab" style="margin-top:0">Before you start</p>
+    <p class="pre-h">Access</p><ul class="prelist"><li><label><input type="checkbox"><span>The as-built from Move 37 and the bill of materials from Move 20, both current</span></label></li><li><label><input type="checkbox"><span>The support contracts from Move 17, with their return terms read rather than assumed</span></label></li></ul><p class="pre-h">Software</p><ul class="prelist"><li><label><input type="checkbox"><span>An inventory system that holds physical position as a first-class field, not a tag on a virtual resource</span></label></li><li><label><input type="checkbox"><span>A seeding script, because typing three hundred serial numbers by hand produces three hundred opportunities for error</span></label></li></ul><p class="pre-h">People</p><ul class="prelist"><li><label><input type="checkbox"><span>A named contact for returns at every supplier, and a named owner for the inventory</span></label></li></ul>
+    <p class="pre-h">Needs first</p><div class="deplist"><a href="the-shelf-and-the-failure-rates-you-stock-against.html"><i style="color:#474F57">19</i><span>The shelf, and the failure rates you stock against</span></a><a href="the-bill-of-materials.html"><i style="color:#474F57">20</i><span>The bill of materials</span></a><a href="labels-port-maps-and-the-as-built.html"><i style="color:#6B5344">37</i><span>Labels, port maps and the as-built</span></a></div><p class="pnote">These must be finished before step one.</p>
+    <p class="pre-h">Unlocks</p><div class="deplist"><a href="the-03-00-disk.html"><i style="color:#8A6112">111</i><span>The 03:00 disk</span></a><a href="the-patch-sla-after-the-vulnerability-feed-stopped.html"><i style="color:#8A6112">117</i><span>The patch SLA after the vulnerability feed stopped</span></a><a href="the-auditor-s-checklist-and-the-contracts-nobody-read.html"><i style="color:#8A6112">119</i><span>The auditor's checklist, and the contracts nobody read</span></a></div><p class="pnote">These become possible once this Move is done.</p>
+  </aside>
+  </div>
+
+  <nav class="mvnav">
+    <a href="the-fleet-roll-with-no-thirteenth-machine.html"><b>Previous</b>109 &middot; The fleet roll with no thirteenth machine</a>
+    <a href="the-03-00-disk.html" style="text-align:right"><b>Next</b>111 &middot; The 03:00 disk</a>
+  </nav>
+</main></div>
+<footer class="foot"><p class="ft">Back to Metal</p><p>Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves’ own effort figures and the dependency graph, not asserted. Prices are public list rates observed while writing and will drift. <a href="../rollback.html">Read the rollback page</a> before running anything.</p><p>By the makers of OneUptime &mdash; <a href="https://oneuptime.com">oneuptime.com</a>, an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Part VII, and the interest is declared on the <a href="../about.html">about page</a>.</p><p>Open source. The Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> — software MIT, text CC BY 4.0. <span class="ver">v0.1.0</span></p></footer>
+<script src="../assets/app.js?v=0.1.0" defer></script>
+</body>
+</html>

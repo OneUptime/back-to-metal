@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>87 · Search off the managed cluster - Back to Metal</title>
+<meta name="description" content="Restores a snapshot into a self-hosted OpenSearch cluster, dual-writes across the gap and cuts the read alias, because the index is rebuildable.">
+<meta name="theme-color" content="#0A0C0D">
+<link rel="stylesheet" href="../assets/style.css?v=0.1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="mast"><div class="mast-in"><a class="wordmark d" href="../index.html">Back to<br><em>Metal</em></a><div class="mast-sub"><p>A step-by-step roadmap off AWS, Google Cloud or Azure and onto Kubernetes you run on hardware you control. Every Move states its downtime, its risk and the way back.</p></div></div><div class="edition"><span>v0.1.0</span><span><b>122</b> Moves</span><span><b>7</b> Parts</span><span><b>975</b> person-days</span><span><b>242</b> weeks at 3</span><span><b>110</b> at zero downtime</span><span>AWS &middot; Google Cloud &middot; Azure</span><span><a href="https://oneuptime.com" style="color:inherit">By the makers of OneUptime</a></span></div></header>
+<nav class="nav"><a href="../index.html">Start here</a><a href="../roadmap.html">Roadmap</a><a href="../plan.html">Plan yours</a><a href="../kit.html">Kit</a><a href="../rollback.html">Rollback</a><a href="../replaces.html">What replaces what</a><a href="../about.html">About</a><a class="sp" href="../Back-to-Metal.pdf" download>PDF</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav>
+<div class="shell">
+<aside class="rail"><a href="../index.html#iron" style="--c:#474F57"><div class="r-n">Stage 1</div><div class="r-t">Work out what to buy</div><div class="r-w">01&ndash;20 &middot; Iron</div></a><a href="../index.html#site" style="--c:#6B5344"><div class="r-n">Stage 2</div><div class="r-t">Find somewhere to put it</div><div class="r-w">21&ndash;38 &middot; Site</div></a><a href="../index.html#cluster" style="--c:#1F4E79"><div class="r-n">Stage 3</div><div class="r-t">Build the cluster</div><div class="r-w">39&ndash;54 &middot; Cluster</div></a><a href="../index.html#platform" style="--c:#4B3F8F"><div class="r-n">Stage 4</div><div class="r-t">Make it fit to run production</div><div class="r-w">55&ndash;70 &middot; Platform</div></a><a class="on" href="../index.html#data" style="--c:#A32E1F"><div class="r-n">Stage 5</div><div class="r-t">Move the data</div><div class="r-w">71&ndash;90 &middot; Data</div></a><a href="../index.html#edge" style="--c:#14655A"><div class="r-n">Stage 6</div><div class="r-t">Move the traffic</div><div class="r-w">91&ndash;107 &middot; Edge</div></a><a href="../index.html#watch" style="--c:#8A6112"><div class="r-n">Stage 7</div><div class="r-t">Run it, and close the account</div><div class="r-w">108&ndash;122 &middot; Watch</div></a></aside>
+<main class="main" style="--c:#A32E1F">
+  <div class="mv-head">
+    <div class="mv-n">87</div>
+    <h1 class="d">Search off the managed cluster</h1>
+    <div class="mv-spec">
+      <div><div class="k">Part</div><div class="v">
+        <span style="color:#A32E1F"><svg class="ico" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.6" rx="7.6" ry="2.9"/><path d="M4.4 5.6v12.8c0 1.6 3.4 2.9 7.6 2.9s7.6-1.3 7.6-2.9V5.6"/><path d="M4.4 12c0 1.6 3.4 2.9 7.6 2.9s7.6-1.3 7.6-2.9"/></svg></span>
+        DATA</div></div>
+      <div><div class="k">Leaving</div><div class="v">Managed search clusters</div></div>
+      <div><div class="k">Risk</div><div class="v">
+        <svg class="ico" viewBox="0 0 13.4 14" height="1em" width="1em" style="width:auto" aria-hidden="true"><rect x="0" y="4" width="3.4" height="6" fill="currentColor"/><rect x="5" y="2" width="3.4" height="10" fill="currentColor"/><rect x="10" y="0" width="3.4" height="14" fill="currentColor" fill-opacity="0.22"/></svg>MEDIUM</div></div>
+      <div><div class="k">Cutover</div><div class="v">0 MIN</div></div>
+      <div><div class="k">Back out for</div><div class="v">
+        7 DAYS</div></div>
+      <div><div class="k">Roadmap</div><div class="v">WEEK 159</div></div>
+    </div>
+    <p class="hook">Restores a snapshot into a self-hosted OpenSearch cluster, dual-writes across the gap and cuts the read alias, because the index is rebuildable.</p>
+  </div>
+
+  <p class="blab">Leaving from</p>
+  <div class="orow"><span class="oc">AWS</span><span class="os">OpenSearch Service</span><span class="on">a provisioned domain exits cleanly through a manual snapshot repository; the serverless collection type has no snapshot API at all.</span></div><div class="orow"><span class="oc">Google Cloud</span><span class="os">Elasticsearch through the marketplace or self-managed</span><span class="on">usually already yours, so the exit is a network change rather than a migration.</span></div><div class="orow"><span class="oc">Azure</span><span class="os">Azure AI Search</span><span class="on">no backup or restore of any kind, so this estate exits by reindexing from the source of truth.</span></div>
+
+  <div class="two">
+  <div>
+    <p class="blab">Why this works</p>
+    <p class="why">Search indexes are derived data, which makes this the cleanest exit in the Part: the worst case is a rebuild from the source of truth, and the best case is a restore. For a provisioned domain the path is short — register a manual snapshot repository on the source, restore into a self-hosted cluster reading the same repository, dual-write across the gap, then move the read alias. The automated snapshots cannot be restored off the domain at all, so registering a manual repository is a mandatory first step rather than a convenience. Two service variants have no snapshot path and exit by reindexing instead.</p>
+    <p class="blab">The runbook</p>
+    <ol class="steps"><li class="step"><button class="sdone" aria-label="Mark step 1 done">01</button><div class="stext">Establish which variant you have. A provisioned domain restores from a manual repository; a serverless collection and one provider's search service have no restore path and must be reindexed from the source of truth.</div></li><li class="step"><button class="sdone" aria-label="Mark step 2 done">02</button><div class="stext">Register a manual snapshot repository on the source and take a snapshot. The automated ones are not restorable outside the domain, which is the single most important fact in this Move.</div></li><li class="step"><button class="sdone" aria-label="Mark step 3 done">03</button><div class="stext">Size the destination for your hardware rather than copying the source's shape. Shard count and shard size chosen against your machines, dedicated master nodes, and heap at half of memory and below the threshold where compressed pointers stop working.</div></li><li class="step"><button class="sdone" aria-label="Mark step 4 done">04</button><div class="stext">Restore into the self-hosted cluster from the same repository, remembering that restores are constrained by the source's version lineage and that a version gap can block the restore entirely.</div></li><li class="step"><button class="sdone" aria-label="Mark step 5 done">05</button><div class="stext">Dual-write from the application or the indexer, so both clusters stay current while you compare them.</div></li><li class="step"><button class="sdone" aria-label="Mark step 6 done">06</button><div class="stext">Compare result sets on real queries, not document counts. Relevance can differ across versions and configurations, and a search that returns the same number of different documents is a regression nobody will attribute to this Move.</div></li><li class="step"><button class="sdone" aria-label="Mark step 7 done">07</button><div class="stext">Move the read alias, watch for a week, then stop the dual-write.</div></li></ol>
+    <div class="rollback"><b>Rollback</b><p>For seven days the alias is moved back and the managed domain is still current because the dual-write is still running. That is the whole rollback and it takes seconds. The point of no return is stopping the dual-write, after which the managed side goes stale — and even then the index can be restored by rebuilding from the source of truth, which is why this Move is Medium risk rather than High.</p></div>
+    <p class="blab">Operator&rsquo;s notes</p>
+    <div class="notes"><div class="note"><b>Swap</b><p>Where the index is small and rebuildable in under an hour, skip the snapshot entirely and reindex. It is simpler and it proves the rebuild path works, which you want anyway.</p></div><div class="note"><b>Do it faster</b><p>Restore into the second cluster from Move 51 first to validate the version lineage. A blocked restore discovered there costs an hour rather than a window.</p></div><div class="note"><b>Watch out</b><p>Heap above the compressed-pointer threshold makes a node slower rather than faster, and it is the single most common sizing error on a self-hosted search cluster.</p></div><div class="note"><b>Leftovers</b><p>The managed domain bills per instance-hour and per gigabyte of storage, and a domain with no traffic still bills both.</p></div></div>
+    <p class="blab">The numbers</p>
+    <div class="figs"><div><b>$2,240/mo</b><span>Was</span></div><div><b>$180/mo</b><span>Now</span></div><div><b>92%</b><span>Saved</span></div><div><b>0 min</b><span>Cutover</span></div><div><b>2 weeks</b><span>Effort</span></div><div><b>7 days</b><span>Wait</span></div></div>
+    <p class="turnoff"><b>What you can turn off</b>The managed domain and its storage, seven days after the alias moved and the dual-write stopped.</p>
+  </div>
+  <aside>
+    <p class="blab" style="margin-top:0">Before you start</p>
+    <p class="pre-h">Access</p><ul class="prelist"><li><label><input type="checkbox"><span>Permission to register a manual snapshot repository on the source domain, and a bucket both sides can read</span></label></li><li><label><input type="checkbox"><span>The source of truth for every index, because reindexing is the fallback and sometimes the only path</span></label></li></ul><p class="pre-h">Software</p><ul class="prelist"><li><label><input type="checkbox"><span>OpenSearch at a pinned version, sized for your hardware rather than for the source's instance types</span></label></li><li><label><input type="checkbox"><span>A dual-write path in the application, or an indexer that can write to both clusters</span></label></li></ul><p class="pre-h">People</p><ul class="prelist"><li><label><input type="checkbox"><span>The owner of each index, to say whether a rebuild is acceptable and how long it takes</span></label></li></ul>
+    <p class="pre-h">Needs first</p><div class="deplist"><a href="ceph-under-rook-block-shared-filesystem-and-the-object-store.html"><i style="color:#1F4E79">49</i><span>Ceph under Rook: block, shared filesystem and the object store</span></a><a href="the-object-store-you-now-own-and-how-it-loses-data.html"><i style="color:#1F4E79">54</i><span>The object store you now own, and how it loses data</span></a><a href="the-mirror-then-harbor-as-the-registry-of-record.html"><i style="color:#4B3F8F">58</i><span>The mirror, then Harbor as the registry of record</span></a><a href="east-west-security-groups-into-networkpolicy.html"><i style="color:#4B3F8F">60</i><span>East-west: security groups into NetworkPolicy</span></a><a href="metrics-off-the-managed-monitor-and-the-cardinality-budget.html"><i style="color:#4B3F8F">62</i><span>Metrics off the managed monitor, and the cardinality budget</span></a><a href="application-buckets-and-the-object-api-your-code-assumes.html"><i style="color:#A32E1F">84</i><span>Application buckets, and the object API your code assumes</span></a></div><p class="pnote">These must be finished before step one.</p>
+    
+  </aside>
+  </div>
+
+  <nav class="mvnav">
+    <a href="the-batch-estate-who-schedules-the-jobs.html"><b>Previous</b>86 &middot; The batch estate: who schedules the jobs</a>
+    <a href="document-and-wide-column-stores-the-hardest-exit.html" style="text-align:right"><b>Next</b>88 &middot; Document and wide-column stores: the hardest exit</a>
+  </nav>
+</main></div>
+<footer class="foot"><p class="ft">Back to Metal</p><p>Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves’ own effort figures and the dependency graph, not asserted. Prices are public list rates observed while writing and will drift. <a href="../rollback.html">Read the rollback page</a> before running anything.</p><p>By the makers of OneUptime &mdash; <a href="https://oneuptime.com">oneuptime.com</a>, an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Part VII, and the interest is declared on the <a href="../about.html">about page</a>.</p><p>Open source. The Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> — software MIT, text CC BY 4.0. <span class="ver">v0.1.0</span></p></footer>
+<script src="../assets/app.js?v=0.1.0" defer></script>
+</body>
+</html>

@@ -171,7 +171,7 @@ def plan(selected, by_num):
             continue
         want.add(n)
         queue.extend(DEPS.get(n, []))
-    return sorted(want)
+    return sorted(want, key=int)
 
 
 def check(moves):

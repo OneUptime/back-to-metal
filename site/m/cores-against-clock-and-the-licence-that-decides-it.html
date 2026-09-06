@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>04 · Cores against clock, and the licence that decides it - Back to Metal</title>
+<meta name="description" content="Picks socket count, generation and vendor against the derated requirement, then re-checks the answer against per-core licensing, which frequently inverts it.">
+<meta name="theme-color" content="#0A0C0D">
+<link rel="stylesheet" href="../assets/style.css?v=0.1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="mast"><div class="mast-in"><a class="wordmark d" href="../index.html">Back to<br><em>Metal</em></a><div class="mast-sub"><p>A step-by-step roadmap off AWS, Google Cloud or Azure and onto Kubernetes you run on hardware you control. Every Move states its downtime, its risk and the way back.</p></div></div><div class="edition"><span>v0.1.0</span><span><b>122</b> Moves</span><span><b>7</b> Parts</span><span><b>975</b> person-days</span><span><b>242</b> weeks at 3</span><span><b>110</b> at zero downtime</span><span>AWS &middot; Google Cloud &middot; Azure</span><span><a href="https://oneuptime.com" style="color:inherit">By the makers of OneUptime</a></span></div></header>
+<nav class="nav"><a href="../index.html">Start here</a><a href="../roadmap.html">Roadmap</a><a href="../plan.html">Plan yours</a><a href="../kit.html">Kit</a><a href="../rollback.html">Rollback</a><a href="../replaces.html">What replaces what</a><a href="../about.html">About</a><a class="sp" href="../Back-to-Metal.pdf" download>PDF</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav>
+<div class="shell">
+<aside class="rail"><a class="on" href="../index.html#iron" style="--c:#474F57"><div class="r-n">Stage 1</div><div class="r-t">Work out what to buy</div><div class="r-w">01&ndash;20 &middot; Iron</div></a><a href="../index.html#site" style="--c:#6B5344"><div class="r-n">Stage 2</div><div class="r-t">Find somewhere to put it</div><div class="r-w">21&ndash;38 &middot; Site</div></a><a href="../index.html#cluster" style="--c:#1F4E79"><div class="r-n">Stage 3</div><div class="r-t">Build the cluster</div><div class="r-w">39&ndash;54 &middot; Cluster</div></a><a href="../index.html#platform" style="--c:#4B3F8F"><div class="r-n">Stage 4</div><div class="r-t">Make it fit to run production</div><div class="r-w">55&ndash;70 &middot; Platform</div></a><a href="../index.html#data" style="--c:#A32E1F"><div class="r-n">Stage 5</div><div class="r-t">Move the data</div><div class="r-w">71&ndash;90 &middot; Data</div></a><a href="../index.html#edge" style="--c:#14655A"><div class="r-n">Stage 6</div><div class="r-t">Move the traffic</div><div class="r-w">91&ndash;107 &middot; Edge</div></a><a href="../index.html#watch" style="--c:#8A6112"><div class="r-n">Stage 7</div><div class="r-t">Run it, and close the account</div><div class="r-w">108&ndash;122 &middot; Watch</div></a></aside>
+<main class="main" style="--c:#474F57">
+  <div class="mv-head">
+    <div class="mv-n">04</div>
+    <h1 class="d">Cores against clock, and the licence that decides it</h1>
+    <div class="mv-spec">
+      <div><div class="k">Part</div><div class="v">
+        <span style="color:#474F57"><svg class="ico" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.2" y="6.6" width="19.6" height="10.8" rx="1"/><path d="M5.2 9.6h5.6M5.2 12h5.6M5.2 14.4h5.6"/><path d="M14.6 10.4h4.6M14.6 13.6h4.6"/><path d="M4.6 17.4v2M19.4 17.4v2"/></svg></span>
+        IRON</div></div>
+      <div><div class="k">Leaving</div><div class="v">—</div></div>
+      <div><div class="k">Risk</div><div class="v">
+        <svg class="ico" viewBox="0 0 13.4 14" height="1em" width="1em" style="width:auto" aria-hidden="true"><rect x="0" y="4" width="3.4" height="6" fill="currentColor"/><rect x="5" y="2" width="3.4" height="10" fill="currentColor"/><rect x="10" y="0" width="3.4" height="14" fill="currentColor"/></svg>HIGH</div></div>
+      <div><div class="k">Cutover</div><div class="v">0 MIN</div></div>
+      <div><div class="k">Back out for</div><div class="v">
+        UNTIL THE ORDER IS SIGNED</div></div>
+      <div><div class="k">Roadmap</div><div class="v">WEEK 8</div></div>
+    </div>
+    <p class="hook">Picks socket count, generation and vendor against the derated requirement, then re-checks the answer against per-core licensing, which frequently inverts it.</p>
+  </div>
+
+  <p class="blab">Leaving from</p>
+  <div class="orow"><span class="oc">AWS</span><span class="os">Dedicated Hosts and licence-included instances</span><span class="on">the licence was bundled into the hourly rate, or brought under a host you did not have to count cores on yourself.</span></div><div class="orow"><span class="oc">Google Cloud</span><span class="os">Sole-tenant nodes</span><span class="on">the same bundling, with node affinity labels doing the work that a physical machine boundary will do for you afterwards.</span></div><div class="orow"><span class="oc">Azure</span><span class="os">Azure Hybrid Benefit and dedicated hosts</span><span class="on">the one place where the licensing arithmetic was already visible to you, which makes this Move less of a surprise there.</span></div>
+
+  <div class="two">
+  <div>
+    <p class="blab">Why this works</p>
+    <p class="why">Silicon is priced per core and software is priced per core, and the two curves point in opposite directions. A dense dual-socket part gives you the cheapest core you will ever buy and, under a per-core licence, the most expensive server you will ever run. Oracle counts every physical core in the host at the 0.5 x86 factor unless the partitioning is one it has approved as hard; SQL Server licenses every core on the server with a four-core minimum per processor; Windows Server carries an eight-core minimum per processor and sixteen per server. So the shape of the fleet is decided by what is licensed, not by what is fastest, and the licensed workloads want few fast cores on a machine of their own.</p>
+    <p class="blab">The runbook</p>
+    <ol class="steps"><li class="step"><button class="sdone" aria-label="Mark step 1 done">01</button><div class="stext">Split the requirement into licensed and unlicensed workloads before choosing anything. These are two different fleets that happen to arrive on the same delivery.</div></li><li class="step"><button class="sdone" aria-label="Mark step 2 done">02</button><div class="stext">For the unlicensed majority, pick the cheapest core that meets the clock floor your latency-sensitive services need. One socket is usually right for a Kubernetes node; two sockets earn their place only for memory capacity or PCIe lanes, not for core count.</div></li><li class="step"><button class="sdone" aria-label="Mark step 3 done">03</button><div class="stext">For the licensed workloads, invert the question. Choose the smallest core count that clears the performance requirement and the highest clock available at that count, then check the per-server minimums, which frequently make a small machine cost the same as a medium one.</div></li><li class="step"><button class="sdone" aria-label="Mark step 4 done">04</button><div class="stext">Price the generation behind the current one. It is worth buying when the discount exceeds the performance-per-watt gap over three years of electricity, and on a site where you now pay the power bill directly that calculation is different from the one the cloud made for you.</div></li><li class="step"><button class="sdone" aria-label="Mark step 5 done">05</button><div class="stext">Get the licensing position in writing before the order goes anywhere. Ask the specific question — how many licences does this exact configuration require — and keep the answer. Verbal reassurance from a reseller is not a defence in an audit.</div></li><li class="step"><button class="sdone" aria-label="Mark step 6 done">06</button><div class="stext">Publish the two fleet shapes with their cost per core and their cost per licensed core side by side. The second number is the one that changes minds.</div></li></ol>
+    <div class="rollback"><b>Rollback</b><p>A choice of part is reversed by choosing a different one, at no cost, right up until Move 20 turns it into an order. The point of no return is that signature: after it, a licensing error is a bill rather than a revision. Keep the benchmark data, the vendor quotes and the written licensing position in source control, so the reasoning can be restored and re-argued when somebody asks in eighteen months why the estate is shaped like this.</p></div>
+    <p class="blab">Operator&rsquo;s notes</p>
+    <div class="notes"><div class="note"><b>Swap</b><p>Where a licensed database is the only reason for an expensive shape, price migrating it off that engine instead. Sometimes the licence is the migration, and the hardware question disappears.</p></div><div class="note"><b>Do it faster</b><p>Ask two vendors to quote the same requirement rather than the same configuration. They will each propose a different part and the gap between them is the information you wanted.</p></div><div class="note"><b>Watch out</b><p>Core factors and minimums change between contract versions. The position that held for your last renewal may not hold for the estate you are about to build.</p></div><div class="note"><b>Leftovers</b><p>Licences already bought against cloud instances may or may not carry to hardware you own. Establish that now, because it is worth more than the servers.</p></div></div>
+    <p class="blab">The numbers</p>
+    <div class="figs"><div><b>—</b><span>Was</span></div><div><b>—</b><span>Now</span></div><div><b>—</b><span>Saved</span></div><div><b>0 min</b><span>Cutover</span></div><div><b>5 days</b><span>Effort</span></div><div><b>2 weeks</b><span>Wait</span></div></div>
+    <p class="turnoff"><b>What you can turn off</b>Nothing yet, but the licensing audit this Move forces has been known to find entitlements already paid for and never deployed.</p>
+  </div>
+  <aside>
+    <p class="blab" style="margin-top:0">Before you start</p>
+    <p class="pre-h">Access</p><ul class="prelist"><li><label><input type="checkbox"><span>The derated core requirement from Move 02, and the non-production requirement from Move 03</span></label></li><li><label><input type="checkbox"><span>Your current licence entitlements, in writing, from whoever holds the contracts</span></label></li></ul><p class="pre-h">Software</p><ul class="prelist"><li><label><input type="checkbox"><span>Benchmark results for the candidate parts on something that resembles your workload, not a synthetic score</span></label></li><li><label><input type="checkbox"><span>A three-year power price for the site you expect to use, even if the site is not chosen yet</span></label></li></ul><p class="pre-h">People</p><ul class="prelist"><li><label><input type="checkbox"><span>Someone from procurement or legal who can get a licensing position confirmed in writing rather than assumed</span></label></li></ul>
+    <p class="pre-h">Needs first</p><div class="deplist"><a href="what-a-vcpu-is-actually-worth.html"><i style="color:#474F57">02</i><span>What a vCPU is actually worth</span></a></div><p class="pnote">These must be finished before step one.</p>
+    <p class="pre-h">Unlocks</p><div class="deplist"><a href="smt-numa-and-the-workload-that-notices.html"><i style="color:#474F57">05</i><span>SMT, NUMA, and the workload that notices</span></a><a href="memory-is-what-runs-out-first.html"><i style="color:#474F57">06</i><span>Memory is what runs out first</span></a><a href="one-rack-unit-or-two-and-the-watts-it-draws.html"><i style="color:#474F57">07</i><span>One rack unit or two, and the watts it draws</span></a></div><p class="pnote">These become possible once this Move is done.</p>
+  </aside>
+  </div>
+
+  <nav class="mvnav">
+    <a href="the-estate-nobody-sizes.html"><b>Previous</b>03 &middot; The estate nobody sizes</a>
+    <a href="smt-numa-and-the-workload-that-notices.html" style="text-align:right"><b>Next</b>05 &middot; SMT, NUMA, and the workload that notices</a>
+  </nav>
+</main></div>
+<footer class="foot"><p class="ft">Back to Metal</p><p>Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves’ own effort figures and the dependency graph, not asserted. Prices are public list rates observed while writing and will drift. <a href="../rollback.html">Read the rollback page</a> before running anything.</p><p>By the makers of OneUptime &mdash; <a href="https://oneuptime.com">oneuptime.com</a>, an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Part VII, and the interest is declared on the <a href="../about.html">about page</a>.</p><p>Open source. The Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> — software MIT, text CC BY 4.0. <span class="ver">v0.1.0</span></p></footer>
+<script src="../assets/app.js?v=0.1.0" defer></script>
+</body>
+</html>

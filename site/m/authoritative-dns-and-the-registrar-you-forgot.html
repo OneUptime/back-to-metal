@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>104 · Authoritative DNS, and the registrar you forgot - Back to Metal</title>
+<meta name="description" content="Moves the zone to a managed anycast provider and dual-serves for the parent TLD's NS TTL, because the recovery path needs DNS too.">
+<meta name="theme-color" content="#0A0C0D">
+<link rel="stylesheet" href="../assets/style.css?v=0.1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="mast"><div class="mast-in"><a class="wordmark d" href="../index.html">Back to<br><em>Metal</em></a><div class="mast-sub"><p>A step-by-step roadmap off AWS, Google Cloud or Azure and onto Kubernetes you run on hardware you control. Every Move states its downtime, its risk and the way back.</p></div></div><div class="edition"><span>v0.1.0</span><span><b>122</b> Moves</span><span><b>7</b> Parts</span><span><b>975</b> person-days</span><span><b>242</b> weeks at 3</span><span><b>110</b> at zero downtime</span><span>AWS &middot; Google Cloud &middot; Azure</span><span><a href="https://oneuptime.com" style="color:inherit">By the makers of OneUptime</a></span></div></header>
+<nav class="nav"><a href="../index.html">Start here</a><a href="../roadmap.html">Roadmap</a><a href="../plan.html">Plan yours</a><a href="../kit.html">Kit</a><a href="../rollback.html">Rollback</a><a href="../replaces.html">What replaces what</a><a href="../about.html">About</a><a class="sp" href="../Back-to-Metal.pdf" download>PDF</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav>
+<div class="shell">
+<aside class="rail"><a href="../index.html#iron" style="--c:#474F57"><div class="r-n">Stage 1</div><div class="r-t">Work out what to buy</div><div class="r-w">01&ndash;20 &middot; Iron</div></a><a href="../index.html#site" style="--c:#6B5344"><div class="r-n">Stage 2</div><div class="r-t">Find somewhere to put it</div><div class="r-w">21&ndash;38 &middot; Site</div></a><a href="../index.html#cluster" style="--c:#1F4E79"><div class="r-n">Stage 3</div><div class="r-t">Build the cluster</div><div class="r-w">39&ndash;54 &middot; Cluster</div></a><a href="../index.html#platform" style="--c:#4B3F8F"><div class="r-n">Stage 4</div><div class="r-t">Make it fit to run production</div><div class="r-w">55&ndash;70 &middot; Platform</div></a><a href="../index.html#data" style="--c:#A32E1F"><div class="r-n">Stage 5</div><div class="r-t">Move the data</div><div class="r-w">71&ndash;90 &middot; Data</div></a><a class="on" href="../index.html#edge" style="--c:#14655A"><div class="r-n">Stage 6</div><div class="r-t">Move the traffic</div><div class="r-w">91&ndash;107 &middot; Edge</div></a><a href="../index.html#watch" style="--c:#8A6112"><div class="r-n">Stage 7</div><div class="r-t">Run it, and close the account</div><div class="r-w">108&ndash;122 &middot; Watch</div></a></aside>
+<main class="main" style="--c:#14655A">
+  <div class="mv-head">
+    <div class="mv-n">104</div>
+    <h1 class="d">Authoritative DNS, and the registrar you forgot</h1>
+    <div class="mv-spec">
+      <div><div class="k">Part</div><div class="v">
+        <span style="color:#14655A"><svg class="ico" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 1.8v3.4M12 18.8v3.4M1.8 12h3.4M18.8 12h3.4"/><path d="M4.8 4.8l2.4 2.4M16.8 16.8l2.4 2.4M19.2 4.8l-2.4 2.4M7.2 16.8l-2.4 2.4"/></svg></span>
+        EDGE</div></div>
+      <div><div class="k">Leaving</div><div class="v">Managed authoritative DNS and provider-integrated registrars</div></div>
+      <div><div class="k">Risk</div><div class="v">
+        <svg class="ico" viewBox="0 0 13.4 14" height="1em" width="1em" style="width:auto" aria-hidden="true"><rect x="0" y="4" width="3.4" height="6" fill="currentColor"/><rect x="5" y="2" width="3.4" height="10" fill="currentColor"/><rect x="10" y="0" width="3.4" height="14" fill="currentColor"/></svg>HIGH</div></div>
+      <div><div class="k">Cutover</div><div class="v">0 MIN</div></div>
+      <div><div class="k">Back out for</div><div class="v">
+        7 DAYS</div></div>
+      <div><div class="k">Roadmap</div><div class="v">WEEK 208</div></div>
+    </div>
+    <p class="hook">Moves the zone to a managed anycast provider and dual-serves for the parent TLD's NS TTL, because the recovery path needs DNS too.</p>
+  </div>
+
+  <p class="blab">Leaving from</p>
+  <div class="orow"><span class="oc">AWS</span><span class="os">Route 53 with its own registrar</span><span class="on">the provider is also the registrar, so both have to be considered together.</span></div><div class="orow"><span class="oc">Google Cloud</span><span class="os">Cloud DNS</span><span class="on">the provider exited domain registration and handed its customers to a third party, so the registrar is already somewhere else.</span></div><div class="orow"><span class="oc">Azure</span><span class="os">Azure DNS with App Service domains</span><span class="on">a partner registrar fronted under the provider's own name, which is the case people forget entirely.</span></div>
+
+  <div class="two">
+  <div>
+    <p class="blab">Why this works</p>
+    <p class="why">Name resolution is the one service that has to work when everything else does not, which is why this Move moves the zone to a managed anycast provider rather than to nameservers you run. Running your own is refused here, and deliberately: a recovery path that depends on your own infrastructure resolving your own names has a circular dependency in exactly the situation you built it for. The transition is a dual-serving window at least as long as the parent zone's nameserver lifetime, during which every edit is applied to both sides — a discipline that is simple to state and easy to break.</p>
+    <p class="blab">The runbook</p>
+    <ol class="steps"><li class="step"><button class="sdone" aria-label="Mark step 1 done">01</button><div class="stext">Find the registrar before anything else. One provider is its own registrar, one exited registration and handed customers to a third party, and one fronts a partner under its own name. Establish which you have and who can log in.</div></li><li class="step"><button class="sdone" aria-label="Mark step 2 done">02</button><div class="stext">Export the zone and import it, then compare record by record rather than by count. Records created by automation are the ones that go missing.</div></li><li class="step"><button class="sdone" aria-label="Mark step 3 done">03</button><div class="stext">Deal with the apex record. A name at the zone apex cannot be a normal alias, so providers implement flattening differently, and the behaviour you rely on may not exist on the other side.</div></li><li class="step"><button class="sdone" aria-label="Mark step 4 done">04</button><div class="stext">Reproduce or retire the routing features. Latency and geography routing keyed to cloud regions is keyed to regions that will not exist much longer, and health-check-driven failover has to be rebuilt against endpoints you now own.</div></li><li class="step"><button class="sdone" aria-label="Mark step 5 done">05</button><div class="stext">Repoint the cluster's record publisher at the new provider so automation keeps working, and confirm it can create and delete records.</div></li><li class="step"><button class="sdone" aria-label="Mark step 6 done">06</button><div class="stext">Add the new nameservers at the registrar and dual-serve for at least the parent zone's nameserver lifetime, which is typically a day or two. Every edit during the window is applied to both sides, without exception.</div></li><li class="step"><button class="sdone" aria-label="Mark step 7 done">07</button><div class="stext">Move the certificate challenge delegation from Move 97 with the zone, or issuance stops working the moment the old provider is removed.</div></li></ol>
+    <div class="rollback"><b>Rollback</b><p>For seven days both providers serve the zone, so reverting is removing the new nameservers at the registrar. The point of no return is the deletion of the old hosted zone, after which the record set exists only in your export — so keep that export in source control and confirm it can be restored into a new zone before deleting anything. The registration itself stays where it is; this Move does not move it.</p></div>
+    <p class="blab">Operator&rsquo;s notes</p>
+    <div class="notes"><div class="note"><b>Swap</b><p>Two managed anycast providers serving the same zone is a genuinely good permanent arrangement for anyone whose availability requirement justifies it, and it costs very little.</p></div><div class="note"><b>Do it faster</b><p>Import the zone and dual-serve weeks before you need to, then take your time verifying. Nothing forces the removal of the old provider on a schedule.</p></div><div class="note"><b>Watch out</b><p>An edit applied to one side during the dual-serving window produces answers that differ depending on which nameserver a resolver picked, which is the hardest class of fault to diagnose because it is intermittent by design.</p></div><div class="note"><b>Leftovers</b><p>The old hosted zone bills per zone and per million queries, and queries continue for a long time after the nameservers change.</p></div></div>
+    <p class="blab">The numbers</p>
+    <div class="figs"><div><b>$180/mo</b><span>Was</span></div><div><b>$30/mo</b><span>Now</span></div><div><b>83%</b><span>Saved</span></div><div><b>0 min</b><span>Cutover</span></div><div><b>1 week</b><span>Effort</span></div><div><b>7 days</b><span>Wait</span></div></div>
+    <p class="turnoff"><b>What you can turn off</b>The old hosted zone, seven days after the nameservers changed and the query count there has fallen to nothing.</p>
+  </div>
+  <aside>
+    <p class="blab" style="margin-top:0">Before you start</p>
+    <p class="pre-h">Access</p><ul class="prelist"><li><label><input type="checkbox"><span>Administrative access to the registrar, which is frequently held by one person who left</span></label></li><li><label><input type="checkbox"><span>A zone export from the current provider, including the records created by automation</span></label></li></ul><p class="pre-h">Software</p><ul class="prelist"><li><label><input type="checkbox"><span>A managed anycast DNS provider, with the zone imported and verified record by record</span></label></li><li><label><input type="checkbox"><span>The cluster's record publisher repointed, so automation keeps writing to the right place</span></label></li></ul><p class="pre-h">People</p><ul class="prelist"><li><label><input type="checkbox"><span>Whoever holds the registrar account, because changing nameservers happens there and nowhere else</span></label></li></ul>
+    <p class="pre-h">Needs first</p><div class="deplist"><a href="tls-off-the-managed-certificate-service.html"><i style="color:#14655A">97</i><span>TLS off the managed certificate service</span></a><a href="go-live-the-soak-the-freeze-and-how-you-abort.html"><i style="color:#14655A">103</i><span>Go-live: the soak, the freeze, and how you abort</span></a></div><p class="pnote">These must be finished before step one.</p>
+    <p class="pre-h">Unlocks</p><div class="deplist"><a href="cdn-change-vendor-not-model.html"><i style="color:#14655A">105</i><span>CDN: change vendor, not model</span></a><a href="email-inbound-comes-home-outbound-does-not.html"><i style="color:#14655A">107</i><span>Email: inbound comes home, outbound does not</span></a></div><p class="pnote">These become possible once this Move is done.</p>
+  </aside>
+  </div>
+
+  <nav class="mvnav">
+    <a href="go-live-the-soak-the-freeze-and-how-you-abort.html"><b>Previous</b>103 &middot; Go-live: the soak, the freeze, and how you abort</a>
+    <a href="cdn-change-vendor-not-model.html" style="text-align:right"><b>Next</b>105 &middot; CDN: change vendor, not model</a>
+  </nav>
+</main></div>
+<footer class="foot"><p class="ft">Back to Metal</p><p>Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves’ own effort figures and the dependency graph, not asserted. Prices are public list rates observed while writing and will drift. <a href="../rollback.html">Read the rollback page</a> before running anything.</p><p>By the makers of OneUptime &mdash; <a href="https://oneuptime.com">oneuptime.com</a>, an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Part VII, and the interest is declared on the <a href="../about.html">about page</a>.</p><p>Open source. The Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> — software MIT, text CC BY 4.0. <span class="ver">v0.1.0</span></p></footer>
+<script src="../assets/app.js?v=0.1.0" defer></script>
+</body>
+</html>

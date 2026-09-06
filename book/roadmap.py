@@ -234,7 +234,7 @@ def svg(moves, workers=3, w=1180, week=WEEK, href=None):
         items = sorted(({'n': m['num'], 's': sc['start'][m['num']],
                          'f': sc['finish'][m['num']], 't': m['title']}
                         for m in moves if m['layer'] == s_['layer']),
-                       key=lambda i: (i['s'], i['n']))
+                       key=lambda i: (i['s'], int(i['n'])))
         lanes = _lanes(items)
         h = len(lanes) * (ROW + LANE) - LANE
         bands.append((s_, y, h, lanes))

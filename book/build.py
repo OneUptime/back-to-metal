@@ -149,7 +149,7 @@ def cover_front_html(moves):
             break
         if len(m['title']) <= FITS and m['num'] not in seen:
             picks.append(m); seen.add(m['num'])
-    SHOWCASE = [m['num'] for m in sorted(picks, key=lambda x: x['num'])]
+    SHOWCASE = [m['num'] for m in sorted(picks, key=lambda x: int(x['num']))]
     # A jacket list wants at least six entries to read as a list. Scaled against
     # the book so a small build - a smoke test, or a single Part rendered on its
     # own - does not trip a check aimed at a finished one.

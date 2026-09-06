@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>75 · Quorum commit and fencing, after the restore was proven - Back to Metal</title>
+<meta name="description" content="Replaces the managed failover checkbox with quorum commit, and says plainly that only fencing gives safety.">
+<meta name="theme-color" content="#0A0C0D">
+<link rel="stylesheet" href="../assets/style.css?v=0.1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="mast"><div class="mast-in"><a class="wordmark d" href="../index.html">Back to<br><em>Metal</em></a><div class="mast-sub"><p>A step-by-step roadmap off AWS, Google Cloud or Azure and onto Kubernetes you run on hardware you control. Every Move states its downtime, its risk and the way back.</p></div></div><div class="edition"><span>v0.1.0</span><span><b>122</b> Moves</span><span><b>7</b> Parts</span><span><b>975</b> person-days</span><span><b>242</b> weeks at 3</span><span><b>110</b> at zero downtime</span><span>AWS &middot; Google Cloud &middot; Azure</span><span><a href="https://oneuptime.com" style="color:inherit">By the makers of OneUptime</a></span></div></header>
+<nav class="nav"><a href="../index.html">Start here</a><a href="../roadmap.html">Roadmap</a><a href="../plan.html">Plan yours</a><a href="../kit.html">Kit</a><a href="../rollback.html">Rollback</a><a href="../replaces.html">What replaces what</a><a href="../about.html">About</a><a class="sp" href="../Back-to-Metal.pdf" download>PDF</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav>
+<div class="shell">
+<aside class="rail"><a href="../index.html#iron" style="--c:#474F57"><div class="r-n">Stage 1</div><div class="r-t">Work out what to buy</div><div class="r-w">01&ndash;20 &middot; Iron</div></a><a href="../index.html#site" style="--c:#6B5344"><div class="r-n">Stage 2</div><div class="r-t">Find somewhere to put it</div><div class="r-w">21&ndash;38 &middot; Site</div></a><a href="../index.html#cluster" style="--c:#1F4E79"><div class="r-n">Stage 3</div><div class="r-t">Build the cluster</div><div class="r-w">39&ndash;54 &middot; Cluster</div></a><a href="../index.html#platform" style="--c:#4B3F8F"><div class="r-n">Stage 4</div><div class="r-t">Make it fit to run production</div><div class="r-w">55&ndash;70 &middot; Platform</div></a><a class="on" href="../index.html#data" style="--c:#A32E1F"><div class="r-n">Stage 5</div><div class="r-t">Move the data</div><div class="r-w">71&ndash;90 &middot; Data</div></a><a href="../index.html#edge" style="--c:#14655A"><div class="r-n">Stage 6</div><div class="r-t">Move the traffic</div><div class="r-w">91&ndash;107 &middot; Edge</div></a><a href="../index.html#watch" style="--c:#8A6112"><div class="r-n">Stage 7</div><div class="r-t">Run it, and close the account</div><div class="r-w">108&ndash;122 &middot; Watch</div></a></aside>
+<main class="main" style="--c:#A32E1F">
+  <div class="mv-head">
+    <div class="mv-n">75</div>
+    <h1 class="d">Quorum commit and fencing, after the restore was proven</h1>
+    <div class="mv-spec">
+      <div><div class="k">Part</div><div class="v">
+        <span style="color:#A32E1F"><svg class="ico" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.6" rx="7.6" ry="2.9"/><path d="M4.4 5.6v12.8c0 1.6 3.4 2.9 7.6 2.9s7.6-1.3 7.6-2.9V5.6"/><path d="M4.4 12c0 1.6 3.4 2.9 7.6 2.9s7.6-1.3 7.6-2.9"/></svg></span>
+        DATA</div></div>
+      <div><div class="k">Leaving</div><div class="v">Managed multi-zone database failover</div></div>
+      <div><div class="k">Risk</div><div class="v">
+        <svg class="ico" viewBox="0 0 13.4 14" height="1em" width="1em" style="width:auto" aria-hidden="true"><rect x="0" y="4" width="3.4" height="6" fill="currentColor"/><rect x="5" y="2" width="3.4" height="10" fill="currentColor"/><rect x="10" y="0" width="3.4" height="14" fill="currentColor"/></svg>HIGH</div></div>
+      <div><div class="k">Cutover</div><div class="v">2 MIN</div></div>
+      <div><div class="k">Back out for</div><div class="v">
+        IMMEDIATELY</div></div>
+      <div><div class="k">Roadmap</div><div class="v">WEEK 141</div></div>
+    </div>
+    <p class="hook">Replaces the managed failover checkbox with quorum commit, and says plainly that only fencing gives safety.</p>
+  </div>
+
+  <p class="blab">Leaving from</p>
+  <div class="orow"><span class="oc">AWS</span><span class="os">RDS Multi-AZ</span><span class="on">a checkbox that doubled the price and handled failover without ever telling you how.</span></div><div class="orow"><span class="oc">Google Cloud</span><span class="os">Cloud SQL high availability</span><span class="on">the same checkbox with the same opacity and the same doubling.</span></div><div class="orow"><span class="oc">Azure</span><span class="os">Flexible Server zone-redundant high availability</span><span class="on">the same again, with the zone mapping being per-subscription and therefore worth checking.</span></div>
+
+  <div class="two">
+  <div>
+    <p class="blab">Why this works</p>
+    <p class="why">The managed checkbox did two different things and never distinguished them: it kept a second copy current, and it decided when to promote it. Quorum commit gives you the first — a write is not acknowledged until enough replicas hold it — and it is durability, not consensus. It cannot by itself stop a partitioned old primary from continuing to accept writes. That is what fencing does, and it is the part almost everyone omits, which is why it is named in this Move's title. This runs only after Move 74 has proven a restore, because building automatic failover before the recovery path works inverts the principle the previous Move exists to establish.</p>
+    <p class="blab">The runbook</p>
+    <ol class="steps"><li class="step"><button class="sdone" aria-label="Mark step 1 done">01</button><div class="stext">Confirm Move 74's restore has been performed and timed. This is a gate: automatic failover in front of an unproven recovery path is a mechanism for turning one bad night into two.</div></li><li class="step"><button class="sdone" aria-label="Mark step 2 done">02</button><div class="stext">Place the members across the failure domains labelled in Move 42. Three replicas on three machines that share a switch is one failure domain with extra replication traffic.</div></li><li class="step"><button class="sdone" aria-label="Mark step 3 done">03</button><div class="stext">Configure quorum commit explicitly, naming how many replicas must acknowledge, and set the commit behaviour honestly. A configuration that acknowledges before any replica has the data is faster and is not what you think you bought.</div></li><li class="step"><button class="sdone" aria-label="Mark step 4 done">04</button><div class="stext">Configure fencing and test it. Quorum commit is durability; fencing is what stops a partitioned old primary from accepting writes that will be lost. Without it, the configuration is safe against machine loss and unsafe against network partition, which is the more common failure.</div></li><li class="step"><button class="sdone" aria-label="Mark step 5 done">05</button><div class="stext">Kill the primary deliberately, during business hours, with people watching. Measure the promotion time, watch the application reconnect, and confirm the old primary does not accept a single write after it is fenced.</div></li><li class="step"><button class="sdone" aria-label="Mark step 6 done">06</button><div class="stext">Write down what the two minutes consist of — detection, promotion, reconnection — so that the number is understood rather than quoted.</div></li><li class="step"><button class="sdone" aria-label="Mark step 7 done">07</button><div class="stext">Do not attempt quorum across sites. Move 24 already declined the second site, and Move 115 settles the recovery question against a measured rebuild time instead.</div></li></ol>
+    <div class="rollback"><b>Rollback</b><p>The configuration is reverted to a single primary in a minute, so this Move is reversible immediately, and the data is untouched because nothing here moves it. There is no point of no return, and if a promotion does go wrong the way back is the proven restore from Move 74 rather than anything in this Move. The real risk is the opposite: enabling automatic promotion without fencing, which is safe until the first partition and then loses writes. Keep the configuration and the failover drill results in source control, and re-run the drill after every upgrade in Move 108, because failover behaviour is exactly the kind of thing a minor version changes quietly.</p></div>
+    <p class="blab">Operator&rsquo;s notes</p>
+    <div class="notes"><div class="note"><b>Swap</b><p>Where two minutes of unavailability is genuinely unacceptable, the answer is connection-level retry and a queue in front, not a cleverer failover. Applications that survive a failover are applications that expected one.</p></div><div class="note"><b>Do it faster</b><p>Test the failover on the second cluster first, several times, including the partition case. It is the only way to see the fencing work.</p></div><div class="note"><b>Watch out</b><p>Synchronous replication to a replica that is slow makes every write slow. Quorum with more replicas than required is what stops one degraded machine from becoming a performance incident.</p></div><div class="note"><b>Leftovers</b><p>The managed high-availability tier can be turned off on the source, halving that bill immediately, once Move 73 has cut over and the week has passed.</p></div></div>
+    <p class="blab">The numbers</p>
+    <div class="figs"><div><b>$2,090/mo</b><span>Was</span></div><div><b>$0/mo</b><span>Now</span></div><div><b>100%</b><span>Saved</span></div><div><b>2 min</b><span>Cutover</span></div><div><b>1 week</b><span>Effort</span></div><div><b>—</b><span>Wait</span></div></div>
+    <p class="turnoff"><b>What you can turn off</b>The managed high-availability tier on the source instance, which is usually half its cost, once the cutover week from Move 73 has passed.</p>
+  </div>
+  <aside>
+    <p class="blab" style="margin-top:0">Before you start</p>
+    <p class="pre-h">Access</p><ul class="prelist"><li><label><input type="checkbox"><span>A proven restore from Move 74, timed and verified, because that is the gate on this Move</span></label></li><li><label><input type="checkbox"><span>The failure-domain labels from Move 42, so the replicas are placed across real racks</span></label></li></ul><p class="pre-h">Software</p><ul class="prelist"><li><label><input type="checkbox"><span>The operator's quorum configuration, written explicitly rather than left at a default</span></label></li><li><label><input type="checkbox"><span>A fencing mechanism configured and tested, not merely available</span></label></li></ul><p class="pre-h">People</p><ul class="prelist"><li><label><input type="checkbox"><span>Somebody from the on-call rota watching the deliberate failover, because this is the behaviour they will meet at night</span></label></li></ul>
+    <p class="pre-h">Needs first</p><div class="deplist"><a href="netboot-node-identity-and-failure-domain-labels.html"><i style="color:#1F4E79">42</i><span>Netboot, node identity and failure-domain labels</span></a><a href="postgres-onto-your-own-disks.html"><i style="color:#A32E1F">73</i><span>Postgres onto your own disks</span></a><a href="point-in-time-recovery-with-pgbackrest.html"><i style="color:#A32E1F">74</i><span>Point-in-time recovery with pgBackRest</span></a></div><p class="pnote">These must be finished before step one.</p>
+    
+  </aside>
+  </div>
+
+  <nav class="mvnav">
+    <a href="point-in-time-recovery-with-pgbackrest.html"><b>Previous</b>74 &middot; Point-in-time recovery with pgBackRest</a>
+    <a href="the-proprietary-postgres-engines-the-exit-is-a-stream.html" style="text-align:right"><b>Next</b>76 &middot; The proprietary Postgres engines: the exit is a stream</a>
+  </nav>
+</main></div>
+<footer class="foot"><p class="ft">Back to Metal</p><p>Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves’ own effort figures and the dependency graph, not asserted. Prices are public list rates observed while writing and will drift. <a href="../rollback.html">Read the rollback page</a> before running anything.</p><p>By the makers of OneUptime &mdash; <a href="https://oneuptime.com">oneuptime.com</a>, an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Part VII, and the interest is declared on the <a href="../about.html">about page</a>.</p><p>Open source. The Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> — software MIT, text CC BY 4.0. <span class="ver">v0.1.0</span></p></footer>
+<script src="../assets/app.js?v=0.1.0" defer></script>
+</body>
+</html>

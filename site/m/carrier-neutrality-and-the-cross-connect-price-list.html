@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>26 · Carrier neutrality and the cross-connect price list - Back to Metal</title>
+<meta name="description" content="Counts the carriers that will sell at your volume and prices every cross-connect you will need across three years against the facility's own list.">
+<meta name="theme-color" content="#0A0C0D">
+<link rel="stylesheet" href="../assets/style.css?v=0.1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="mast"><div class="mast-in"><a class="wordmark d" href="../index.html">Back to<br><em>Metal</em></a><div class="mast-sub"><p>A step-by-step roadmap off AWS, Google Cloud or Azure and onto Kubernetes you run on hardware you control. Every Move states its downtime, its risk and the way back.</p></div></div><div class="edition"><span>v0.1.0</span><span><b>122</b> Moves</span><span><b>7</b> Parts</span><span><b>975</b> person-days</span><span><b>242</b> weeks at 3</span><span><b>110</b> at zero downtime</span><span>AWS &middot; Google Cloud &middot; Azure</span><span><a href="https://oneuptime.com" style="color:inherit">By the makers of OneUptime</a></span></div></header>
+<nav class="nav"><a href="../index.html">Start here</a><a href="../roadmap.html">Roadmap</a><a href="../plan.html">Plan yours</a><a href="../kit.html">Kit</a><a href="../rollback.html">Rollback</a><a href="../replaces.html">What replaces what</a><a href="../about.html">About</a><a class="sp" href="../Back-to-Metal.pdf" download>PDF</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav>
+<div class="shell">
+<aside class="rail"><a href="../index.html#iron" style="--c:#474F57"><div class="r-n">Stage 1</div><div class="r-t">Work out what to buy</div><div class="r-w">01&ndash;20 &middot; Iron</div></a><a class="on" href="../index.html#site" style="--c:#6B5344"><div class="r-n">Stage 2</div><div class="r-t">Find somewhere to put it</div><div class="r-w">21&ndash;38 &middot; Site</div></a><a href="../index.html#cluster" style="--c:#1F4E79"><div class="r-n">Stage 3</div><div class="r-t">Build the cluster</div><div class="r-w">39&ndash;54 &middot; Cluster</div></a><a href="../index.html#platform" style="--c:#4B3F8F"><div class="r-n">Stage 4</div><div class="r-t">Make it fit to run production</div><div class="r-w">55&ndash;70 &middot; Platform</div></a><a href="../index.html#data" style="--c:#A32E1F"><div class="r-n">Stage 5</div><div class="r-t">Move the data</div><div class="r-w">71&ndash;90 &middot; Data</div></a><a href="../index.html#edge" style="--c:#14655A"><div class="r-n">Stage 6</div><div class="r-t">Move the traffic</div><div class="r-w">91&ndash;107 &middot; Edge</div></a><a href="../index.html#watch" style="--c:#8A6112"><div class="r-n">Stage 7</div><div class="r-t">Run it, and close the account</div><div class="r-w">108&ndash;122 &middot; Watch</div></a></aside>
+<main class="main" style="--c:#6B5344">
+  <div class="mv-head">
+    <div class="mv-n">26</div>
+    <h1 class="d">Carrier neutrality and the cross-connect price list</h1>
+    <div class="mv-spec">
+      <div><div class="k">Part</div><div class="v">
+        <span style="color:#6B5344"><svg class="ico" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20.6V8.4l7.2-3.8 7.2 3.8v12.2"/><path d="M1.6 20.6h20.8"/><path d="M8.2 20.6v-5.2h4.4v5.2"/><path d="M18.4 20.6v-7.4h3.2v7.4"/><path d="M7.4 10.4h1.2M12 10.4h1.2"/></svg></span>
+        SITE</div></div>
+      <div><div class="k">Leaving</div><div class="v">—</div></div>
+      <div><div class="k">Risk</div><div class="v">
+        <svg class="ico" viewBox="0 0 13.4 14" height="1em" width="1em" style="width:auto" aria-hidden="true"><rect x="0" y="4" width="3.4" height="6" fill="currentColor"/><rect x="5" y="2" width="3.4" height="10" fill="currentColor"/><rect x="10" y="0" width="3.4" height="14" fill="currentColor" fill-opacity="0.22"/></svg>MEDIUM</div></div>
+      <div><div class="k">Cutover</div><div class="v">0 MIN</div></div>
+      <div><div class="k">Back out for</div><div class="v">
+        IMMEDIATELY</div></div>
+      <div><div class="k">Roadmap</div><div class="v">WEEK 49</div></div>
+    </div>
+    <p class="hook">Counts the carriers that will sell at your volume and prices every cross-connect you will need across three years against the facility's own list.</p>
+  </div>
+
+  <p class="blab">Leaving from</p>
+  <div class="orow"><span class="oc">AWS</span><span class="os">Direct Connect</span><span class="on">a port you ordered through a console, with the physical cross-connect ordered separately and forgotten about.</span></div><div class="orow"><span class="oc">Google Cloud</span><span class="os">Cloud Interconnect</span><span class="on">the same shape, with a dedicated and a partner variant, and the partner one hiding the physical layer completely.</span></div><div class="orow"><span class="oc">Azure</span><span class="os">ExpressRoute</span><span class="on">again a logical circuit, and again a cross-connect underneath it that somebody had to order in a building.</span></div>
+
+  <div class="two">
+  <div>
+    <p class="blab">Why this works</p>
+    <p class="why">Carrier neutral is a marketing term that means the facility will let other people's fibre into the building. What matters is narrower: which carriers have live fibre in the meet-me room today, and which of those will sell to a customer of your size. The second list is always much shorter than the first. Underneath that sits a price list nobody quotes in the headline number — a cross-connect is commonly fifty to three hundred and fifty dollars a month each, plus installation, recurring forever, and outside the cabinet price. You will need more of them than you think.</p>
+    <p class="blab">The runbook</p>
+    <ol class="steps"><li class="step"><button class="sdone" aria-label="Mark step 1 done">01</button><div class="stext">Ask for the list of carriers with live fibre in the meet-me room. Then ask each of them, separately, whether they will sell at your committed volume. This is the list that matters and it is usually three or four names rather than thirty.</div></li><li class="step"><button class="sdone" aria-label="Mark step 2 done">02</button><div class="stext">Count every cross-connect you will need over three years: two transit providers, a peering fabric port, the private interconnect back to the cloud you are leaving, and one per additional cabinet. Missing any of these turns a monthly number into a surprise.</div></li><li class="step"><button class="sdone" aria-label="Mark step 3 done">03</button><div class="stext">Price them against the facility's own list, with installation and disconnection charges included. Ask specifically whether the price is per connection or per pair, because the two conventions differ by a factor of two.</div></li><li class="step"><button class="sdone" aria-label="Mark step 4 done">04</button><div class="stext">Negotiate the cross-connect cost inside the facility agreement rather than afterwards. It is the line facilities are most willing to move, and once the contract is signed it is the line they are least willing to move.</div></li><li class="step"><button class="sdone" aria-label="Mark step 5 done">05</button><div class="stext">Time the cloud on-ramp paperwork properly. The authorisation letter and connecting facility assignment that a cloud provider issues expires after ninety days if the cross-connect has not been completed, so it is ordered when the cabinet is ready and not when the contract is signed.</div></li><li class="step"><button class="sdone" aria-label="Mark step 6 done">06</button><div class="stext">Record which carrier terminates in which position, because Move 37 will need it and Move 93 will order transit against it.</div></li></ol>
+    <div class="rollback"><b>Rollback</b><p>Nothing is committed until the facility contract is signed in Move 30 and the first cross-connect is ordered. Cancelling an ordered cross-connect before installation is usually free and after it is usually a disconnection fee. The point of no return, such as it is, is the installation itself, and it is small money. Keep the carrier list, the price list and the cross-connect plan in source control so the original commercial position can be restored when a renewal quotes different numbers.</p></div>
+    <p class="blab">Operator&rsquo;s notes</p>
+    <div class="notes"><div class="note"><b>Swap</b><p>Where a building has few carriers, a wavelength or dark fibre to a nearby carrier hotel can restore the choice. It costs more per month and it is better than being captive to one provider.</p></div><div class="note"><b>Do it faster</b><p>Ask the facility for a copy of a recent, redacted cross-connect invoice. It answers the per-connection question and several others in one document.</p></div><div class="note"><b>Watch out</b><p>Some facilities charge to disconnect as well as to install, and some require notice. Both belong in the exit runbook that Move 30 writes.</p></div><div class="note"><b>Leftovers</b><p>The cloud interconnect on the far side keeps billing until Part VI has moved the traffic and Part VII closes the account. Do not cancel it early to save a few hundred dollars.</p></div></div>
+    <p class="blab">The numbers</p>
+    <div class="figs"><div><b>—</b><span>Was</span></div><div><b>—</b><span>Now</span></div><div><b>—</b><span>Saved</span></div><div><b>0 min</b><span>Cutover</span></div><div><b>1 week</b><span>Effort</span></div><div><b>2 to 4 weeks</b><span>Wait</span></div></div>
+    <p class="turnoff"><b>What you can turn off</b>Nothing yet. The cloud interconnect stays until Part VI has moved the traffic across it.</p>
+  </div>
+  <aside>
+    <p class="blab" style="margin-top:0">Before you start</p>
+    <p class="pre-h">Access</p><ul class="prelist"><li><label><input type="checkbox"><span>The carrier list for the specific building, not the operator's national list</span></label></li><li><label><input type="checkbox"><span>The facility's cross-connect price list, in writing, including installation and disconnection charges</span></label></li></ul><p class="pre-h">Software</p><ul class="prelist"><li><label><input type="checkbox"><span>A three-year plan of every cross-connect the estate will need, drawn as a list rather than remembered</span></label></li><li><label><input type="checkbox"><span>The cloud provider's own documentation on how their authorisation and assignment paperwork expires</span></label></li></ul><p class="pre-h">People</p><ul class="prelist"><li><label><input type="checkbox"><span>Whoever will negotiate the facility contract in Move 30, because cross-connects belong in that negotiation</span></label></li></ul>
+    <p class="pre-h">Needs first</p><div class="deplist"><a href="the-four-places-the-machines-could-live.html"><i style="color:#6B5344">22</i><span>The four places the machines could live</span></a></div><p class="pnote">These must be finished before step one.</p>
+    <p class="pre-h">Unlocks</p><div class="deplist"><a href="committed-kilowatts-metered-kilowatts-and-the-derate.html"><i style="color:#6B5344">28</i><span>Committed kilowatts, metered kilowatts and the derate</span></a><a href="the-links-you-build-first-to-the-cloud-to-the-office.html"><i style="color:#1F4E79">53</i><span>The links you build first: to the cloud, to the office</span></a><a href="transit-two-upstreams-and-the-95th-percentile.html"><i style="color:#14655A">93</i><span>Transit: two upstreams and the 95th percentile</span></a></div><p class="pnote">These become possible once this Move is done.</p>
+  </aside>
+  </div>
+
+  <nav class="mvnav">
+    <a href="the-flood-plain-the-fault-line-and-the-grid.html"><b>Previous</b>25 &middot; The flood plain, the fault line and the grid</a>
+    <a href="what-a-tier-rating-promises-and-what-it-does-not.html" style="text-align:right"><b>Next</b>27 &middot; What a tier rating promises, and what it does not</a>
+  </nav>
+</main></div>
+<footer class="foot"><p class="ft">Back to Metal</p><p>Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves’ own effort figures and the dependency graph, not asserted. Prices are public list rates observed while writing and will drift. <a href="../rollback.html">Read the rollback page</a> before running anything.</p><p>By the makers of OneUptime &mdash; <a href="https://oneuptime.com">oneuptime.com</a>, an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Part VII, and the interest is declared on the <a href="../about.html">about page</a>.</p><p>Open source. The Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> — software MIT, text CC BY 4.0. <span class="ver">v0.1.0</span></p></footer>
+<script src="../assets/app.js?v=0.1.0" defer></script>
+</body>
+</html>

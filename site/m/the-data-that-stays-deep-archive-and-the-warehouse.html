@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>85 · The data that stays: deep archive and the warehouse - Back to Metal</title>
+<meta name="description" content="Keeps deep archive and the warehouse on the provider deliberately, and hardens the one account that holds the archive and the third backup copy.">
+<meta name="theme-color" content="#0A0C0D">
+<link rel="stylesheet" href="../assets/style.css?v=0.1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="mast"><div class="mast-in"><a class="wordmark d" href="../index.html">Back to<br><em>Metal</em></a><div class="mast-sub"><p>A step-by-step roadmap off AWS, Google Cloud or Azure and onto Kubernetes you run on hardware you control. Every Move states its downtime, its risk and the way back.</p></div></div><div class="edition"><span>v0.1.0</span><span><b>122</b> Moves</span><span><b>7</b> Parts</span><span><b>975</b> person-days</span><span><b>242</b> weeks at 3</span><span><b>110</b> at zero downtime</span><span>AWS &middot; Google Cloud &middot; Azure</span><span><a href="https://oneuptime.com" style="color:inherit">By the makers of OneUptime</a></span></div></header>
+<nav class="nav"><a href="../index.html">Start here</a><a href="../roadmap.html">Roadmap</a><a href="../plan.html">Plan yours</a><a href="../kit.html">Kit</a><a href="../rollback.html">Rollback</a><a href="../replaces.html">What replaces what</a><a href="../about.html">About</a><a class="sp" href="../Back-to-Metal.pdf" download>PDF</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav>
+<div class="shell">
+<aside class="rail"><a href="../index.html#iron" style="--c:#474F57"><div class="r-n">Stage 1</div><div class="r-t">Work out what to buy</div><div class="r-w">01&ndash;20 &middot; Iron</div></a><a href="../index.html#site" style="--c:#6B5344"><div class="r-n">Stage 2</div><div class="r-t">Find somewhere to put it</div><div class="r-w">21&ndash;38 &middot; Site</div></a><a href="../index.html#cluster" style="--c:#1F4E79"><div class="r-n">Stage 3</div><div class="r-t">Build the cluster</div><div class="r-w">39&ndash;54 &middot; Cluster</div></a><a href="../index.html#platform" style="--c:#4B3F8F"><div class="r-n">Stage 4</div><div class="r-t">Make it fit to run production</div><div class="r-w">55&ndash;70 &middot; Platform</div></a><a class="on" href="../index.html#data" style="--c:#A32E1F"><div class="r-n">Stage 5</div><div class="r-t">Move the data</div><div class="r-w">71&ndash;90 &middot; Data</div></a><a href="../index.html#edge" style="--c:#14655A"><div class="r-n">Stage 6</div><div class="r-t">Move the traffic</div><div class="r-w">91&ndash;107 &middot; Edge</div></a><a href="../index.html#watch" style="--c:#8A6112"><div class="r-n">Stage 7</div><div class="r-t">Run it, and close the account</div><div class="r-w">108&ndash;122 &middot; Watch</div></a></aside>
+<main class="main" style="--c:#A32E1F">
+  <div class="mv-head">
+    <div class="mv-n">85</div>
+    <h1 class="d">The data that stays: deep archive and the warehouse</h1>
+    <div class="mv-spec">
+      <div><div class="k">Part</div><div class="v">
+        <span style="color:#A32E1F"><svg class="ico" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.6" rx="7.6" ry="2.9"/><path d="M4.4 5.6v12.8c0 1.6 3.4 2.9 7.6 2.9s7.6-1.3 7.6-2.9V5.6"/><path d="M4.4 12c0 1.6 3.4 2.9 7.6 2.9s7.6-1.3 7.6-2.9"/></svg></span>
+        DATA</div></div>
+      <div><div class="k">Leaving</div><div class="v">—</div></div>
+      <div><div class="k">Risk</div><div class="v">
+        <svg class="ico" viewBox="0 0 13.4 14" height="1em" width="1em" style="width:auto" aria-hidden="true"><rect x="0" y="4" width="3.4" height="6" fill="currentColor"/><rect x="5" y="2" width="3.4" height="10" fill="currentColor" fill-opacity="0.22"/><rect x="10" y="0" width="3.4" height="14" fill="currentColor" fill-opacity="0.22"/></svg>LOW</div></div>
+      <div><div class="k">Cutover</div><div class="v">0 MIN</div></div>
+      <div><div class="k">Back out for</div><div class="v">
+        IMMEDIATELY</div></div>
+      <div><div class="k">Roadmap</div><div class="v">WEEK 159</div></div>
+    </div>
+    <p class="hook">Keeps deep archive and the warehouse on the provider deliberately, and hardens the one account that holds the archive and the third backup copy.</p>
+  </div>
+
+  <p class="blab">Leaving from</p>
+  <div class="orow"><span class="oc">AWS</span><span class="os">S3 Glacier Deep Archive and Redshift</span><span class="on">a one-hundred-and-eighty-day minimum storage term on the deepest tier, which changes the retrieval arithmetic.</span></div><div class="orow"><span class="oc">Google Cloud</span><span class="os">Archive storage and BigQuery</span><span class="on">a three-hundred-and-sixty-five-day minimum on the archive class, the longest of the three.</span></div><div class="orow"><span class="oc">Azure</span><span class="os">Archive tier and Synapse</span><span class="on">a one-hundred-and-eighty-day minimum, with rehydration priorities that change both the time and the price.</span></div>
+
+  <div class="two">
+  <div>
+    <p class="blab">Why this works</p>
+    <p class="why">This is an honest no with a runbook attached. Deep archive is cheap to hold and expensive to move, and repatriating it means a one-off egress bill plus a media-refresh obligation you do not want. The managed warehouse means somebody else owns a query engine, a scheduler and a storage tier, and owning those three is a team rather than a Move. So both stay, deliberately, and the work here is different: hardening the one account that will outlive the migration, because it now holds the archive and the third copy of your backups, and it is no longer protected by everything else you were running.</p>
+    <p class="blab">The runbook</p>
+    <ol class="steps"><li class="step"><button class="sdone" aria-label="Mark step 1 done">01</button><div class="stext">Price the retrieval properly, with early-deletion charges rather than list retrieval rates. The deepest tiers carry a minimum storage term of six months on two clouds and a full year on the third, and deleting early bills the remainder anyway.</div></li><li class="step"><button class="sdone" aria-label="Mark step 2 done">02</button><div class="stext">Decide, and write the decision down: the archive stays, the warehouse stays, and the reason for each is arithmetic rather than inertia. Move 122 needs this in writing so it does not try to close the account.</div></li><li class="step"><button class="sdone" aria-label="Mark step 3 done">03</button><div class="stext">Bring the lake substrate home. Open table formats on the object store from Move 84, with a query engine in front, is the part that does move, and it is where most of the ongoing query cost actually lives.</div></li><li class="step"><button class="sdone" aria-label="Mark step 4 done">04</button><div class="stext">Harden the retained account. Separate credentials outside the identity path from Move 55, immutability on the archive buckets, multi-factor deletion, and a budget alarm that alerts a human rather than a mailbox.</div></li><li class="step"><button class="sdone" aria-label="Mark step 5 done">05</button><div class="stext">Rehearse a retrieval end to end and time it, including the rehydration wait. A retrieval nobody has performed is a retention policy rather than a capability.</div></li><li class="step"><button class="sdone" aria-label="Mark step 6 done">06</button><div class="stext">Put the account into Move 119's evidence pack and Move 120's cost model as a permanent line, so it is never a surprise on a future invoice.</div></li></ol>
+    <div class="rollback"><b>Rollback</b><p>Nothing here is a one-way door: the archive can be repatriated later at the price of the egress bill, and the warehouse can be migrated when someone is willing to own a query engine. The point of no return does not exist in this Move. Keep the retrieval drill timings and the hardening configuration in source control, so the account's intended state can be restored and audited when nobody has looked at it for a year.</p></div>
+    <p class="blab">Operator&rsquo;s notes</p>
+    <div class="notes"><div class="note"><b>Swap</b><p>Where the archive is small and cold enough to fit on your own store under immutability, bringing it home is fine and removes an account. Price the one-off egress before deciding.</p></div><div class="note"><b>Do it faster</b><p>Split the archive by whether it must be retrievable in hours or in days. The second half can go one tier deeper and is usually most of the volume.</p></div><div class="note"><b>Watch out</b><p>A retained account with no active workloads is a security blind spot. It stops appearing in dashboards, its credentials stop being rotated, and its budget alarm is the only thing anybody looks at.</p></div><div class="note"><b>Leftovers</b><p>The warehouse's scheduled queries and its ingestion pipelines keep billing whether or not anyone reads the results. Review them before deciding what the warehouse actually costs.</p></div></div>
+    <p class="blab">The numbers</p>
+    <div class="figs"><div><b>$1,860/mo</b><span>Was</span></div><div><b>$1,860/mo</b><span>Now</span></div><div><b>0%</b><span>Saved</span></div><div><b>0 min</b><span>Cutover</span></div><div><b>1 week</b><span>Effort</span></div><div><b>—</b><span>Wait</span></div></div>
+    <p class="turnoff"><b>What you can turn off</b>Nothing here, by design. What you can turn off is the warehouse's scheduled queries that nobody reads, which is usually a third of its cost.</p>
+  </div>
+  <aside>
+    <p class="blab" style="margin-top:0">Before you start</p>
+    <p class="pre-h">Access</p><ul class="prelist"><li><label><input type="checkbox"><span>The archive inventory with its storage classes and the minimum-term charges that apply to each</span></label></li><li><label><input type="checkbox"><span>The warehouse's real query cost, so the decision to keep it is priced rather than assumed</span></label></li></ul><p class="pre-h">Software</p><ul class="prelist"><li><label><input type="checkbox"><span>A separate credential set for the retained account, outside the identity path built in Move 55</span></label></li><li><label><input type="checkbox"><span>Immutability, multi-factor deletion and a budget alarm on the retained account</span></label></li></ul><p class="pre-h">People</p><ul class="prelist"><li><label><input type="checkbox"><span>Whoever owns retention policy, because this account is now the long-term record</span></label></li></ul>
+    <p class="pre-h">Needs first</p><div class="deplist"><a href="application-buckets-and-the-object-api-your-code-assumes.html"><i style="color:#A32E1F">84</i><span>Application buckets, and the object API your code assumes</span></a></div><p class="pnote">These must be finished before step one.</p>
+    <p class="pre-h">Unlocks</p><div class="deplist"><a href="the-batch-estate-who-schedules-the-jobs.html"><i style="color:#A32E1F">86</i><span>The batch estate: who schedules the jobs</span></a><a href="the-last-account.html"><i style="color:#8A6112">122</i><span>The last account</span></a></div><p class="pnote">These become possible once this Move is done.</p>
+  </aside>
+  </div>
+
+  <nav class="mvnav">
+    <a href="application-buckets-and-the-object-api-your-code-assumes.html"><b>Previous</b>84 &middot; Application buckets, and the object API your code assumes</a>
+    <a href="the-batch-estate-who-schedules-the-jobs.html" style="text-align:right"><b>Next</b>86 &middot; The batch estate: who schedules the jobs</a>
+  </nav>
+</main></div>
+<footer class="foot"><p class="ft">Back to Metal</p><p>Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves’ own effort figures and the dependency graph, not asserted. Prices are public list rates observed while writing and will drift. <a href="../rollback.html">Read the rollback page</a> before running anything.</p><p>By the makers of OneUptime &mdash; <a href="https://oneuptime.com">oneuptime.com</a>, an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Part VII, and the interest is declared on the <a href="../about.html">about page</a>.</p><p>Open source. The Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> — software MIT, text CC BY 4.0. <span class="ver">v0.1.0</span></p></footer>
+<script src="../assets/app.js?v=0.1.0" defer></script>
+</body>
+</html>

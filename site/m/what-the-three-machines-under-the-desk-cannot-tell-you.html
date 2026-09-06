@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>21 · What the three machines under the desk cannot tell you - Back to Metal</title>
+<meta name="description" content="Writes down on one page what a three-machine desk cluster proved and what it did not, and attaches each remaining gap by name to the Move that closes it.">
+<meta name="theme-color" content="#0A0C0D">
+<link rel="stylesheet" href="../assets/style.css?v=0.1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="mast"><div class="mast-in"><a class="wordmark d" href="../index.html">Back to<br><em>Metal</em></a><div class="mast-sub"><p>A step-by-step roadmap off AWS, Google Cloud or Azure and onto Kubernetes you run on hardware you control. Every Move states its downtime, its risk and the way back.</p></div></div><div class="edition"><span>v0.1.0</span><span><b>122</b> Moves</span><span><b>7</b> Parts</span><span><b>975</b> person-days</span><span><b>242</b> weeks at 3</span><span><b>110</b> at zero downtime</span><span>AWS &middot; Google Cloud &middot; Azure</span><span><a href="https://oneuptime.com" style="color:inherit">By the makers of OneUptime</a></span></div></header>
+<nav class="nav"><a href="../index.html">Start here</a><a href="../roadmap.html">Roadmap</a><a href="../plan.html">Plan yours</a><a href="../kit.html">Kit</a><a href="../rollback.html">Rollback</a><a href="../replaces.html">What replaces what</a><a href="../about.html">About</a><a class="sp" href="../Back-to-Metal.pdf" download>PDF</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav>
+<div class="shell">
+<aside class="rail"><a href="../index.html#iron" style="--c:#474F57"><div class="r-n">Stage 1</div><div class="r-t">Work out what to buy</div><div class="r-w">01&ndash;20 &middot; Iron</div></a><a class="on" href="../index.html#site" style="--c:#6B5344"><div class="r-n">Stage 2</div><div class="r-t">Find somewhere to put it</div><div class="r-w">21&ndash;38 &middot; Site</div></a><a href="../index.html#cluster" style="--c:#1F4E79"><div class="r-n">Stage 3</div><div class="r-t">Build the cluster</div><div class="r-w">39&ndash;54 &middot; Cluster</div></a><a href="../index.html#platform" style="--c:#4B3F8F"><div class="r-n">Stage 4</div><div class="r-t">Make it fit to run production</div><div class="r-w">55&ndash;70 &middot; Platform</div></a><a href="../index.html#data" style="--c:#A32E1F"><div class="r-n">Stage 5</div><div class="r-t">Move the data</div><div class="r-w">71&ndash;90 &middot; Data</div></a><a href="../index.html#edge" style="--c:#14655A"><div class="r-n">Stage 6</div><div class="r-t">Move the traffic</div><div class="r-w">91&ndash;107 &middot; Edge</div></a><a href="../index.html#watch" style="--c:#8A6112"><div class="r-n">Stage 7</div><div class="r-t">Run it, and close the account</div><div class="r-w">108&ndash;122 &middot; Watch</div></a></aside>
+<main class="main" style="--c:#6B5344">
+  <div class="mv-head">
+    <div class="mv-n">21</div>
+    <h1 class="d">What the three machines under the desk cannot tell you</h1>
+    <div class="mv-spec">
+      <div><div class="k">Part</div><div class="v">
+        <span style="color:#6B5344"><svg class="ico" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20.6V8.4l7.2-3.8 7.2 3.8v12.2"/><path d="M1.6 20.6h20.8"/><path d="M8.2 20.6v-5.2h4.4v5.2"/><path d="M18.4 20.6v-7.4h3.2v7.4"/><path d="M7.4 10.4h1.2M12 10.4h1.2"/></svg></span>
+        SITE</div></div>
+      <div><div class="k">Leaving</div><div class="v">—</div></div>
+      <div><div class="k">Risk</div><div class="v">
+        <svg class="ico" viewBox="0 0 13.4 14" height="1em" width="1em" style="width:auto" aria-hidden="true"><rect x="0" y="4" width="3.4" height="6" fill="currentColor"/><rect x="5" y="2" width="3.4" height="10" fill="currentColor" fill-opacity="0.22"/><rect x="10" y="0" width="3.4" height="14" fill="currentColor" fill-opacity="0.22"/></svg>LOW</div></div>
+      <div><div class="k">Cutover</div><div class="v">0 MIN</div></div>
+      <div><div class="k">Back out for</div><div class="v">
+        IMMEDIATELY</div></div>
+      <div><div class="k">Roadmap</div><div class="v">WEEK 25</div></div>
+    </div>
+    <p class="hook">Writes down on one page what a three-machine desk cluster proved and what it did not, and attaches each remaining gap by name to the Move that closes it.</p>
+  </div>
+
+  <p class="blab">Leaving from</p>
+  <div class="orow"><span class="oc">AWS</span><span class="os">the free tier and a personal account</span><span class="on">where most people first ran a cluster, and where nothing about physical failure was ever visible.</span></div><div class="orow"><span class="oc">Google Cloud</span><span class="os">the free tier and a personal project</span><span class="on">the same, with a generous allowance that made experimenting feel like operating.</span></div><div class="orow"><span class="oc">Azure</span><span class="os">a free account and a personal subscription</span><span class="on">again a place to learn the software and never the hardware underneath it.</span></div>
+
+  <div class="two">
+  <div>
+    <p class="blab">Why this works</p>
+    <p class="why">The on-ramp in this book's front matter is three refurbished small machines, a managed switch and about eighteen hundred dollars. It is an excellent thing to have done and it proves a great deal: the software estate installs, the cluster forms, the storage layer works, the deployment pipeline reaches it. It also convinces people that the migration is de-risked, which it is not, because nothing about that desk cluster resembles the parts of the estate that fail at three in the morning. This Move writes the gap list down on one page and attaches each item to the Move that closes it, which turns a warning into a map.</p>
+    <p class="blab">The runbook</p>
+    <ol class="steps"><li class="step"><button class="sdone" aria-label="Mark step 1 done">01</button><div class="stext">Leave the desk cluster at genuine load for a week and read what happens. Sustained thermals, fan behaviour, the power draw at the wall, and whether anything throttles. A ten-minute benchmark tells you none of this.</div></li><li class="step"><button class="sdone" aria-label="Mark step 2 done">02</button><div class="stext">Read the wear and error counters off every device in it. A year of real writes against a consumer part is the number nobody has, and the desk cluster is the cheapest place to start collecting it.</div></li><li class="step"><button class="sdone" aria-label="Mark step 3 done">03</button><div class="stext">Write the gap list. A fabric wider than one switch, dual power supplies fed from two sources, out-of-band access from another city, drive endurance measured against a year of writes, and the four-week wait for a replacement part are all things the desk cluster cannot show you.</div></li><li class="step"><button class="sdone" aria-label="Mark step 4 done">04</button><div class="stext">Attach each gap to the Move that closes it, by number. The fabric is Moves 12 and 13, the supplies are Move 07 and Move 32, out-of-band is Moves 16 and 40, endurance is Move 09, and the wait for a part is Move 19.</div></li><li class="step"><button class="sdone" aria-label="Mark step 5 done">05</button><div class="stext">State plainly which of the gaps are the reason for Part II. The facility exists to supply power that does not fail, cooling that does not stop and physical access that is controlled, and none of those are things a desk can offer.</div></li><li class="step"><button class="sdone" aria-label="Mark step 6 done">06</button><div class="stext">Publish the page to everyone working on the programme and put a date on it. It gets revisited once, after the first rack is built in Move 36, to see which gaps turned out to matter.</div></li></ol>
+    <div class="rollback"><b>Rollback</b><p>A page of writing is undone by rewriting it, so there is nothing to reverse here. The point of no return is elsewhere entirely: it is Move 20, which has already been signed by the time most readers reach this page, and Move 28, which commits to a facility. This Move exists to make sure neither of those was signed on the strength of a desk. Keep the page in source control so the original gap list can be restored and compared against what actually went wrong.</p></div>
+    <p class="blab">Operator&rsquo;s notes</p>
+    <div class="notes"><div class="note"><b>Swap</b><p>If there is no desk cluster, build one. Eighteen hundred dollars and a weekend is the cheapest possible way to discover that the software estate does not do what you assumed.</p></div><div class="note"><b>Do it faster</b><p>The gap list is short and mostly the same for everyone. Start from the six items above and add your own rather than beginning with a blank page.</p></div><div class="note"><b>Watch out</b><p>The most seductive false conclusion here is about storage. A replicated storage cluster on three consumer devices works beautifully for a week and tells you nothing about how it behaves after a year of writes and a device failure during recovery.</p></div><div class="note"><b>Leftovers</b><p>The desk cluster stays useful for the whole programme as a place to break things. Do not dismantle it when the real hardware arrives.</p></div></div>
+    <p class="blab">The numbers</p>
+    <div class="figs"><div><b>—</b><span>Was</span></div><div><b>—</b><span>Now</span></div><div><b>—</b><span>Saved</span></div><div><b>0 min</b><span>Cutover</span></div><div><b>3 days</b><span>Effort</span></div><div><b>—</b><span>Wait</span></div></div>
+    <p class="turnoff"><b>What you can turn off</b>Nothing. The desk cluster earns its electricity for the rest of the programme.</p>
+  </div>
+  <aside>
+    <p class="blab" style="margin-top:0">Before you start</p>
+    <p class="pre-h">Access</p><ul class="prelist"><li><label><input type="checkbox"><span>The desk cluster, left running at full load for a week rather than benchmarked for ten minutes</span></label></li><li><label><input type="checkbox"><span>Somewhere to publish one page that the whole team will actually read</span></label></li></ul><p class="pre-h">Software</p><ul class="prelist"><li><label><input type="checkbox"><span>A thermal and power meter at the wall, so the numbers on the page are measured rather than asserted</span></label></li><li><label><input type="checkbox"><span>The wear and error counters from each device in the desk cluster, read rather than assumed</span></label></li></ul><p class="pre-h">People</p><ul class="prelist"><li><label><input type="checkbox"><span>Whoever is sponsoring this programme, because this page is what stops the plan being sized off a desk</span></label></li></ul>
+    
+    <p class="pre-h">Unlocks</p><div class="deplist"><a href="the-four-places-the-machines-could-live.html"><i style="color:#6B5344">22</i><span>The four places the machines could live</span></a></div><p class="pnote">These become possible once this Move is done.</p>
+  </aside>
+  </div>
+
+  <nav class="mvnav">
+    <a href="the-bill-of-materials.html"><b>Previous</b>20 &middot; The bill of materials</a>
+    <a href="the-four-places-the-machines-could-live.html" style="text-align:right"><b>Next</b>22 &middot; The four places the machines could live</a>
+  </nav>
+</main></div>
+<footer class="foot"><p class="ft">Back to Metal</p><p>Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves’ own effort figures and the dependency graph, not asserted. Prices are public list rates observed while writing and will drift. <a href="../rollback.html">Read the rollback page</a> before running anything.</p><p>By the makers of OneUptime &mdash; <a href="https://oneuptime.com">oneuptime.com</a>, an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Part VII, and the interest is declared on the <a href="../about.html">about page</a>.</p><p>Open source. The Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> — software MIT, text CC BY 4.0. <span class="ver">v0.1.0</span></p></footer>
+<script src="../assets/app.js?v=0.1.0" defer></script>
+</body>
+</html>

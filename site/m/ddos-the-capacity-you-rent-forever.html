@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>106 · DDoS: the capacity you rent forever - Back to Metal</title>
+<meta name="description" content="Rents mitigation capacity, because a volumetric attack saturates transit upstream of every device you own.">
+<meta name="theme-color" content="#0A0C0D">
+<link rel="stylesheet" href="../assets/style.css?v=0.1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="mast"><div class="mast-in"><a class="wordmark d" href="../index.html">Back to<br><em>Metal</em></a><div class="mast-sub"><p>A step-by-step roadmap off AWS, Google Cloud or Azure and onto Kubernetes you run on hardware you control. Every Move states its downtime, its risk and the way back.</p></div></div><div class="edition"><span>v0.1.0</span><span><b>122</b> Moves</span><span><b>7</b> Parts</span><span><b>975</b> person-days</span><span><b>242</b> weeks at 3</span><span><b>110</b> at zero downtime</span><span>AWS &middot; Google Cloud &middot; Azure</span><span><a href="https://oneuptime.com" style="color:inherit">By the makers of OneUptime</a></span></div></header>
+<nav class="nav"><a href="../index.html">Start here</a><a href="../roadmap.html">Roadmap</a><a href="../plan.html">Plan yours</a><a href="../kit.html">Kit</a><a href="../rollback.html">Rollback</a><a href="../replaces.html">What replaces what</a><a href="../about.html">About</a><a class="sp" href="../Back-to-Metal.pdf" download>PDF</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav>
+<div class="shell">
+<aside class="rail"><a href="../index.html#iron" style="--c:#474F57"><div class="r-n">Stage 1</div><div class="r-t">Work out what to buy</div><div class="r-w">01&ndash;20 &middot; Iron</div></a><a href="../index.html#site" style="--c:#6B5344"><div class="r-n">Stage 2</div><div class="r-t">Find somewhere to put it</div><div class="r-w">21&ndash;38 &middot; Site</div></a><a href="../index.html#cluster" style="--c:#1F4E79"><div class="r-n">Stage 3</div><div class="r-t">Build the cluster</div><div class="r-w">39&ndash;54 &middot; Cluster</div></a><a href="../index.html#platform" style="--c:#4B3F8F"><div class="r-n">Stage 4</div><div class="r-t">Make it fit to run production</div><div class="r-w">55&ndash;70 &middot; Platform</div></a><a href="../index.html#data" style="--c:#A32E1F"><div class="r-n">Stage 5</div><div class="r-t">Move the data</div><div class="r-w">71&ndash;90 &middot; Data</div></a><a class="on" href="../index.html#edge" style="--c:#14655A"><div class="r-n">Stage 6</div><div class="r-t">Move the traffic</div><div class="r-w">91&ndash;107 &middot; Edge</div></a><a href="../index.html#watch" style="--c:#8A6112"><div class="r-n">Stage 7</div><div class="r-t">Run it, and close the account</div><div class="r-w">108&ndash;122 &middot; Watch</div></a></aside>
+<main class="main" style="--c:#14655A">
+  <div class="mv-head">
+    <div class="mv-n">106</div>
+    <h1 class="d">DDoS: the capacity you rent forever</h1>
+    <div class="mv-spec">
+      <div><div class="k">Part</div><div class="v">
+        <span style="color:#14655A"><svg class="ico" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 1.8v3.4M12 18.8v3.4M1.8 12h3.4M18.8 12h3.4"/><path d="M4.8 4.8l2.4 2.4M16.8 16.8l2.4 2.4M19.2 4.8l-2.4 2.4M7.2 16.8l-2.4 2.4"/></svg></span>
+        EDGE</div></div>
+      <div><div class="k">Leaving</div><div class="v">Managed DDoS protection subscriptions</div></div>
+      <div><div class="k">Risk</div><div class="v">
+        <svg class="ico" viewBox="0 0 13.4 14" height="1em" width="1em" style="width:auto" aria-hidden="true"><rect x="0" y="4" width="3.4" height="6" fill="currentColor"/><rect x="5" y="2" width="3.4" height="10" fill="currentColor"/><rect x="10" y="0" width="3.4" height="14" fill="currentColor"/></svg>HIGH</div></div>
+      <div><div class="k">Cutover</div><div class="v">0 MIN</div></div>
+      <div><div class="k">Back out for</div><div class="v">
+        NO</div></div>
+      <div><div class="k">Roadmap</div><div class="v">WEEK 214</div></div>
+    </div>
+    <p class="hook">Rents mitigation capacity, because a volumetric attack saturates transit upstream of every device you own.</p>
+  </div>
+
+  <p class="blab">Leaving from</p>
+  <div class="orow"><span class="oc">AWS</span><span class="os">Shield Advanced</span><span class="on">an annual commitment with a response team attached.</span></div><div class="orow"><span class="oc">Google Cloud</span><span class="os">Cloud Armor with its managed protection tier</span><span class="on">the same shape, sold as a subscription.</span></div><div class="orow"><span class="oc">Azure</span><span class="os">DDoS Protection</span><span class="on">the same again, priced per protected plan with an annual term.</span></div>
+
+  <div class="two">
+  <div>
+    <p class="blab">Why this works</p>
+    <p class="why">A volumetric attack does not reach your firewall. It saturates your transit, upstream of every device you own, which means no equipment you buy can mitigate it. The capacity to absorb it is the product, and it is rented. This Move therefore prices four options with time-to-mitigate against each, kills origin secrecy as a strategy, and reaches a keep-paying verdict. The reason it is irreversible is commercial rather than technical: announcements and tunnels can be withdrawn in an afternoon, but diversion authority is a signed contract with a minimum term and a notice period.</p>
+    <p class="blab">The runbook</p>
+    <ol class="steps"><li class="step"><button class="sdone" aria-label="Mark step 1 done">01</button><div class="stext">Price the four options with time-to-mitigate against each: transit with inline scrubbing, a scrubbing provider reached over a tunnel or a private interconnect with on-demand diversion, always-on proxying behind the network from Move 105, and prefix-level protection using your own address space and routing.</div></li><li class="step"><button class="sdone" aria-label="Mark step 2 done">02</button><div class="stext">Kill origin secrecy as a strategy. It fails to the first certificate transparency log entry, the first misconfigured subdomain and the first email header. Replace it with an origin access list that only accepts the mitigation vendor's ranges, and a process to refresh those ranges when they change.</div></li><li class="step"><button class="sdone" aria-label="Mark step 3 done">03</button><div class="stext">Choose the diversion mechanism and test it during business hours. A diversion that has never been performed takes an hour longer than it should, and the hour is during an attack.</div></li><li class="step"><button class="sdone" aria-label="Mark step 4 done">04</button><div class="stext">Establish who can authorise diversion out of hours, with a deputy, a telephone number and an agreed form of words. Vendors will not divert on the word of somebody they cannot identify.</div></li><li class="step"><button class="sdone" aria-label="Mark step 5 done">05</button><div class="stext">Read the commitment terms. All three cloud subscriptions are annual, and what replaces them has the same shape, so the exit cost is a notice period rather than a switch.</div></li><li class="step"><button class="sdone" aria-label="Mark step 6 done">06</button><div class="stext">Set the detection thresholds and rehearse the runbook once, end to end, including the return to normal routing afterwards, which is the half people forget.</div></li><li class="step"><button class="sdone" aria-label="Mark step 7 done">07</button><div class="stext">Put the recurring cost in Move 116's list of things you deliberately keep, and in Move 120's model as a permanent line.</div></li></ol>
+    <div class="rollback"><b>Rollback</b><p>The technical parts are reversible in an afternoon, but this Move is irreversible in the way that counts: diversion authority is a signed contract with a minimum term and a notice period, so leaving costs the remainder of the term. The point of no return is that signature. Nothing here holds data, so there is nothing to restore; what has to be kept is the origin access list, which is the thing that must be current before an attack rather than during one.</p></div>
+    <p class="blab">Operator&rsquo;s notes</p>
+    <div class="notes"><div class="note"><b>Swap</b><p>For a small estate already behind an always-on proxying network from Move 105, that may be the whole answer and no separate subscription is needed. Confirm what the proxy's own terms cover.</p></div><div class="note"><b>Do it faster</b><p>Get the tunnels or the announcements configured and tested before you need them. Configuring a diversion path during an attack is not a plan.</p></div><div class="note"><b>Watch out</b><p>Prefix-level protection depends on your announcements being accepted, which depends on the routing records from Move 91 being correct. Validate them before relying on this path.</p></div><div class="note"><b>Leftovers</b><p>The provider subscription runs to the end of its annual term whether or not anything is behind it, which is a line Move 120 has to carry.</p></div></div>
+    <p class="blab">The numbers</p>
+    <div class="figs"><div><b>$3,000/mo</b><span>Was</span></div><div><b>$2,400/mo</b><span>Now</span></div><div><b>20%</b><span>Saved</span></div><div><b>0 min</b><span>Cutover</span></div><div><b>1 week</b><span>Effort</span></div><div><b>4 weeks</b><span>Wait</span></div></div>
+    <p class="turnoff"><b>What you can turn off</b>The provider subscription at the end of its annual term, and nothing before it. This is a cost you keep paying, deliberately.</p>
+  </div>
+  <aside>
+    <p class="blab" style="margin-top:0">Before you start</p>
+    <p class="pre-h">Access</p><ul class="prelist"><li><label><input type="checkbox"><span>The address space and network number from Move 91, since prefix-level protection uses both</span></label></li><li><label><input type="checkbox"><span>The transit contracts from Move 93, because inline scrubbing may be available there</span></label></li></ul><p class="pre-h">Software</p><ul class="prelist"><li><label><input type="checkbox"><span>An origin access list, refreshed as vendor ranges change, replacing origin secrecy entirely</span></label></li><li><label><input type="checkbox"><span>A diversion mechanism configured and tested, whether tunnelled or announced</span></label></li></ul><p class="pre-h">People</p><ul class="prelist"><li><label><input type="checkbox"><span>Whoever can authorise diversion at three in the morning, with a deputy and a telephone number</span></label></li></ul>
+    <p class="pre-h">Needs first</p><div class="deplist"><a href="your-own-asn-a-24-and-the-address-space-you-already-have.html"><i style="color:#14655A">91</i><span>Your own ASN, a /24 and the address space you already have</span></a><a href="transit-two-upstreams-and-the-95th-percentile.html"><i style="color:#14655A">93</i><span>Transit: two upstreams and the 95th percentile</span></a><a href="cdn-change-vendor-not-model.html"><i style="color:#14655A">105</i><span>CDN: change vendor, not model</span></a></div><p class="pnote">These must be finished before step one.</p>
+    
+  </aside>
+  </div>
+
+  <nav class="mvnav">
+    <a href="cdn-change-vendor-not-model.html"><b>Previous</b>105 &middot; CDN: change vendor, not model</a>
+    <a href="email-inbound-comes-home-outbound-does-not.html" style="text-align:right"><b>Next</b>107 &middot; Email: inbound comes home, outbound does not</a>
+  </nav>
+</main></div>
+<footer class="foot"><p class="ft">Back to Metal</p><p>Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves’ own effort figures and the dependency graph, not asserted. Prices are public list rates observed while writing and will drift. <a href="../rollback.html">Read the rollback page</a> before running anything.</p><p>By the makers of OneUptime &mdash; <a href="https://oneuptime.com">oneuptime.com</a>, an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Part VII, and the interest is declared on the <a href="../about.html">about page</a>.</p><p>Open source. The Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> — software MIT, text CC BY 4.0. <span class="ver">v0.1.0</span></p></footer>
+<script src="../assets/app.js?v=0.1.0" defer></script>
+</body>
+</html>

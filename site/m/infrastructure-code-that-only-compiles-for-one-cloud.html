@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>66 · Infrastructure code that only compiles for one cloud - Back to Metal</title>
+<meta name="description" content="Provider-native templates have no target off the cloud that defines them, so the estate they describe is re-expressed once rather than translated stack by stack.">
+<meta name="theme-color" content="#0A0C0D">
+<link rel="stylesheet" href="../assets/style.css?v=0.1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="mast"><div class="mast-in"><a class="wordmark d" href="../index.html">Back to<br><em>Metal</em></a><div class="mast-sub"><p>A step-by-step roadmap off AWS, Google Cloud or Azure and onto Kubernetes you run on hardware you control. Every Move states its downtime, its risk and the way back.</p></div></div><div class="edition"><span>v0.1.0</span><span><b>122</b> Moves</span><span><b>7</b> Parts</span><span><b>975</b> person-days</span><span><b>242</b> weeks at 3</span><span><b>110</b> at zero downtime</span><span>AWS &middot; Google Cloud &middot; Azure</span><span><a href="https://oneuptime.com" style="color:inherit">By the makers of OneUptime</a></span></div></header>
+<nav class="nav"><a href="../index.html">Start here</a><a href="../roadmap.html">Roadmap</a><a href="../plan.html">Plan yours</a><a href="../kit.html">Kit</a><a href="../rollback.html">Rollback</a><a href="../replaces.html">What replaces what</a><a href="../about.html">About</a><a class="sp" href="../Back-to-Metal.pdf" download>PDF</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav>
+<div class="shell">
+<aside class="rail"><a href="../index.html#iron" style="--c:#474F57"><div class="r-n">Stage 1</div><div class="r-t">Work out what to buy</div><div class="r-w">01&ndash;20 &middot; Iron</div></a><a href="../index.html#site" style="--c:#6B5344"><div class="r-n">Stage 2</div><div class="r-t">Find somewhere to put it</div><div class="r-w">21&ndash;38 &middot; Site</div></a><a href="../index.html#cluster" style="--c:#1F4E79"><div class="r-n">Stage 3</div><div class="r-t">Build the cluster</div><div class="r-w">39&ndash;54 &middot; Cluster</div></a><a class="on" href="../index.html#platform" style="--c:#4B3F8F"><div class="r-n">Stage 4</div><div class="r-t">Make it fit to run production</div><div class="r-w">55&ndash;70 &middot; Platform</div></a><a href="../index.html#data" style="--c:#A32E1F"><div class="r-n">Stage 5</div><div class="r-t">Move the data</div><div class="r-w">71&ndash;90 &middot; Data</div></a><a href="../index.html#edge" style="--c:#14655A"><div class="r-n">Stage 6</div><div class="r-t">Move the traffic</div><div class="r-w">91&ndash;107 &middot; Edge</div></a><a href="../index.html#watch" style="--c:#8A6112"><div class="r-n">Stage 7</div><div class="r-t">Run it, and close the account</div><div class="r-w">108&ndash;122 &middot; Watch</div></a></aside>
+<main class="main" style="--c:#4B3F8F">
+  <div class="mv-head">
+    <div class="mv-n">66</div>
+    <h1 class="d">Infrastructure code that only compiles for one cloud</h1>
+    <div class="mv-spec">
+      <div><div class="k">Part</div><div class="v">
+        <span style="color:#4B3F8F"><svg class="ico" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6 21.4 7.4 12 12.2 2.6 7.4z"/><path d="M2.6 12.2 12 17l9.4-4.8"/><path d="M2.6 16.6 12 21.4l9.4-4.8"/></svg></span>
+        PLATFORM</div></div>
+      <div><div class="k">Leaving</div><div class="v">Provider-native stack templates, their programming-language synthesisers and the serverless application frameworks built on them</div></div>
+      <div><div class="k">Risk</div><div class="v">
+        <svg class="ico" viewBox="0 0 13.4 14" height="1em" width="1em" style="width:auto" aria-hidden="true"><rect x="0" y="4" width="3.4" height="6" fill="currentColor"/><rect x="5" y="2" width="3.4" height="10" fill="currentColor"/><rect x="10" y="0" width="3.4" height="14" fill="currentColor" fill-opacity="0.22"/></svg>MEDIUM</div></div>
+      <div><div class="k">Cutover</div><div class="v">0 MIN</div></div>
+      <div><div class="k">Back out for</div><div class="v">
+        IMMEDIATELY</div></div>
+      <div><div class="k">Roadmap</div><div class="v">WEEK 127</div></div>
+    </div>
+    <p class="hook">Provider-native templates have no target off the cloud that defines them, so the estate they describe is re-expressed once rather than translated stack by stack.</p>
+  </div>
+
+  <p class="blab">Leaving from</p>
+  <div class="orow"><span class="oc">AWS</span><span class="os">CloudFormation with the Cloud Development Kit</span><span class="on">the hardest of the three, because the source is a program rather than a document, and the serverless framework sits on top of it.</span></div><div class="orow"><span class="oc">Google Cloud</span><span class="os">Deployment Manager</span><span class="on">already past end of support and scheduled for turndown, with Config Connector and a managed service as successors, so this reader is moving regardless.</span></div><div class="orow"><span class="oc">Azure</span><span class="os">ARM templates with Bicep</span><span class="on">a template language with a friendlier front end, which makes the source at least readable as a description.</span></div>
+
+  <div class="two">
+  <div>
+    <p class="blab">Why this works</p>
+    <p class="why">A provider-native template has no target other than the cloud that defines it. There is no compiler flag that emits your cluster. So the honest approach is to re-express the estate once rather than to translate stack by stack, and the split is clean: identity, networking and buckets — the shrinking cloud footprint that stays — are described in the tool chosen in Move 65, while everything describing compute becomes Kubernetes manifests under that same reconciler and is not translated at all. The synthesiser estates are the harder half, because their higher-level constructs have no equivalent to compile into, and this Move decides how much of the function estate in Move 89 can move at all.</p>
+    <p class="blab">The runbook</p>
+    <ol class="steps"><li class="step"><button class="sdone" aria-label="Mark step 1 done">01</button><div class="stext">Inventory every stack and mark each one. Stays in the cloud, becomes a Kubernetes manifest, or is deleted because nothing has used it in two years. The third category is usually larger than expected.</div></li><li class="step"><button class="sdone" aria-label="Mark step 2 done">02</button><div class="stext">Re-express what stays — identity, networking, buckets — in the tool chosen in Move 65, against the shrinking cloud footprint. This is ordinary work and it goes quickly.</div></li><li class="step"><button class="sdone" aria-label="Mark step 3 done">03</button><div class="stext">Do not translate the compute stacks. A description of an instance group has no meaning here; the workload is described as a manifest and the stack is deleted. Attempting a translation produces something that resembles the old estate and works like neither.</div></li><li class="step"><button class="sdone" aria-label="Mark step 4 done">04</button><div class="stext">Take the synthesiser estates one project at a time, and read what they actually create rather than what they appear to say. A single high-level construct can create a dozen resources, several of which nobody knows about.</div></li><li class="step"><button class="sdone" aria-label="Mark step 5 done">05</button><div class="stext">Where a provider's own template service is being retired, move to its successor only if you are staying on that cloud for that resource. Otherwise move straight to the target and skip the intermediate step entirely.</div></li><li class="step"><button class="sdone" aria-label="Mark step 6 done">06</button><div class="stext">Record which parts of the function estate cannot move because their infrastructure only exists as a synthesiser construct. Move 89 needs that list, and this is the Move that produces it.</div></li><li class="step"><button class="sdone" aria-label="Mark step 7 done">07</button><div class="stext">Delete each old stack only after its resources are managed elsewhere, and confirm the deletion does not remove anything still in use, which is the failure mode that ends this Move badly.</div></li></ol>
+    <div class="rollback"><b>Rollback</b><p>Nothing is destroyed while the estate is being re-expressed, because the new description and the old stack can both exist against the same resources for a while. There is no point of no return until a stack is deleted. Keep the original templates in source control after they stop being used, so the previous definition can be restored and compared when a resource turns out to have had a setting nobody carried across.</p></div>
+    <p class="blab">Operator&rsquo;s notes</p>
+    <div class="notes"><div class="note"><b>Swap</b><p>Where a stack describes something genuinely staying on the cloud forever, leave it alone. Rewriting working infrastructure code for its own sake is the least valuable month available.</p></div><div class="note"><b>Do it faster</b><p>Start with the stacks that only create identity and networking. They convert almost mechanically and they unblock everything else.</p></div><div class="note"><b>Watch out</b><p>Deleting a stack can delete the resources it created, including buckets with data in them. Set the retention behaviour deliberately on every resource before removing any stack.</p></div><div class="note"><b>Leftovers</b><p>Orphaned resources left behind by half-deleted stacks are extremely common and Move 120 will find them in the billing data.</p></div></div>
+    <p class="blab">The numbers</p>
+    <div class="figs"><div><b>—</b><span>Was</span></div><div><b>—</b><span>Now</span></div><div><b>—</b><span>Saved</span></div><div><b>0 min</b><span>Cutover</span></div><div><b>4 weeks</b><span>Effort</span></div><div><b>—</b><span>Wait</span></div></div>
+    <p class="turnoff"><b>What you can turn off</b>Old stacks, once their resources are managed elsewhere — and the orphaned resources they left behind, once Move 120 has found them.</p>
+  </div>
+  <aside>
+    <p class="blab" style="margin-top:0">Before you start</p>
+    <p class="pre-h">Access</p><ul class="prelist"><li><label><input type="checkbox"><span>Every template, stack and synthesiser project in the estate, listed rather than remembered</span></label></li><li><label><input type="checkbox"><span>The state backend and repository from Move 65, ready to receive what survives</span></label></li></ul><p class="pre-h">Software</p><ul class="prelist"><li><label><input type="checkbox"><span>A stack-by-stack inventory marked as stays, moves to manifests, or is deleted</span></label></li><li><label><input type="checkbox"><span>The successor tooling for any provider whose native service is being retired underneath you</span></label></li></ul><p class="pre-h">People</p><ul class="prelist"><li><label><input type="checkbox"><span>The author of each synthesiser project, because reading somebody else's generated infrastructure is slower than rewriting it</span></label></li></ul>
+    <p class="pre-h">Needs first</p><div class="deplist"><a href="argo-cd-and-the-two-infrastructure-as-code-estates.html"><i style="color:#4B3F8F">65</i><span>Argo CD, and the two infrastructure-as-code estates</span></a></div><p class="pnote">These must be finished before step one.</p>
+    <p class="pre-h">Unlocks</p><div class="deplist"><a href="the-serverless-estate-in-four-piles.html"><i style="color:#A32E1F">89</i><span>The serverless estate in four piles</span></a></div><p class="pnote">These become possible once this Move is done.</p>
+  </aside>
+  </div>
+
+  <nav class="mvnav">
+    <a href="argo-cd-and-the-two-infrastructure-as-code-estates.html"><b>Previous</b>65 &middot; Argo CD, and the two infrastructure-as-code estates</a>
+    <a href="the-first-stateless-service-end-to-end.html" style="text-align:right"><b>Next</b>67 &middot; The first stateless service, end to end</a>
+  </nav>
+</main></div>
+<footer class="foot"><p class="ft">Back to Metal</p><p>Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves’ own effort figures and the dependency graph, not asserted. Prices are public list rates observed while writing and will drift. <a href="../rollback.html">Read the rollback page</a> before running anything.</p><p>By the makers of OneUptime &mdash; <a href="https://oneuptime.com">oneuptime.com</a>, an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Part VII, and the interest is declared on the <a href="../about.html">about page</a>.</p><p>Open source. The Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> — software MIT, text CC BY 4.0. <span class="ver">v0.1.0</span></p></footer>
+<script src="../assets/app.js?v=0.1.0" defer></script>
+</body>
+</html>

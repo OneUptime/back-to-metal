@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>30 · The notice period and the door out - Back to Metal</title>
+<meta name="description" content="Fixes the term, the escalator, the auto-renewal notice and the relocation clause, and writes the exit as a runbook with its notice date in the calendar.">
+<meta name="theme-color" content="#0A0C0D">
+<link rel="stylesheet" href="../assets/style.css?v=0.1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="mast"><div class="mast-in"><a class="wordmark d" href="../index.html">Back to<br><em>Metal</em></a><div class="mast-sub"><p>A step-by-step roadmap off AWS, Google Cloud or Azure and onto Kubernetes you run on hardware you control. Every Move states its downtime, its risk and the way back.</p></div></div><div class="edition"><span>v0.1.0</span><span><b>122</b> Moves</span><span><b>7</b> Parts</span><span><b>975</b> person-days</span><span><b>242</b> weeks at 3</span><span><b>110</b> at zero downtime</span><span>AWS &middot; Google Cloud &middot; Azure</span><span><a href="https://oneuptime.com" style="color:inherit">By the makers of OneUptime</a></span></div></header>
+<nav class="nav"><a href="../index.html">Start here</a><a href="../roadmap.html">Roadmap</a><a href="../plan.html">Plan yours</a><a href="../kit.html">Kit</a><a href="../rollback.html">Rollback</a><a href="../replaces.html">What replaces what</a><a href="../about.html">About</a><a class="sp" href="../Back-to-Metal.pdf" download>PDF</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav>
+<div class="shell">
+<aside class="rail"><a href="../index.html#iron" style="--c:#474F57"><div class="r-n">Stage 1</div><div class="r-t">Work out what to buy</div><div class="r-w">01&ndash;20 &middot; Iron</div></a><a class="on" href="../index.html#site" style="--c:#6B5344"><div class="r-n">Stage 2</div><div class="r-t">Find somewhere to put it</div><div class="r-w">21&ndash;38 &middot; Site</div></a><a href="../index.html#cluster" style="--c:#1F4E79"><div class="r-n">Stage 3</div><div class="r-t">Build the cluster</div><div class="r-w">39&ndash;54 &middot; Cluster</div></a><a href="../index.html#platform" style="--c:#4B3F8F"><div class="r-n">Stage 4</div><div class="r-t">Make it fit to run production</div><div class="r-w">55&ndash;70 &middot; Platform</div></a><a href="../index.html#data" style="--c:#A32E1F"><div class="r-n">Stage 5</div><div class="r-t">Move the data</div><div class="r-w">71&ndash;90 &middot; Data</div></a><a href="../index.html#edge" style="--c:#14655A"><div class="r-n">Stage 6</div><div class="r-t">Move the traffic</div><div class="r-w">91&ndash;107 &middot; Edge</div></a><a href="../index.html#watch" style="--c:#8A6112"><div class="r-n">Stage 7</div><div class="r-t">Run it, and close the account</div><div class="r-w">108&ndash;122 &middot; Watch</div></a></aside>
+<main class="main" style="--c:#6B5344">
+  <div class="mv-head">
+    <div class="mv-n">30</div>
+    <h1 class="d">The notice period and the door out</h1>
+    <div class="mv-spec">
+      <div><div class="k">Part</div><div class="v">
+        <span style="color:#6B5344"><svg class="ico" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20.6V8.4l7.2-3.8 7.2 3.8v12.2"/><path d="M1.6 20.6h20.8"/><path d="M8.2 20.6v-5.2h4.4v5.2"/><path d="M18.4 20.6v-7.4h3.2v7.4"/><path d="M7.4 10.4h1.2M12 10.4h1.2"/></svg></span>
+        SITE</div></div>
+      <div><div class="k">Leaving</div><div class="v">—</div></div>
+      <div><div class="k">Risk</div><div class="v">
+        <svg class="ico" viewBox="0 0 13.4 14" height="1em" width="1em" style="width:auto" aria-hidden="true"><rect x="0" y="4" width="3.4" height="6" fill="currentColor"/><rect x="5" y="2" width="3.4" height="10" fill="currentColor"/><rect x="10" y="0" width="3.4" height="14" fill="currentColor" fill-opacity="0.22"/></svg>MEDIUM</div></div>
+      <div><div class="k">Cutover</div><div class="v">0 MIN</div></div>
+      <div><div class="k">Back out for</div><div class="v">
+        UNTIL THE TERM COMMENCES</div></div>
+      <div><div class="k">Roadmap</div><div class="v">WEEK 63</div></div>
+    </div>
+    <p class="hook">Fixes the term, the escalator, the auto-renewal notice and the relocation clause, and writes the exit as a runbook with its notice date in the calendar.</p>
+  </div>
+
+  <p class="blab">Leaving from</p>
+  <div class="orow"><span class="oc">AWS</span><span class="os">on-demand and Savings Plans</span><span class="on">leaving was a matter of stopping instances, with the commitment as the only thing that outlived the decision.</span></div><div class="orow"><span class="oc">Google Cloud</span><span class="os">on-demand and Committed Use Discounts</span><span class="on">the same, with the commitment attached to a project or an organisation rather than to a building.</span></div><div class="orow"><span class="oc">Azure</span><span class="os">pay-as-you-go and reservations</span><span class="on">again, exit by deletion, which is the property that makes a facility term feel so unfamiliar.</span></div>
+
+  <div class="two">
+  <div>
+    <p class="blab">Why this works</p>
+    <p class="why">The cloud let you leave by deleting things. A facility agreement does not, and the shape of the exit is decided at signature rather than at departure. Four terms carry almost all of it: the initial term and whether it matches the depreciation schedule the bill of materials assumed, the annual escalator, the auto-renewal and the notice required to stop it, and the conditions under which the facility may move you within the building or out of it. The fifth thing is not a clause at all but a date in a calendar, because an agreement that rolls into a further term because nobody diarised the notice is the commonest way this saving quietly disappears.</p>
+    <p class="blab">The runbook</p>
+    <ol class="steps"><li class="step"><button class="sdone" aria-label="Mark step 1 done">01</button><div class="stext">Match the initial term to the depreciation schedule from Move 20. A five-year hardware life against a three-year facility term means a renegotiation halfway through the asset's life, which is a weak position; a term longer than the hardware life is a commitment to a building you may not want.</div></li><li class="step"><button class="sdone" aria-label="Mark step 2 done">02</button><div class="stext">Fix the escalator. An uncapped index-linked increase is an open cheque; a fixed percentage is predictable. Ask for a cap either way and put the resulting figure into the three-year model.</div></li><li class="step"><button class="sdone" aria-label="Mark step 3 done">03</button><div class="stext">Find the auto-renewal and the notice period, which is often ninety or one hundred and eighty days. Put the notice date in the shared calendar the day the agreement is signed, with two reminders before it.</div></li><li class="step"><button class="sdone" aria-label="Mark step 4 done">04</button><div class="stext">Read the relocation clause. Facilities reserve the right to move customers within a building and occasionally between buildings. Ask what notice you get, who pays, and whether your cross-connects are re-provisioned at their cost.</div></li><li class="step"><button class="sdone" aria-label="Mark step 5 done">05</button><div class="stext">Write the exit as a runbook rather than as a clause: space returned to a bare cabinet, cross-connects formally disconnected and their fees paid, the final invoice reconciled, who does the de-racking and where the equipment goes. Move 38 handles the drives.</div></li><li class="step"><button class="sdone" aria-label="Mark step 6 done">06</button><div class="stext">Publish the one-page summary to the team. The people who will be affected by the notice date are not the people who signed, and that is exactly how a notice date gets missed.</div></li></ol>
+    <div class="rollback"><b>Rollback</b><p>An unsigned agreement is reversed by not signing it, and this Move deliberately happens before the term commences for that reason. The point of no return is the commencement date, after which the exit is governed by the notice period rather than by a decision. Keep the executed agreement, the one-page summary and the calendar entries in one place, so the commercial position can be restored quickly when a renewal notice arrives and nobody remembers what was agreed.</p></div>
+    <p class="blab">Operator&rsquo;s notes</p>
+    <div class="notes"><div class="note"><b>Swap</b><p>Where a longer term buys a materially better rate, take it only if the exit and relocation terms are good. A cheap five-year agreement in a building that can move you is not cheap.</p></div><div class="note"><b>Do it faster</b><p>Ask for the facility's standard agreement early, before pricing. Reading it takes a day and it tells you which battles are worth fighting.</p></div><div class="note"><b>Watch out</b><p>Some agreements incorporate a facility handbook or rules by reference, and that document can be changed unilaterally. Ask for the current version and ask what happens when it changes.</p></div><div class="note"><b>Leftovers</b><p>Disconnection fees for cross-connects are frequently forgotten in exit budgets. Move 26 priced them; carry the number into the exit runbook here.</p></div></div>
+    <p class="blab">The numbers</p>
+    <div class="figs"><div><b>—</b><span>Was</span></div><div><b>—</b><span>Now</span></div><div><b>—</b><span>Saved</span></div><div><b>0 min</b><span>Cutover</span></div><div><b>3 days</b><span>Effort</span></div><div><b>—</b><span>Wait</span></div></div>
+    <p class="turnoff"><b>What you can turn off</b>Nothing yet. This Move decides what turning it all off will cost when Part VII arrives.</p>
+  </div>
+  <aside>
+    <p class="blab" style="margin-top:0">Before you start</p>
+    <p class="pre-h">Access</p><ul class="prelist"><li><label><input type="checkbox"><span>The full draft agreement, including every schedule and any documents it incorporates by reference</span></label></li><li><label><input type="checkbox"><span>The depreciation schedule the bill of materials in Move 20 assumed</span></label></li></ul><p class="pre-h">Software</p><ul class="prelist"><li><label><input type="checkbox"><span>A one-page summary of the commercial terms that non-lawyers on the team will actually read</span></label></li><li><label><input type="checkbox"><span>A calendar everybody uses, with reminders that survive the person who set them leaving</span></label></li></ul><p class="pre-h">People</p><ul class="prelist"><li><label><input type="checkbox"><span>Counsel to draft the exit runbook with you, and whoever holds the budget for the term length</span></label></li></ul>
+    <p class="pre-h">Needs first</p><div class="deplist"><a href="committed-kilowatts-metered-kilowatts-and-the-derate.html"><i style="color:#6B5344">28</i><span>Committed kilowatts, metered kilowatts and the derate</span></a><a href="what-the-service-credit-is-actually-worth.html"><i style="color:#6B5344">29</i><span>What the service credit is actually worth</span></a></div><p class="pnote">These must be finished before step one.</p>
+    <p class="pre-h">Unlocks</p><div class="deplist"><a href="the-auditor-s-checklist-and-the-contracts-nobody-read.html"><i style="color:#8A6112">119</i><span>The auditor's checklist, and the contracts nobody read</span></a></div><p class="pnote">These become possible once this Move is done.</p>
+  </aside>
+  </div>
+
+  <nav class="mvnav">
+    <a href="what-the-service-credit-is-actually-worth.html"><b>Previous</b>29 &middot; What the service credit is actually worth</a>
+    <a href="the-80-per-cent-you-are-allowed-to-draw.html" style="text-align:right"><b>Next</b>31 &middot; The 80 per cent you are allowed to draw</a>
+  </nav>
+</main></div>
+<footer class="foot"><p class="ft">Back to Metal</p><p>Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves’ own effort figures and the dependency graph, not asserted. Prices are public list rates observed while writing and will drift. <a href="../rollback.html">Read the rollback page</a> before running anything.</p><p>By the makers of OneUptime &mdash; <a href="https://oneuptime.com">oneuptime.com</a>, an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Part VII, and the interest is declared on the <a href="../about.html">about page</a>.</p><p>Open source. The Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> — software MIT, text CC BY 4.0. <span class="ver">v0.1.0</span></p></footer>
+<script src="../assets/app.js?v=0.1.0" defer></script>
+</body>
+</html>

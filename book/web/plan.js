@@ -55,7 +55,7 @@
       want.add(n);
       (BY[n].deps || []).forEach(d => queue.push(d));
     }
-    return [...want].sort();
+    return [...want].sort((a, b) => (+a) - (+b));
   }
 
   function render() {
@@ -79,7 +79,7 @@
     out.weeks.textContent = Math.max(1, Math.round(weeksFor(full)));
     out.save.textContent = money(save);
 
-    const q = full.length ? '?m=' + [...chosen].sort().join(',') : location.pathname;
+    const q = full.length ? '?m=' + [...chosen].sort((a, b) => (+a) - (+b)).join(',') : location.pathname;
     history.replaceState(null, '', full.length ? q : location.pathname);
   }
 
