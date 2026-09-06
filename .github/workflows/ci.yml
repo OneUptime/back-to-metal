@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Verify, audit and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install fonts
+        run: npm ci
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Chromium
+        run: python -m playwright install --with-deps chromium
+
+      # The two gates. verify.py checks the shape of every Move file; audit.py
+      # checks the content — undeclared tools, unguarded destructive steps,
+      # unpinned installs, drifted service names, the dependency graph and
+      # repeated prose. Both must be clean.
+      - name: Verify Move structure
+        run: make verify
+
+      - name: Audit Move content
+        run: make audit
+
+      - name: Build the book
+        run: make book
+
+      - name: Build the site
+        run: make site
+
+      # moves/ is the source of truth and site/ is generated from it, so a commit
+      # that changes one without regenerating the other has drifted. The PDF and
+      # EPUB are excluded: both carry a build timestamp, so they are not
+      # byte-reproducible. The HTML is.
+      - name: Check the committed site is up to date
+        run: |
+          # --porcelain rather than `git diff`, because a diff only sees files
+          # git already tracks: a new page nobody committed would generate here
+          # and pass silently. This catches a modified file and an uncommitted
+          # new one alike.
+          CHANGED=$(git status --porcelain -- site/ ':(exclude)site/*.pdf' ':(exclude)site/*.epub')
+          if [ -n "$CHANGED" ]; then
+            echo "::error::site/ is out of date with moves/. Run 'make' and commit the result."
+            echo "$CHANGED"
+            exit 1
+          fi
+          echo "site/ matches the sources."
+
+      - name: Upload the built book
+        uses: actions/upload-artifact@v4
+        with:
+          name: back-to-metal-pdf
+          path: dist/Back-to-Metal.pdf
+          if-no-files-found: error
+
+      # The Amazon artefacts share the same sources and have their own gates:
+      # kdpcheck.py on the interior, a safe-area check on the wrap, and a
+      # structural check on the EPUB. The hardback case is skipped here — it
+      # needs dimensions measured by hand from KDP's Cover Calculator, and
+      # cover.py refuses to guess.
+      - name: Build the covers and the Kindle edition
+        run: |
+          make covers
+          make epub
+
+      - name: Upload the Amazon artefacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: amazon-editions
+          path: |
+            dist/cover-paperback.pdf
+            dist/cover-kindle.jpg
+            dist/Back-to-Metal.epub
+          if-no-files-found: error

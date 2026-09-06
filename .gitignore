@@ -1,0 +1,10 @@
+*-debug.log
+*.pyc
+.DS_Store
+.firebase/
+.venv/
+__pycache__/
+book/_manifest/
+build/
+firebase-debug.log
+node_modules/

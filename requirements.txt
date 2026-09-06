@@ -1,0 +1,4 @@
+# The only external Python dependency. render.py drives headless Chromium
+# through it to paginate and vertically justify the book, and cover.py uses
+# it to render the wraps as vector.
+playwright>=1.40

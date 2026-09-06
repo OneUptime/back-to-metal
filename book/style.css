@@ -1,0 +1,427 @@
+/* Back to Metal - print interior.
+   ------------------------------------------------------------------
+   The visual language is a technical datasheet crossed with an
+   operations checklist: hairline rules instead of boxes, no rounded
+   corners, no shadows, no tinted cards. Data is set in mono, prose in
+   a grotesque, and colour is a signal - a Part tab, a rule, a numeral -
+   never a decorative fill.
+
+   8.25 x 11in trim plus 0.125in bleed on the top, bottom and outer
+   edge. The gutter never carries bleed. Margins below are measured
+   from the trim line, not from the page box.
+   ------------------------------------------------------------------ */
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --ink:#0E1113; --ink2:#383F44; --ink3:#6B7377; --ink4:#9DA4A8;
+  --paper:#FFFFFF; --rule:#B9BFC3; --rule2:#DFE3E5; --fill:#F0F2F3;
+}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+body{font-family:'Archivo',Helvetica,Arial,sans-serif;color:var(--ink);
+  background:#CFD3D6;font-variation-settings:'wdth' 100;
+  font-feature-settings:'kern' 1,'liga' 1;}
+/* .d is the display voice: condensed and heavy, the way a rack label or a
+   drawing title block is set. Never a serif - this book is not a menu. */
+.d{font-variation-settings:'wdth' 84;font-weight:750;letter-spacing:-.005em;}
+.m,code,.num{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  font-feature-settings:'kern' 0,'liga' 0,'tnum' 1;}
+
+@page{size:8.375in 11.25in;margin:0;}
+.page{width:8.375in;height:11.25in;background:var(--paper);position:relative;
+  overflow:hidden;page-break-after:always;break-after:page;margin:0 auto;}
+.page:last-child{page-break-after:auto;break-after:auto;}
+/* Gutter is 15.5mm rather than the 14mm the margin table asks for, because
+   .snum hangs outside the content box by design; that still leaves over
+   KDP's 12.7mm floor for this page count. */
+.inner{position:absolute;inset:0;padding:16.5mm 19.175mm 18.2mm 15.5mm;
+  display:flex;flex-direction:column;}
+/* recto = right-hand page: spine on the left, bleed on the right. Verso mirrors it. */
+.page[data-side="verso"] .inner{padding:16.5mm 15.5mm 18.2mm 19.175mm;}
+
+/* ---- page furniture: a hairline head rule and a thumb index ---------------
+   The tab is printed hard against the outer edge and steps down the page by
+   Part, so the closed book shows five bands on the fore-edge. It replaces the
+   full-width colour bar, which was decoration; this is navigation. */
+.topbar{position:absolute;top:0;left:0;right:0;height:1.6mm;}
+.tab{position:absolute;right:0;width:9mm;height:26mm;}
+.page[data-side="verso"] .tab{right:auto;left:0;}
+.tab span{position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;color:#fff;font-family:'JetBrains Mono',monospace;
+  font-size:6.2pt;letter-spacing:.2em;
+  writing-mode:vertical-rl;text-orientation:mixed;}
+/* Deliberately NOT rotated on the verso. A CSS transform makes Chromium emit a
+   transparency group, and kdpcheck.py fails the build on one: KDP requires a
+   flattened interior. Both sides therefore read top-to-bottom, which is also the
+   more legible of the two conventions on a fore-edge tab. */
+.folio{position:absolute;bottom:12.7mm;left:0;right:0;text-align:center;
+  font-family:'JetBrains Mono',monospace;font-size:6.4pt;letter-spacing:.14em;
+  color:var(--ink4);margin-right:3.175mm;}
+.page[data-side="verso"] .folio{margin-right:0;margin-left:3.175mm;}
+.pageno{position:absolute;bottom:12.5mm;right:16mm;font-size:7.4pt;
+  font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--ink2);}
+.page[data-side="verso"] .pageno{right:auto;left:16mm;}
+.ico{flex:none;vertical-align:-.5mm;}
+.hrule{height:.3mm;background:var(--rule);margin:6mm 0;}
+.hrule.thin{height:.18mm;background:var(--rule2);}
+
+/* ===== FRONT MATTER ===== */
+.ht{font-size:40pt;line-height:1.02;letter-spacing:-.02em;
+  font-variation-settings:'wdth' 80;font-weight:800;text-transform:uppercase;}
+.ht em{font-style:normal;color:#1F4E79;}
+.tp-t{font-size:50pt;line-height:1;letter-spacing:-.02em;text-transform:uppercase;
+  font-variation-settings:'wdth' 78;font-weight:800;}
+.tp-t em{font-style:normal;color:#1F4E79;}
+.tp-sub{font-size:11pt;line-height:1.45;color:var(--ink2);max-width:112mm;margin-top:8mm;
+  font-variation-settings:'wdth' 96;}
+.tp-au{font-size:11pt;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;}
+.tp-pub{font-size:7.2pt;letter-spacing:.22em;text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;color:var(--ink3);margin-top:3mm;}
+.why-k{font-size:6.8pt;letter-spacing:.26em;text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;color:#1F4E79;}
+.why-t{font-size:23pt;line-height:1.1;margin-top:5mm;text-transform:uppercase;
+  font-variation-settings:'wdth' 82;font-weight:750;letter-spacing:-.012em;}
+.why-body{max-width:122mm;margin-top:8mm;}
+.why-body p{font-size:9.3pt;line-height:1.6;color:var(--ink2);margin-bottom:4.5mm;}
+.why-body b{color:var(--ink);font-weight:700;}
+.cp-body{max-width:130mm;}
+.cp-body p{font-size:7.4pt;line-height:1.56;color:var(--ink3);margin-bottom:3mm;}
+.cp-t{font-size:10pt!important;color:var(--ink)!important;margin-bottom:1mm!important;
+  text-transform:uppercase;font-variation-settings:'wdth' 84;font-weight:750;}
+.cp-sub{font-size:8pt!important;color:var(--ink2)!important;margin-bottom:4.5mm!important;}
+
+/* ===== PART DIVIDERS AND THE COVER ===== */
+.cover{background:#0E1113;color:#F2F4F5;}
+.page.cover .inner{padding:17mm 17mm 15mm;}
+.cover-rule{height:.3mm;background:#3C4448;}
+.eyebrow{font-size:6.8pt;letter-spacing:.28em;text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;color:#9DB6CC;}
+.cover h1{font-size:64pt;line-height:.95;margin:8mm 0 0;text-transform:uppercase;
+  font-variation-settings:'wdth' 76;font-weight:800;letter-spacing:-.02em;}
+.cover h1 em{font-style:normal;color:#9DB6CC;}
+.cover h1.dv{font-size:58pt;margin-top:9mm;}
+.cover h1.dv-2{font-size:76pt;}
+.divider .inner{justify-content:flex-start;}
+.partno{font-family:'JetBrains Mono',monospace;font-size:120pt;line-height:.8;
+  color:#20262A;letter-spacing:-.04em;}
+.cover-sub{font-size:11.6pt;line-height:1.48;color:#A7AEB2;max-width:118mm;margin-top:7mm;
+  font-variation-settings:'wdth' 96;}
+/* The statistics band is a ruled table, not four floating figures. */
+.stats{display:flex;border-top:.3mm solid #3C4448;border-bottom:.3mm solid #3C4448;}
+.stat{flex:1 1 0;min-width:0;padding:5mm 5mm 4.5mm;border-right:.18mm solid #2B3236;}
+.stat:first-child{padding-left:0;}
+.stat:last-child{padding-right:0;border-right:none;}
+.stat .sv{font-family:'JetBrains Mono',monospace;font-size:26pt;line-height:1;
+  color:#9DB6CC;letter-spacing:-.02em;}
+.stat .sl{font-size:6.4pt;letter-spacing:.2em;text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;color:#767E83;margin-top:2.4mm;}
+.texture{font-family:'JetBrains Mono',monospace;font-size:5.4pt;line-height:1.6;
+  letter-spacing:.03em;color:#4E565A;text-transform:uppercase;}
+.cover-chips{display:flex;gap:0;flex-wrap:wrap;border-top:.18mm solid #2B3236;}
+.cchip{padding:3mm 6mm 3mm 0;display:flex;align-items:baseline;gap:2.4mm;
+  border-right:.18mm solid #2B3236;margin-right:6mm;}
+.cchip b{font-family:'JetBrains Mono',monospace;font-size:12pt;line-height:1;}
+.cchip span{font-size:6.4pt;letter-spacing:.16em;text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;color:#767E83;}
+.cover-foot{display:flex;justify-content:space-between;align-items:flex-end;
+  font-family:'JetBrains Mono',monospace;font-size:6.8pt;letter-spacing:.12em;
+  text-transform:uppercase;color:#767E83;}
+.promise{border-left:.6mm solid #9DB6CC;padding-left:6mm;}
+.promise p{font-size:12.6pt;line-height:1.55;color:#D5DADD;
+  font-variation-settings:'wdth' 92;font-weight:500;}
+.promise em{font-style:normal;color:#9DB6CC;}
+.menu-k{font-family:'JetBrains Mono',monospace;font-size:6.4pt;letter-spacing:.24em;
+  text-transform:uppercase;color:#5F676B;margin-bottom:3mm;}
+.menu{column-count:2;column-gap:11mm;}
+.mrow{display:flex;align-items:baseline;gap:2.4mm;font-size:8.2pt;line-height:1.34;
+  padding:.8mm 0;break-inside:avoid;color:#A7AEB2;}
+.mname{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mdot{flex:1;border-bottom:.18mm dotted #3C4448;transform:translateY(-1px);min-width:2mm;}
+.mmin{flex:none;font-family:'JetBrains Mono',monospace;font-size:7.2pt;color:#767E83;}
+.starts{border-top:.3mm solid #3C4448;padding-top:5.5mm;}
+.st-k{font-family:'JetBrains Mono',monospace;font-size:6.4pt;letter-spacing:.24em;
+  text-transform:uppercase;color:#767E83;margin-bottom:4.5mm;}
+.strio{display:grid;grid-template-columns:repeat(3,1fr);gap:9mm;}
+.strio .sn{font-family:'JetBrains Mono',monospace;font-size:18pt;line-height:1;color:#9DB6CC;}
+.strio h4{font-size:10pt;margin:2.4mm 0 2mm;color:#F2F4F5;text-transform:uppercase;
+  font-variation-settings:'wdth' 86;font-weight:750;}
+.strio p{font-size:8pt;line-height:1.5;color:#8D9498;}
+
+/* ===== SHARED HEADS ===== */
+.ptitle{font-size:29pt;line-height:1.04;text-transform:uppercase;
+  font-variation-settings:'wdth' 80;font-weight:800;letter-spacing:-.015em;}
+.ptitle em{font-style:normal;color:#1F4E79;}
+.pkicker{font-family:'JetBrains Mono',monospace;font-size:6.6pt;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--ink3);margin-bottom:3.5mm;}
+.pintro{font-size:9.3pt;line-height:1.56;color:var(--ink2);max-width:150mm;margin-top:4mm;}
+
+/* ===== FOREWORD ===== */
+.fw{margin-top:6mm;column-count:2;column-gap:10mm;column-rule:.18mm solid var(--rule2);}
+.fw p{font-size:9.2pt;line-height:1.54;color:var(--ink2);margin-bottom:3.2mm;}
+.fw .lede{font-size:11pt;line-height:1.42;color:var(--ink);
+  font-variation-settings:'wdth' 92;font-weight:500;}
+.fw .sign{color:var(--ink);font-weight:600;font-size:9.4pt;line-height:1.5;}
+.anat{margin-top:auto;padding-top:4.5mm;border-top:.3mm solid var(--rule);
+  display:grid;grid-template-columns:54mm 1fr;gap:9mm;align-items:start;}
+.anat-cap{font-family:'JetBrains Mono',monospace;font-size:6.2pt;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink4);margin-top:2.4mm;text-align:center;}
+.kitem{display:flex;gap:3mm;margin-bottom:2.4mm;}
+.kitem .kn{flex:none;width:4.4mm;height:4.4mm;background:#1F4E79;color:#fff;
+  font-family:'JetBrains Mono',monospace;font-size:6.2pt;display:flex;
+  align-items:center;justify-content:center;margin-top:.3mm;}
+.kitem div b{display:block;font-size:7.8pt;font-weight:700;margin-bottom:.4mm;
+  text-transform:uppercase;letter-spacing:.04em;font-variation-settings:'wdth' 90;}
+.kitem div{font-size:7.7pt;line-height:1.4;color:var(--ink2);}
+
+/* ===== RULED CARD PAGES: kit, rules, rollback, endnote ===== */
+.pan{display:grid;grid-template-columns:1fr 1fr;gap:0 9mm;}
+.pcard{break-inside:avoid;padding:3.2mm 0;border-top:.18mm solid var(--rule2);}
+.pcard h4{font-family:'JetBrains Mono',monospace;font-size:6.6pt;letter-spacing:.16em;
+  text-transform:uppercase;color:#1F4E79;margin-bottom:1.6mm;}
+.pcard p{font-size:8.4pt;line-height:1.5;color:var(--ink2);}
+.rules.big{column-count:2;column-gap:10mm;}
+.rule-item{display:flex;gap:3.5mm;margin-bottom:4.4mm;break-inside:avoid;
+  padding-top:2.6mm;border-top:.18mm solid var(--rule2);}
+.rule-item .rn{font-family:'JetBrains Mono',monospace;font-size:11pt;color:var(--ink4);
+  line-height:1.1;flex:none;width:8mm;}
+.rule-item .rt{font-size:8.8pt;line-height:1.5;color:var(--ink2);}
+.rule-item .rt b{color:var(--ink);font-weight:700;}
+.shelves{column-count:4;column-gap:7mm;}
+.shelf{break-inside:avoid;margin-bottom:5mm;}
+.shelf h4{font-family:'JetBrains Mono',monospace;font-size:6.4pt;letter-spacing:.16em;
+  text-transform:uppercase;color:#1F4E79;margin-bottom:1.8mm;padding-bottom:1.2mm;
+  border-bottom:.3mm solid var(--rule);}
+.ck{display:flex;align-items:flex-start;gap:2.2mm;font-size:7.9pt;line-height:1.32;
+  color:var(--ink2);margin-bottom:1.8mm;}
+.ck .box{flex:none;width:2.8mm;height:2.8mm;border:.25mm solid var(--ink4);margin-top:.6mm;}
+.kitwrap{margin-top:auto;padding-top:6mm;}
+.legend-note{margin-top:4.5mm;font-size:7.4pt;color:var(--ink3);line-height:1.48;}
+.chartwrap{margin-top:8mm;padding-top:6mm;border-top:.3mm solid var(--rule);}
+
+/* ===== CONTENTS: a ruled index, not a menu ===== */
+.toc{display:grid;grid-template-columns:1fr 1fr;gap:0 10mm;align-items:start;}
+.trow{display:flex;align-items:baseline;gap:2.4mm;font-size:8.1pt;line-height:1.3;
+  padding:1.5mm 0;border-bottom:.18mm solid var(--rule2);}
+.trow .n{font-family:'JetBrains Mono',monospace;font-size:7pt;width:5.6mm;flex:none;}
+.trow .t{min-width:0;}
+.trow .lead{flex:1;min-width:2mm;}
+.trow .mn{font-family:'JetBrains Mono',monospace;color:var(--ink3);font-size:6.8pt;flex:none;}
+.trow .pn{flex:none;width:7mm;text-align:right;font-family:'JetBrains Mono',monospace;
+  font-size:7pt;color:var(--ink3);}
+.legend-wrap{margin-top:auto;}
+.legend{padding-top:5mm;border-top:.3mm solid var(--rule);display:grid;
+  grid-template-columns:repeat(4,1fr);gap:4mm;}
+.lg{padding-right:5mm;border-right:.18mm solid var(--rule2);}
+.lg:last-child{border-right:0;padding-right:0;}
+.lg h5{font-family:'JetBrains Mono',monospace;font-size:6.4pt;letter-spacing:.16em;
+  text-transform:uppercase;margin-bottom:1.8mm;display:flex;align-items:center;gap:1.6mm;}
+.lg p{font-size:7.3pt;line-height:1.42;color:var(--ink2);}
+
+/* ===== INDEXES AND TABLES ===== */
+.cindex{column-count:3;column-gap:8mm;}
+.ci{break-inside:avoid;margin-bottom:3mm;}
+.ci h4{font-family:'JetBrains Mono',monospace;font-size:6.8pt;letter-spacing:.08em;
+  margin-bottom:1mm;text-transform:uppercase;}
+.ci .u{height:.25mm;background:var(--rule);margin-bottom:1.4mm;}
+.ci p{font-size:7.1pt;line-height:1.34;color:var(--ink2);display:flex;gap:1.4mm;}
+.ci p .n{font-family:'JetBrains Mono',monospace;color:var(--ink4);flex:none;}
+.ci p .cp{margin-left:auto;flex:none;font-family:'JetBrains Mono',monospace;
+  font-size:6.8pt;color:var(--ink4);padding-left:2mm;}
+.eqt{width:100%;border-collapse:collapse;font-size:7.2pt;}
+.eqt th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:6.2pt;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);
+  padding:0 3mm 1.6mm 0;border-bottom:.3mm solid var(--rule);}
+.eqt td{padding:1.4mm 3mm 1.4mm 0;border-bottom:.18mm solid var(--rule2);
+  color:var(--ink2);line-height:1.32;vertical-align:top;}
+.eqt td:first-child{font-weight:700;color:var(--ink);}
+.eqt td.yours{color:var(--ink);}
+.eqt tr.keep td.yours{font-weight:700;color:#A32E1F;}
+.whens{display:grid;grid-template-columns:1fr 1fr;gap:0 11mm;}
+.when{display:block;padding:2.2mm 0;border-bottom:.18mm solid var(--rule2);break-inside:avoid;}
+.when .wq{font-size:9pt;line-height:1.26;margin-bottom:1.2mm;
+  font-variation-settings:'wdth' 90;font-weight:600;}
+.when .wl{display:flex;flex-wrap:wrap;gap:1mm 4mm;}
+.when .wl span{font-size:7.1pt;line-height:1.32;color:var(--ink2);display:flex;gap:1.4mm;}
+.when .wl b{font-family:'JetBrains Mono',monospace;color:#1F4E79;font-weight:500;}
+.feature{margin-top:6mm;padding-top:5mm;border-top:.3mm solid var(--rule);}
+.ft-head{display:flex;align-items:baseline;gap:4mm;margin-bottom:3.5mm;flex-wrap:wrap;}
+.ft-k{font-family:'JetBrains Mono',monospace;font-size:6.6pt;letter-spacing:.2em;
+  text-transform:uppercase;color:#1F4E79;}
+.ft-s{font-size:7.8pt;color:var(--ink3);}
+.ft-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8mm;}
+.ft-grid h4{font-size:8.2pt;margin-bottom:1.4mm;text-transform:uppercase;
+  font-variation-settings:'wdth' 88;font-weight:750;}
+.ft-grid p{font-size:7.7pt;line-height:1.44;color:var(--ink2);}
+
+/* =====================================================================
+   A MOVE: THE SETUP PAGE (verso)
+   ===================================================================== */
+.rhead{display:flex;gap:5mm;align-items:flex-start;}
+.rht{flex:1;min-width:0;}
+.rnum{font-family:'JetBrains Mono',monospace;font-size:26pt;line-height:.9;flex:none;
+  letter-spacing:-.03em;}
+.rtitle{font-size:20pt;line-height:1.06;text-transform:uppercase;
+  font-variation-settings:'wdth' 80;font-weight:800;letter-spacing:-.015em;}
+
+/* The specification strip: key over value, in mono, divided by hairlines.
+   This replaces a row of coloured pills. */
+.spec{display:flex;margin-top:4mm;border-top:.3mm solid var(--rule);
+  border-bottom:.3mm solid var(--rule);}
+.spec>div{flex:1 1 0;min-width:0;padding:2.2mm 3mm 2.2mm 0;
+  border-right:.18mm solid var(--rule2);}
+.spec>div:last-child{border-right:0;padding-right:0;}
+.spec .k{font-family:'JetBrains Mono',monospace;font-size:5.8pt;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink4);margin-bottom:1.2mm;}
+.spec .v{font-family:'JetBrains Mono',monospace;font-size:8pt;color:var(--ink);
+  display:flex;align-items:center;gap:1.4mm;line-height:1.15;}
+.spec .v.wide{font-family:'Archivo',sans-serif;font-size:8.2pt;font-weight:600;
+  font-variation-settings:'wdth' 88;text-transform:uppercase;letter-spacing:.02em;}
+
+/* The cutover meter: a scale with ticks, read like a gauge. Replaces a dial. */
+.meterwrap{flex:none;width:44mm;}
+.meterwrap .mk{font-family:'JetBrains Mono',monospace;font-size:5.8pt;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink4);margin-bottom:1.6mm;text-align:right;}
+.meterwrap .mv{font-family:'JetBrains Mono',monospace;font-size:17pt;line-height:1;
+  text-align:right;margin-bottom:1.8mm;}
+.meterwrap .mv i{font-style:normal;font-size:7pt;color:var(--ink4);margin-left:1mm;}
+
+.hook{font-size:11pt;line-height:1.4;margin-top:5.5mm;padding-left:4.5mm;
+  border-left:.6mm solid;font-variation-settings:'wdth' 92;font-weight:500;}
+
+/* The three origins, as a ruled table. The whole reason this book is not
+   three books. */
+.origins{margin-top:5.5mm;}
+.orow{display:flex;gap:4mm;align-items:baseline;padding:1.9mm 0;
+  border-top:.18mm solid var(--rule2);}
+.orow:first-of-type{border-top:.3mm solid var(--rule);}
+.orow:last-child{border-bottom:.3mm solid var(--rule);}
+.orow .oc{flex:none;width:17mm;font-family:'JetBrains Mono',monospace;font-size:6.2pt;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);}
+.orow .os{flex:none;width:44mm;font-size:7.9pt;font-weight:700;line-height:1.3;
+  font-variation-settings:'wdth' 90;}
+.orow .on{flex:1;min-width:0;font-size:7.7pt;line-height:1.36;color:var(--ink2);}
+
+.rbody{margin-top:6mm;}
+.rgrid{display:grid;grid-template-columns:62mm 1fr;gap:8mm;align-items:stretch;}
+.rgrid>.rcol{display:flex;flex-direction:column;min-width:0;}
+.rgrid>.rcol:first-child{padding-right:8mm;border-right:.18mm solid var(--rule2);}
+.blab{font-family:'JetBrains Mono',monospace;font-size:6.2pt;letter-spacing:.2em;
+  text-transform:uppercase;padding-bottom:1.6mm;border-bottom:.3mm solid currentColor;
+  margin-bottom:2.8mm;}
+/* No tint, no radius: a specification list, ruled like one. */
+.pre-panel{flex:1;}
+.pre-group{font-family:'JetBrains Mono',monospace;font-size:6pt;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink4);margin:3mm 0 1.6mm;}
+.pre-group:first-child{margin-top:0;}
+.pre{font-size:8.1pt;line-height:1.38;color:var(--ink2);display:flex;gap:2.2mm;
+  margin-bottom:1.7mm;}
+.pre .bt{flex:none;width:1.6mm;height:.5mm;margin-top:1.9mm;}
+.why{font-size:8.7pt;line-height:1.54;color:var(--ink2);margin-bottom:6mm;}
+.rfoot{margin-top:auto;padding-top:6mm;}
+.notes{display:grid;grid-template-columns:repeat(4,1fr);gap:0 6mm;padding-top:3.4mm;
+  border-top:.3mm solid var(--rule);}
+.note{font-size:7.5pt;line-height:1.4;color:var(--ink2);padding-right:6mm;
+  border-right:.18mm solid var(--rule2);}
+.note:last-child{border-right:0;padding-right:0;}
+.note b{font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:.14em;
+  text-transform:uppercase;font-size:6pt;display:block;margin-bottom:1mm;}
+
+/* The figures: a ruled table with mono numerals. No fill, no rounding. */
+.strip{display:flex;margin-top:5mm;border-top:.5mm solid;border-bottom:.3mm solid var(--rule);}
+.fig{flex:1;padding:2.6mm 3mm 2.6mm 0;border-right:.18mm solid var(--rule2);}
+.fig:last-child{border-right:none;padding-right:0;}
+.fig .v{font-family:'JetBrains Mono',monospace;font-size:11pt;line-height:1.1;}
+.fig .k{font-family:'JetBrains Mono',monospace;font-size:5.8pt;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink4);margin-top:1.4mm;}
+.turnoff{margin-top:3mm;font-size:7.6pt;color:var(--ink3);display:flex;gap:2.6mm;
+  align-items:baseline;}
+.turnoff b{font-family:'JetBrains Mono',monospace;font-size:6pt;letter-spacing:.16em;
+  text-transform:uppercase;font-weight:400;flex:none;}
+.needs{margin-top:2.4mm;font-size:7.6pt;color:var(--ink3);display:flex;gap:2.6mm;
+  align-items:baseline;flex-wrap:wrap;}
+.needs b{font-family:'JetBrains Mono',monospace;font-size:6pt;letter-spacing:.16em;
+  text-transform:uppercase;font-weight:400;flex:none;}
+.nitem{display:inline-flex;gap:1.4mm;align-items:baseline;color:var(--ink2);}
+.nitem i{font-style:normal;font-family:'JetBrains Mono',monospace;font-size:7pt;}
+
+/* long prerequisite lists run in two columns and take a wider column */
+.rgrid.wide{grid-template-columns:100mm 1fr;}
+.pre-panel.two{column-count:2;column-gap:6mm;}
+.pre-panel.two .pre,.pre-panel.two .pre-group{break-inside:avoid;}
+.pre-panel.two .pre-group:first-child{margin-top:0;}
+
+/* =====================================================================
+   A MOVE: THE RUNBOOK PAGE (recto)
+   ===================================================================== */
+.mhead{display:flex;align-items:baseline;gap:4mm;padding-bottom:3mm;
+  border-bottom:.5mm solid;}
+.mh-num{font-family:'JetBrains Mono',monospace;font-size:15pt;line-height:1;flex:none;}
+.mh-title{font-size:12.5pt;line-height:1.1;flex:1;min-width:0;text-transform:uppercase;
+  font-variation-settings:'wdth' 82;font-weight:750;letter-spacing:-.01em;}
+.mh-meta{font-family:'JetBrains Mono',monospace;font-size:6.4pt;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink3);flex:none;}
+.mblab{margin-top:6mm;}
+.msteps{display:block;}
+/* A numbered procedure: the number sits in a ruled gutter and the text hangs
+   beside it. No discs, no badges. */
+.mstep{display:flex;gap:5mm;align-items:flex-start;margin-bottom:6mm;}
+.mmark{flex:none;width:11mm;text-align:right;padding-top:.6mm;}
+.snum{font-family:'JetBrains Mono',monospace;font-size:10.5pt;line-height:1.2;
+  display:block;}
+.mtext{flex:1;min-width:0;font-size:9.8pt;line-height:1.54;color:var(--ink2);
+  padding-left:5mm;border-left:.18mm solid var(--rule2);}
+.mtext code{font-size:8.6pt;color:var(--ink);}
+.mfoot{display:flex;align-items:flex-start;gap:5mm;padding-top:3mm;
+  border-top:.3mm solid var(--rule);font-family:'JetBrains Mono',monospace;
+  font-size:6.4pt;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);}
+.mfoot .mf-facts{flex:none;white-space:nowrap;}
+.mfoot .mf-off{margin-left:auto;text-align:right;max-width:86mm;text-transform:none;
+  letter-spacing:0;font-family:'Archivo',sans-serif;font-size:7.4pt;color:var(--ink4);
+  line-height:1.4;}
+
+/* The rollback block. The most important panel in the book, so it is set as a
+   caution notice: a heavy rule above, a hairline below, and no fill to soften it. */
+.rb{padding:3.4mm 0 3.6mm;margin-bottom:4.5mm;border-top:.8mm solid;
+  border-bottom:.3mm solid var(--rule);}
+.rb b{display:block;font-family:'JetBrains Mono',monospace;font-size:6.2pt;
+  letter-spacing:.2em;text-transform:uppercase;font-weight:400;margin-bottom:1.8mm;}
+.rb p{font-size:8.4pt;line-height:1.5;color:var(--ink2);}
+
+/* ===== COLOPHON ===== */
+.colophon{margin-top:auto;padding-top:6mm;}
+.signoff{font-size:10pt;line-height:1.44;color:var(--ink2);max-width:146mm;
+  margin-bottom:6mm;font-variation-settings:'wdth' 92;font-weight:500;}
+.colo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0 8mm;}
+.colo-grid>div{padding-right:8mm;border-right:.18mm solid var(--rule2);}
+.colo-grid>div:last-child{border-right:0;padding-right:0;}
+.colo-grid h6{font-family:'JetBrains Mono',monospace;font-size:6.2pt;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink4);margin-bottom:1.6mm;}
+.colo-grid p{font-size:7.5pt;line-height:1.46;color:var(--ink3);}
+.colo-edition{margin-top:4mm;padding-top:2.6mm;border-top:.3mm solid var(--rule);
+  font-family:'JetBrains Mono',monospace;font-size:6.2pt;color:var(--ink4);text-align:center;}
+
+/* The Part numeral on a divider: set large, in the ink's own near-black, so it
+   reads as a structural marker rather than a headline competing with the name. */
+.divider .partno{margin:6mm 0 -6mm;}
+
+/* ===== THE IMPRINT LINE ===== */
+/* OneUptime is the author's company and the book recommends it, so the byline
+   and the disclosure on the copyright page are a pair. Set quietly: it is an
+   imprint line, not a promotion. */
+.cover-by{margin-top:5mm;font-family:'JetBrains Mono',monospace;font-size:8pt;
+  letter-spacing:.2em;text-transform:uppercase;color:#9DB6CC;}
+.tp-by{margin-top:2.5mm;font-family:'JetBrains Mono',monospace;font-size:7.4pt;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);}
+
+/* ===== THE STAGE CHECKLIST PAGES ===== */
+/* The contents pages are tick lists: a migration runs for months and the printed
+   copy is the one nobody can accidentally clear. */
+.trow .tick{flex:none;width:3mm;height:3mm;border:.25mm solid var(--ink4);
+  margin-right:2mm;transform:translateY(.3mm);}
+.stage-done{margin-top:3.5mm;font-size:8.6pt;line-height:1.5;color:var(--ink2);
+  max-width:140mm;}
+.stage-done b{font-family:'JetBrains Mono',monospace;font-weight:400;font-size:6.4pt;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--ink4);
+  display:inline-block;margin-right:2.5mm;}
+/* The disclosure runs full width under the colophon grid rather than inside a
+   narrow column of it, where it was tall enough to push the page over. */
+.colo-disc{margin-top:4mm;padding-top:3mm;border-top:.18mm solid var(--rule2);
+  font-size:7.4pt;line-height:1.5;color:var(--ink3);}

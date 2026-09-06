@@ -1,0 +1,148 @@
+"""Structural validation of the built EPUB.
+
+Not a substitute for Adobe's epubcheck or Kindle Previewer — run those before
+publishing — but it catches the things that actually break a Kindle conversion
+and it runs in the build with no Java dependency.
+"""
+import re, sys, zipfile
+import xml.etree.ElementTree as ET
+from pathlib import PurePosixPath, Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / 'book'))
+import imprint as IMP
+
+EPUB = ROOT / 'dist' / IMP.EPUB_NAME
+OPF_NS = {'o': 'http://www.idpf.org/2007/opf',
+          'dc': 'http://purl.org/dc/elements/1.1/'}
+NCX_NS = {'n': 'http://www.daisy.org/z3986/2005/ncx/'}
+
+# RFC 4122: the urn:uuid: scheme has to be followed by an actual UUID. Adobe's
+# epubcheck rejects anything else; this checker used not to, which is how
+# 'urn:uuid:twenty-minute-table-1.0.1' survived several releases. Asserting the
+# shape here also rules out interpolating the version back in, since no version
+# string can match it.
+UUID_URN = re.compile(r'^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}'
+                      r'-[0-9a-f]{4}-[0-9a-f]{12}$', re.I)
+
+
+def resolve(base, href):
+    parts = []
+    for seg in str((PurePosixPath(base).parent / href).as_posix()).split('/'):
+        if seg == '..':
+            parts and parts.pop()
+        elif seg not in ('.', ''):
+            parts.append(seg)
+    return '/'.join(parts)
+
+
+def main():
+    if not EPUB.exists():
+        sys.exit('epubcheck: build the epub first (make epub)')
+    # A build that fails before writing leaves the previous archive in place, and
+    # validating that would report success for a file nobody just built. Compare
+    # against the newest input instead of trusting whatever is on disk.
+    built = EPUB.stat().st_mtime
+    sources = list((ROOT / 'moves').glob('*.md')) + list((ROOT / 'book').rglob('*.py'))
+    cover = ROOT / 'dist' / 'cover-kindle.jpg'
+    if cover.exists():
+        sources.append(cover)
+    newer = [p for p in sources if p.stat().st_mtime > built]
+    if newer:
+        rel = [str(p.relative_to(ROOT)) for p in sorted(newer)[:4]]
+        sys.exit(f'epubcheck: {EPUB.name} is older than {len(newer)} of its sources '
+                 f'({", ".join(rel)}). Rebuild it — the epub build probably failed.')
+
+    z = zipfile.ZipFile(EPUB)
+    names = z.namelist()
+    problems = []
+
+    if names[0] != 'mimetype':
+        problems.append(f'first archive entry is {names[0]!r}; it must be "mimetype"')
+    if z.getinfo('mimetype').compress_type != zipfile.ZIP_STORED:
+        problems.append('mimetype must be stored uncompressed')
+    if z.read('mimetype') != b'application/epub+zip':
+        problems.append('mimetype content is wrong')
+
+    for n in names:
+        if n.endswith(('.xhtml', '.opf', '.ncx', '.xml')):
+            try:
+                ET.fromstring(z.read(n))
+            except ET.ParseError as e:
+                problems.append(f'{n} is not well-formed XML: {e}')
+
+    pub_uid = None
+    if 'OEBPS/content.opf' in names:
+        root = ET.fromstring(z.read('OEBPS/content.opf'))
+        items = root.findall('.//o:manifest/o:item', OPF_NS)
+        missing = [i.get('href') for i in items if f"OEBPS/{i.get('href')}" not in names]
+        if missing:
+            problems.append(f'{len(missing)} manifest items are not in the archive: {missing[:4]}')
+        ids = {i.get('id') for i in items}
+        dangling = [r.get('idref') for r in root.findall('.//o:spine/o:itemref', OPF_NS)
+                    if r.get('idref') not in ids]
+        if dangling:
+            problems.append(f'spine points at unknown ids: {dangling[:4]}')
+        navs = [i for i in items if 'nav' in (i.get('properties') or '')]
+        if len(navs) != 1:
+            problems.append(f'{len(navs)} items declare properties="nav"; EPUB3 needs exactly one')
+        covers = [i for i in items if 'cover-image' in (i.get('properties') or '')]
+        if len(covers) != 1:
+            problems.append(f'{len(covers)} items declare cover-image; need exactly one')
+
+        # The publication identifier: well-formed, and the one the package points at.
+        # It is deliberately NOT checked against a literal, so imprint.py stays the
+        # single source of truth — only its form and its internal agreement matter.
+        uid_id = root.get('unique-identifier')
+        idents = {e.get('id'): (e.text or '').strip()
+                  for e in root.findall('.//dc:identifier', OPF_NS)}
+        if uid_id not in idents:
+            problems.append(f'package unique-identifier={uid_id!r} names no dc:identifier '
+                            f'(have {sorted(k for k in idents if k)})')
+        else:
+            pub_uid = idents[uid_id]
+            if not UUID_URN.match(pub_uid):
+                problems.append(f'dc:identifier {pub_uid!r} is not urn:uuid: followed by a '
+                                f'UUID; it must be EPUB_ID from imprint.py, and must never '
+                                f'be derived from the version')
+
+    # toc.ncx carries the same identifier as dtb:uid. Kindle's converter reads the
+    # NCX, so the two disagreeing is worse than either being wrong alone.
+    if 'OEBPS/toc.ncx' in names:
+        ncx = ET.fromstring(z.read('OEBPS/toc.ncx'))
+        uids = [m.get('content') for m in ncx.findall('.//n:head/n:meta', NCX_NS)
+                if m.get('name') == 'dtb:uid']
+        if len(uids) != 1:
+            problems.append(f'toc.ncx declares {len(uids)} dtb:uid values; need exactly one')
+        elif pub_uid is not None and uids[0] != pub_uid:
+            problems.append(f'toc.ncx dtb:uid {uids[0]!r} does not match dc:identifier '
+                            f'{pub_uid!r}')
+
+    dead = []
+    for n in names:
+        if n.endswith('.xhtml'):
+            for href in re.findall(rb'(?:href|src)="([^"#:]+)"', z.read(n)):
+                t = resolve(n, href.decode())
+                if t not in names:
+                    dead.append(f'{n} -> {href.decode()}')
+    if dead:
+        problems.append(f'{len(dead)} dead internal links, e.g. {dead[:3]}')
+
+    # KDP forbids transparency in EPUB images
+    pngs = [n for n in names if n.lower().endswith('.png')]
+    if pngs:
+        problems.append(f'{len(pngs)} PNGs present; KDP wants no alpha — prefer JPEG: {pngs[:3]}')
+
+    mb = EPUB.stat().st_size / 1e6
+    if problems:
+        print('epubcheck: FAILED')
+        for p in problems:
+            print('  -', p)
+        sys.exit(1)
+    print(f'epubcheck: OK — {len(names)} entries, {sum(n.endswith(".xhtml") for n in names)} documents, '
+          f'{mb:.2f} MB')
+    print('           still run Adobe epubcheck and Kindle Previewer 3 before publishing')
+
+
+if __name__ == '__main__':
+    main()
