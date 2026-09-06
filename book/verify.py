@@ -65,7 +65,7 @@ def main():
         h2 = re.findall(r'^## (.+)$', t, re.M)
         if len(h1) != 1:
             problems.append(f'{n}: {len(h1)} H1s')
-        if not re.match(r'^\d{2} · \S', h1[0] if h1 else ''):
+        if not re.match(r'^\d{2,3} · \S', h1[0] if h1 else ''):
             problems.append(f'{n}: H1 is not "NN · Title"')
         if h2 != SECTIONS:
             problems.append(f'{n}: H2 mismatch -> {h2}')
