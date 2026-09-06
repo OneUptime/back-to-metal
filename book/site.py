@@ -204,18 +204,24 @@ def build_index(moves):
     sched = RM.schedule(moves, DEFAULT_CREW)
     stages = RM.stages(moves, sched)
 
+    # One card per stage, phrased as the sentence a reader would say about
+    # themselves. The whole point of this strip is that somebody who has never
+    # opened the book can place themselves in it in about ten seconds.
+    WHERE = [
+        ('Iron',     'We have not bought anything yet'),
+        ('Site',     'We know what to buy, not where to put it'),
+        ('Cluster',  'The machines are racked and powered'),
+        ('Platform', 'The cluster runs, nothing is on it'),
+        ('Data',     'Apps have moved, the data is still rented'),
+        ('Edge',     'Everything runs here except the traffic'),
+        ('Watch',    'It all moved and we are still paying'),
+    ]
     entry = ''.join(
         f'<a href="#{LAYERS[k]["key"]}" style="--c:{LAYERS[k]["color"]}">'
         f'<div class="e-k">{esc(where)}</div>'
-        f'<div class="e-t">Start at stage {LAYERS[k]["stage"]}, '
+        f'<div class="e-t">Start at stage {LAYERS[k]["stage"]}: '
         f'{esc(LAYERS[k]["doing"].lower())}.</div></a>'
-        for k, where in [
-            ('Iron', 'Nothing bought yet'),
-            ('Cluster', 'Hardware racked, no cluster'),
-            ('Platform', 'Cluster up, nothing on it'),
-            ('Data', 'Apps moved, data still rented'),
-            ('Watch', 'All moved, still paying'),
-        ])
+        for k, where in WHERE)
 
     blocks = ''
     for st in stages:
@@ -257,6 +263,18 @@ def build_index(moves):
 <div class="shell">
 {rail(moves, sched)}
 <main class="main">
+  <section class="howto">
+    <h2 class="d">How to use this</h2>
+    <ol class="howto-l">
+      <li><b>Find where you are.</b> Pick the sentence below that sounds like
+        your estate. It takes you to the stage you start at.</li>
+      <li><b>Work down the checklist in order.</b> Each Move says what has to be
+        finished first, what it costs, how long the cutover is and how to undo
+        it. Open one and follow it.</li>
+      <li><b>Tick them off.</b> This page remembers, in this browser, and tells
+        you what is next.</li>
+    </ol>
+  </section>
   <section class="now">
     <div class="now-h"><h2 class="d">Where you are</h2>
       <span class="now-k">Ticks are saved in this browser</span></div>
