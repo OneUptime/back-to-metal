@@ -7,7 +7,7 @@
 ## Leaving from
 - **AWS:** Route 53 weighted records — sitting in front of the Application Load Balancer, and the mechanism that both shifts the traffic and takes it back.
 - **Google Cloud:** Cloud DNS weighted routing — the same shape, in front of the external application load balancer.
-- **Azure:** Traffic Manager weighted routing in front of Application Gateway — the same again, with its own probe behaviour.
+- **Azure:** Traffic Manager weighted routing — the same again in front of Application Gateway, with its own probe behaviour.
 
 ## Why this works
 This is the largest cutover in the book and it is done as a weighted shift rather than a switch, because the way back has to be one record change at every point. Two halves have to be right. The technical half is a synthetic peak that reproduces the failures that only appear under load: connection-tracking exhaustion, ephemeral port limits, name-resolution replica counts and the flow rehash from Move 96. The business half is the one engineers skip: a freeze window, customer notice, a status-page entry, a named person who says go or no-go, and a lowered record lifetime set a week in advance.
