@@ -53,9 +53,9 @@ Until step seven the source is still the primary and still authoritative, so bac
 
 ## The numbers
 
-| Was | Now | Saved | Cutover | Effort |
-|---|---|---|---|---|
-| $4,180/mo | $410/mo | 90% | 12 min | 6 days |
+| Was | Now | Saved | Cutover | Effort | Wait |
+|---|---|---|---|---|---|
+| $4,180/mo | $410/mo | 90% | 12 min | 6 days | — |
 
 ## What you can turn off
 The managed instance, its read replicas and its snapshots — after thirty days, and after a full billing cycle has shown the line gone.
