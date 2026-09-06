@@ -185,7 +185,7 @@ def check(moves):
         for d in ds:
             if d not in have:
                 out.append(f'move {n} depends on {d}, which does not exist')
-            elif d >= n:
+            elif int(d) >= int(n):
                 out.append(f'move {n} depends on {d}, which is not an earlier Move')
         if len(set(ds)) != len(ds):
             out.append(f'move {n} lists a dependency twice')

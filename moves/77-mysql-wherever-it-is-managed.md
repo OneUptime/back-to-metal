@@ -41,7 +41,7 @@ MySQL replicates by global transaction identifiers rather than by replication sl
 - **Leftovers:** Binary log retention on the source continues to consume storage after the cutover. Reduce it deliberately once the seven days have passed.
 
 ## Rollback
-Until the source is taken out of read-only and the application is repointed, backing out is a single setting. For the week afterwards, replication is reversed by streaming from the new primary back to the source, and the source's own backups remain available for a restore to a known good point. The point of no return is the deletion of the source, which is Move 38. Keep the recorded positions, because a rollback without them is a full recopy.
+Until the source is taken out of read-only and the application is repointed, backing out is a single setting. For the week afterwards, replication is reversed by streaming from the new primary back to the source, and the source's own backups remain available for a restore to a known good point. The point of no return here is the deletion of the source instance in Move 38 and not a moment in this runbook. Keep the recorded positions, because a rollback without them is a full recopy.
 
 ## The numbers
 
