@@ -5,6 +5,21 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+### Fixed
+
+- **The book is four pages too short to print, and nothing said so.** KDP will
+  not manufacture outside its page-count bands whatever the price works out at:
+  a standard-colour paperback needs 72 pages and this interior is 68, and a
+  hardcover needs 75. Both bands were written as a comment beside `INK` in
+  `imprint.py` and nothing ever read them, so `pricing.py` cheerfully computed
+  a margin for an edition that cannot be made — which is a submission rejected
+  after the covers have been drawn. They are data now, and checked before any
+  margin is. `PUBLISHING.md` carries the three ways out and what each costs.
+- **The hardcover printing rate is no longer unset.** $5.65 fixed plus $0.080 a
+  page, premium colour, large trim, read off KDP's own table — it is a property
+  of the trim and the ink rather than of this title, so it carries. It only
+  becomes usable if the interior reaches 75 pages.
+
 ## [3.0.1] - 2026-09-07
 
 3.0.0 shipped with the roadmap on the front page invisible, and twenty-one

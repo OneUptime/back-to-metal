@@ -60,19 +60,52 @@ def main():
     target = IMP.MIN_PRINT_MARGIN
     rows, problems, notes = [], [], []
 
+    # ---- can it be printed at all? ------------------------------------------
+    # BEFORE ANY MARGIN. KDP will not manufacture outside these bands whatever
+    # the arithmetic says, and a margin computed for an edition that cannot be
+    # made is a submission rejected after the covers have been drawn. The bands
+    # were a comment beside INK for three editions and nothing read them.
+    lo, hi = IMP.INK_PAGES[IMP.INK_CHOICE]
+    if not (lo <= n <= hi):
+        short = lo - n if n < lo else 0
+        problems.append(
+            f'Paperback ({IMP.INK_CHOICE}): {n} pages is outside KDP\'s {lo}-{hi} band '
+            + (f'for this ink - the interior is {short} page{"" if short == 1 else "s"} '
+               f'short and CANNOT be printed this way. Either grow it past {lo}, or '
+               f'switch INK_CHOICE to premium colour, which prints from '
+               f'{IMP.INK_PAGES["premium colour"][0]} pages and costs '
+               f'${print_cost(n, "premium colour"):.2f} a copy against '
+               f'${print_cost(n, IMP.INK_CHOICE):.2f}. Ink is locked permanently once a '
+               f'title is published, so this is not a decision to take twice.'
+               if short else 'and cannot be printed this way.'))
+
+    hlo, hhi = IMP.HARDBACK_PAGES
+    hardback_printable = hlo <= n <= hhi
+    if not hardback_printable:
+        problems.append(
+            f'Hardback ({IMP.HARDBACK_INK}): {n} pages is outside KDP\'s {hlo}-{hhi} band, '
+            f'so there is no hardcover edition to price. It needs {hlo - n} more page'
+            f'{"" if hlo - n == 1 else "s"}. This is also why cover.py has no jacket to '
+            f'draw: there is no book to wrap.')
+
     # ---- print editions ----------------------------------------------------
     pb_cost = print_cost(n, IMP.INK_CHOICE)
     rows.append(row(f'Paperback ({IMP.INK_CHOICE})', pb_cost,
                     IMP.PRINT_ROYALTY_RATE, target, IMP.LIST_USD.get('paperback')))
 
-    if IMP.HARDBACK_PRINT_COST_USD is None:
-        notes.append('Hardback printing cost is unset. Read it off KDP\'s Printing Cost & '
-                     'Royalty Calculator and put it in imprint.HARDBACK_PRINT_COST_USD.')
-    else:
-        rows.append(row(f'Hardback ({IMP.HARDBACK_INK})', IMP.HARDBACK_PRINT_COST_USD,
+    # The hardcover rate is a property of the trim and the ink, so it can be
+    # computed - but only for a page count KDP will actually print.
+    hb_cost = (IMP.HARDBACK_PRINT_COST_USD if IMP.HARDBACK_PRINT_COST_USD is not None
+               else IMP.HARDBACK_FIXED_USD + IMP.HARDBACK_PER_PAGE_USD * n)
+    if hardback_printable:
+        rows.append(row(f'Hardback ({IMP.HARDBACK_INK})', hb_cost,
                         IMP.PRINT_ROYALTY_RATE, target, IMP.LIST_USD.get('hardback')))
         notes.append('Hardcover is premium colour only — KDP does not offer standard colour '
                      'for it, so the hardback cannot be made cheaper the way the paperback can.')
+    else:
+        notes.append(f'Hardback not priced: {n} pages is under the {hlo}-page minimum. At '
+                     f'{hlo} pages it would cost ${IMP.HARDBACK_FIXED_USD + IMP.HARDBACK_PER_PAGE_USD * hlo:.2f} '
+                     f'a copy.')
 
     # ---- kindle ------------------------------------------------------------
     if EPUB.exists():

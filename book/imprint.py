@@ -128,9 +128,22 @@ MIN_PRINT_MARGIN = 0.25
 
 # fixed cost, per-page cost - USD, Amazon.com, large trim
 INK = {
-    'premium colour':  (1.00, 0.0800),   # paperback, 42-828 pages
-    'standard colour': (1.00, 0.0402),   # paperback, 72-600 pages
+    'premium colour':  (1.00, 0.0800),
+    'standard colour': (1.00, 0.0402),
 }
+
+# THE PAGE-COUNT BANDS, which were a comment on the line above and are now a
+# check. KDP will not print outside them at all, whatever the price works out
+# at, and this book is INSIDE only one of the three: at 68 pages it is four
+# short of a standard-colour paperback and seven short of any hardcover.
+# pricing.py used to compute a margin for an edition that could not be
+# manufactured, which is a submission rejected after the covers are drawn.
+# (min pages, max pages), Amazon.com, large trim.
+INK_PAGES = {
+    'premium colour':  (42, 828),
+    'standard colour': (72, 600),
+}
+HARDBACK_PAGES = (75, 550)
 # The interior is type, rules and flat colour - no photographs anywhere - so
 # premium colour buys this book nothing it can use.
 INK_CHOICE = 'standard colour'
@@ -147,10 +160,14 @@ LIST_USD = {
     'hardback': None,
 }
 
-# Unset until the interior's real page count is known - the hardback print cost
-# is fixed + per-page in premium colour, and guessing it would put a wrong floor
-# under the price. pricing.py says so rather than inventing a number.
-HARDBACK_PRINT_COST_USD = None
+# Hardcover, premium colour, large trim: $5.65 fixed plus $0.080 a page, read
+# off KDP's own Hardcover Printing Cost table. It is a rate for the trim and the
+# ink rather than for this title, so it carries - but the band above does not:
+# at 68 pages there is no hardcover to price, and this figure only becomes
+# usable if the interior reaches 75.
+HARDBACK_FIXED_USD = 5.65
+HARDBACK_PER_PAGE_USD = 0.080
+HARDBACK_PRINT_COST_USD = None      # set by pricing.py from the two above
 
 # The content is CC BY 4.0, so the copyright page says that rather than the
 # "all rights reserved" boilerplate, which would contradict the LICENSE files.
