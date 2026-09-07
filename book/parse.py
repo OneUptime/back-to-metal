@@ -13,6 +13,13 @@ MOVES = ROOT / 'moves'
 # The five Parts. `key` is the CSS/HTML handle, `color` prints and `tint` is the
 # opaque panel behind it - opaque because a KDP interior carries no alpha, so a
 # tint is a colour rather than a colour at 12%. See flatten.py.
+#
+# `dark` is the same signal lifted off a near-black ground. It is not a
+# decoration: `color` is chosen to sit on paper, and every one of the seven
+# measures between 2.2:1 and 3.6:1 against the website's dark background, which
+# is below the 3:1 floor for a graphic and nowhere near the 4.5:1 a numeral set
+# in it needs. Both hexes are the Part; which one is correct depends on what is
+# behind it, so both live here rather than one of them living in a stylesheet.
 # Each Part is also a STAGE of the migration, and carries the plain-language
 # version of what you are doing while you are in it.
 #
@@ -22,31 +29,31 @@ MOVES = ROOT / 'moves'
 # number, and between them a reader can answer "where am I" without holding the
 # whole book in their head. Both outputs lead with them.
 LAYERS = {
-    'Iron':     dict(key='iron',     color='#474F57', tint='#ECEEF0', label='Iron',
+    'Iron':     dict(key='iron',     color='#474F57', dark='#A8B0B8', tint='#ECEEF0', label='Iron',
                      part='I',    roman='Part I',    stage=1,
                      doing='Work out what to buy',
                      done='You know what to order, and why.'),
-    'Site':     dict(key='site',     color='#6B5344', tint='#F0ECE8', label='Site',
+    'Site':     dict(key='site',     color='#6B5344', dark='#C9B29E', tint='#F0ECE8', label='Site',
                      part='II',   roman='Part II',   stage=2,
                      doing='Find somewhere to put it',
                      done='The machines are racked, powered and reachable.'),
-    'Cluster':  dict(key='cluster',  color='#1F4E79', tint='#E6ECF3', label='Cluster',
+    'Cluster':  dict(key='cluster',  color='#1F4E79', dark='#8FB4D6', tint='#E6ECF3', label='Cluster',
                      part='III',  roman='Part III',  stage=3,
                      doing='Build the cluster',
                      done='A cluster that can take production traffic, and has never seen any.'),
-    'Platform': dict(key='platform', color='#4B3F8F', tint='#ECEAF4', label='Platform',
+    'Platform': dict(key='platform', color='#4B3F8F', dark='#A996D8', tint='#ECEAF4', label='Platform',
                      part='IV',   roman='Part IV',   stage=4,
                      doing='Make it fit to run production',
                      done='Identity, secrets, images, policy and dashboards, before any data arrives.'),
-    'Data':     dict(key='data',     color='#A32E1F', tint='#F6E8E5', label='Data',
+    'Data':     dict(key='data',     color='#A32E1F', dark='#E39A7B', tint='#F6E8E5', label='Data',
                      part='V',    roman='Part V',    stage=5,
                      doing='Move the data',
                      done='Your state is on your disks, and the old copy is still warm.'),
-    'Edge':     dict(key='edge',     color='#14655A', tint='#E3EFED', label='Edge',
+    'Edge':     dict(key='edge',     color='#14655A', dark='#7FC4B2', tint='#E3EFED', label='Edge',
                      part='VI',   roman='Part VI',   stage=6,
                      doing='Move the traffic',
                      done='Users are reaching your addresses, not somebody else’s.'),
-    'Watch':    dict(key='watch',    color='#8A6112', tint='#F4EEE1', label='Watch',
+    'Watch':    dict(key='watch',    color='#8A6112', dark='#DDB26A', tint='#F4EEE1', label='Watch',
                      part='VII',  roman='Part VII',  stage=7,
                      doing='Run it, and close the account',
                      done='You can carry it at 03:00, and the cloud bill is zero.'),

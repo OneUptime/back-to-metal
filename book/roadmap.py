@@ -245,7 +245,13 @@ def svg(moves, workers=3, w=1180, week=WEEK, href=None):
              f'stroke="var(--rule)" stroke-width="1"/>',
              f'<text x="{L - 12}" y="{TOP - 18}" class="rm-axis" '
              f'text-anchor="end">WEEK</text>']
-    step = 1 if weeks <= 16 else (2 if weeks <= 32 else 4)
+    # The ruler is spaced from the room it has, not from a guess. At three
+    # engineers the schedule runs to 242 weeks, and a fixed step of 4 put 61
+    # three-digit labels into 1,060 units of drawing - they overprinted into a
+    # grey smear and the axis stopped being readable at all.
+    LAB = 32.0
+    step = next((c for c in (1, 2, 4, 5, 10, 20, 25, 50, 100)
+                 if (weeks / c) * LAB <= plot), 100)
     for wk in range(0, weeks + 1, step):
         x = L + wk * week * px
         if x > w - R:
@@ -254,10 +260,13 @@ def svg(moves, workers=3, w=1180, week=WEEK, href=None):
                      f'stroke="var(--rule2)" stroke-width="1"/>')
         ruler.append(f'<text x="{x:.1f}" y="{TOP - 18}" class="rm-wk">{wk}</text>')
 
+    fill = 'var(--c)' if href else None
     body = []
     for s_, top, h, lanes in bands:
+        key = LAYERS[s_['layer']]['key']
+        body.append(f'<g data-part="{key}">')
         body.append(f'<text x="{L - 12}" y="{top + 10}" class="rm-part" '
-                    f'text-anchor="end" fill="{s_["color"]}">{s_["roman"]}</text>')
+                    f'text-anchor="end" fill="{fill or s_["color"]}">{s_["roman"]}</text>')
         body.append(f'<text x="{L - 12}" y="{top + 22}" class="rm-partn" '
                     f'text-anchor="end">{s_["layer"]}</text>')
         for li, lane in enumerate(lanes):
@@ -274,13 +283,19 @@ def svg(moves, workers=3, w=1180, week=WEEK, href=None):
                              f'class="rm-n">{it["n"]}</text>')
                 block = (f'<title>{it["n"]} · {it["t"]}</title>'
                          f'<rect x="{x0:.1f}" y="{ly:.1f}" width="{bw:.1f}" '
-                         f'height="{ROW}" fill="{s_["color"]}"{edge}/>{label}')
+                         f'height="{ROW}" fill="{fill or s_["color"]}"{edge}/>{label}')
                 if href:
                     body.append(f'<a href="{href(by[it["n"]])}">{block}</a>')
                 else:
                     body.append(f'<g>{block}</g>')
+        body.append('</g>')
+    # role="img" is children-presentational: on the web the bars are 122 real
+    # links, and declaring the drawing an image prunes every one of them from
+    # the accessibility tree while leaving them in the tab order as silent
+    # stops. The printed drawing has nothing to click, so there it is an image.
+    role = 'img' if href is None else 'group'
     return (f'<svg class="rm" viewBox="0 0 {w} {height:.0f}" width="100%" '
-            f'style="height:auto;display:block" role="img" '
+            f'style="height:auto;display:block" role="{role}" '
             f'aria-label="The roadmap: {len(moves)} Moves across {len(st)} Parts, '
             f'{sc["weeks"]:.0f} weeks with {workers} engineers">'
             + ''.join(ruler) + ''.join(body) + '</svg>')

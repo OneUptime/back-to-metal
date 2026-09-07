@@ -1,581 +1,982 @@
 /* Back to Metal - website.
-   ------------------------------------------------------------------
-   A schedule drawing and a technical index, not a landing page. The
-   front page IS the roadmap: masthead, the chart, then every Move in
-   order, stage by stage.
+   ==================================================================
+   An instrument, not a document. Somebody keeps this open for six
+   months while they rack machines, so every page carries the same
+   48px chrome: where you are, where you can go, how far you have got,
+   and a box that takes a Move number. The book cover is a cover, and
+   appears once, on the front page.
 
    Rules rather than boxes. No rounded corners, no shadows, no pills,
-   no cards, nothing centred. Every number is monospaced; prose is a
-   grotesque. Colour marks a Part and does nothing else.
+   no tinted cards, nothing centred. Every number is monospaced; prose
+   is a grotesque. Colour marks a Part and does nothing else.
+
+   Everything below is built from the tokens in the first eighty
+   lines. If you are about to type a length, a size or a colour that
+   is not one of them, the answer is a token you have not added yet.
 
    Fonts are embedded into this file at build time, so site/ makes no
    external request.
-   ------------------------------------------------------------------ */
+   ================================================================== */
 *,*::before,*::after{box-sizing:border-box}
+
 :root{
-  --ink:#0B0E10; --ink2:#333A3F; --ink3:#666E74; --ink4:#98A0A6;
-  --bg:#FCFCFB; --fill:#F1F2F2; --rule:#C2C7CA; --rule2:#E3E6E7;
-  --accent:#1F4E79; --warn:#A32E1F; --rail:196px; --gut:34px;
+  color-scheme:light dark;
+
+  /* ---- families ------------------------------------------------ */
+  --fam:'Archivo',Helvetica,Arial,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+
+  /* ---- space: 4px base, nine steps, no other lengths ----------- */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px;
+  --s6:32px; --s7:48px; --s8:64px; --s9:96px;
+
+  /* ---- type ---------------------------------------------------- */
+  /* Prose */
+  --t-lede:19px; --t-body:16px; --t-sub:14px;
+  /* Display: Archivo at the narrow width stop, the `.d` voice */
+  --d-mast:clamp(40px,7vw,76px);
+  --d-page:clamp(28px,3.2vw,40px);
+  --d-sect:clamp(20px,2vw,26px);
+  --d-sub:17px;
+  /* Item titles: the one middle width stop */
+  --t-item:16px; --t-item-lg:17px;
+  /* Mono */
+  --m-fig:26px; --m-val:15px; --m-lab:12px;
+  /* Leading, tighter as size grows */
+  --lh-d:1; --lh-lede:1.4; --lh-body:1.55; --lh-sub:1.6;
+  /* Tracking: two for display, one for labels, and that is all */
+  --tr-d:-.02em; --tr-lab:.08em;
+  /* Measure in em, never ch: Archivo's average glyph is .45em but its
+     zero is .56em, so `70ch` sets 88 characters and lies by a fifth. */
+  --measure:31em; --measure-sm:26em; --measure-lede:27em;
+  --col-text:520px;
+
+  /* ---- layout -------------------------------------------------- */
+  --gut:clamp(16px,4vw,32px);
+  --page:1240px;
+  --rail:212px;
+  --aside:300px;
+  --bar:48px;                       /* the chrome, on every page */
+  --strip:44px;                     /* the stage strip, on a phone */
+  --anchor:calc(var(--bar) + var(--s5));
+
+  /* ---- ink ----------------------------------------------------- */
+  /* Every value below is 4.5:1 or better against --bg. The greys this
+     replaced ran to 2.58:1 and carried most of the site's labels. */
+  --ink:#0B0E10; --ink2:#333A3F; --ink3:#535B61; --ink4:#6B7479;
+  --bg:#FCFCFB; --fill:#ECEEEE; --rule:#A8AFB3; --rule2:#DADEDE;
+  --accent:#0F5C8C; --warn:#B3200A; --on-c:#FFFFFF;
+
+  /* ---- the seven Parts ----------------------------------------- */
+  /* Written by site.py out of parse.LAYERS, so the stylesheet and the
+     printed book cannot hold different opinions about what Iron is. */
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --ink:#E9EBEC; --ink2:#B2B8BC; --ink3:#828A8F; --ink4:#5F686D;
-  --bg:#0A0C0D; --fill:#14171A; --rule:#2A3033; --rule2:#1B1F22;
-  --accent:#8FB4D6; --warn:#E39A7B;
+@media (prefers-color-scheme:dark){:root{
+  --ink:#E2E5E6; --ink2:#B2B8BC; --ink3:#9AA2A7; --ink4:#7E878C;
+  --bg:#14181A; --fill:#1F2427; --rule:#434B50; --rule2:#282D30;
+  --accent:#7EC3E8; --warn:#F3A08A; --on-c:#14181A;
 }}
-html{-webkit-text-size-adjust:100%}
+
+/* A Part colour is set by `data-part`, never by an inline hex, so one
+   attribute drives the rule, the numeral and the fill, and the dark
+   variant arrives without site.py knowing which theme is on. */
+[data-part=none]{--c:var(--ink)}
+
+html{-webkit-text-size-adjust:100%;scroll-padding-top:var(--anchor)}
+html,body{overflow-x:clip}
 body{margin:0;background:var(--bg);color:var(--ink);
-  font:400 15px/1.58 'Archivo',Helvetica,Arial,sans-serif;
+  font:400 var(--t-body)/var(--lh-body) var(--fam);
   font-variation-settings:'wdth' 100;-webkit-font-smoothing:antialiased}
+
+/* The display voice: Archivo's width axis, not its weight axis. */
 .d{font-variation-settings:'wdth' 79;font-weight:800;text-transform:uppercase;
-  letter-spacing:-.015em;line-height:.98}
-.m,code,kbd,.n{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;
-  font-feature-settings:'tnum' 1}
-code{font-size:.87em}
+  letter-spacing:var(--tr-d);line-height:var(--lh-d)}
+code,kbd{font-family:var(--mono);font-size:.87em}
 a{color:inherit}
 img,svg{max-width:100%}
-/* Author display rules outrank the user agent's [hidden], which is why the
-   planner's summary used to show while it was still empty. Say it once here
-   and every hidden element in the site behaves. */
+/* Author display rules outrank the user agent's [hidden], which is why
+   the planner's summary used to show while it was still empty. */
 [hidden]{display:none!important}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.19em;
-  text-transform:uppercase;color:var(--ink4)}
+:target{scroll-margin-top:var(--anchor)}
+.vh{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;
+  clip-path:inset(50%);white-space:nowrap}
+html:not(.js) .jsonly{display:none}
 
-/* ---------- masthead ---------------------------------------------------- */
-.mast{border-top:5px solid var(--ink);padding:0 var(--gut)}
-.mast-in{display:flex;align-items:flex-end;gap:40px;padding:20px 0 16px;
-  border-bottom:1px solid var(--ink);flex-wrap:wrap}
-.mast h1,.mast .wordmark{margin:0;font-size:clamp(38px,7.2vw,86px);
-  font-variation-settings:'wdth' 76;font-weight:800;text-transform:uppercase;
-  letter-spacing:-.022em;line-height:.86;text-decoration:none;display:block}
+/* THE ONE LABEL RECIPE. There used to be forty-two of these, at five
+   sizes and eleven trackings, and a label voice spoken forty-two ways
+   is a texture rather than a signal. Caps-mono is for four words or
+   fewer; anything longer is sentence case in --ink3. */
+.lbl{font:400 var(--m-lab)/1.3 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;color:var(--ink3);font-variant-numeric:tabular-nums}
+.lbl-c{color:var(--c,var(--ink))}
+
+/* ---------- the container ---------------------------------------- */
+/* Bands run full bleed, so a structural rule still spans the window and
+   the datasheet look survives; what is inside them is capped. Without
+   this the runbook set 274 characters to the line at 2560px. */
+.bar-in,.mast-in,.edition-in,.shell,.foot-in{
+  max-width:var(--page);margin-inline:auto;padding-inline:var(--gut)}
+
+/* ================================================================
+   THE CHROME
+   48px, sticky, identical on all 131 pages. It replaced a 265px
+   masthead that was a book cover reprinted on every page: on a phone
+   that was 39% of the viewport before a word of content.
+   ================================================================ */
+.skip{position:absolute;left:-9999px;top:0;z-index:100}
+.skip:focus{left:0;display:block;padding:var(--s3) var(--gut);
+  background:var(--ink);color:var(--bg);text-decoration:none}
+
+.bar{position:sticky;top:0;z-index:70;background:var(--bg);
+  border-bottom:1px solid var(--ink)}
+.bar-in{display:flex;align-items:center;gap:var(--s4);height:var(--bar)}
+.bar-mark{flex:none;display:flex;align-items:center;min-height:40px;
+  text-decoration:none;font-variation-settings:'wdth' 76;font-weight:800;
+  text-transform:uppercase;font-size:15px;line-height:1;letter-spacing:-.01em;
+  white-space:nowrap}
+.bar-mark em{font-style:normal;color:var(--accent)}
+/* Where you are. The last segment is the page and is never a link. */
+.crumb{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:var(--s2);
+  overflow:hidden;white-space:nowrap}
+.crumb a,.crumb b{font:400 var(--m-lab)/1.3 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;overflow:hidden;text-overflow:ellipsis}
+.crumb a{color:var(--ink3);text-decoration:none;flex:none}
+.crumb a:hover{color:var(--ink)}
+.crumb b{color:var(--ink);font-weight:400;min-width:0}
+.crumb i{font-style:normal;color:var(--ink4);flex:none}
+.bar-tools{flex:none;display:flex;align-items:center;gap:var(--s3)}
+.bar-pct{font:400 var(--m-lab)/1 var(--mono);letter-spacing:var(--tr-lab);
+  color:var(--ink3);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;
+  text-decoration:none;color:var(--ink3);font-family:var(--mono);font-size:16px}
+.pn:hover{color:var(--ink);background:var(--fill)}
+
+/* The jump box. A Move had no address before this: 122 pages reachable
+   only by scrolling a 7,600px list. It takes a number or a title, and
+   with no script the native datalist still types ahead over all 122. */
+.jump{position:relative;display:flex;align-items:center}
+.jump input{width:clamp(120px,18vw,210px);border:0;border-bottom:1px solid var(--rule);
+  background:transparent;color:var(--ink);font:400 var(--t-sub)/1 var(--fam);
+  padding:var(--s2) 18px var(--s2) 0;-webkit-appearance:none;appearance:none}
+.jump input::placeholder{color:var(--ink4)}
+.jump input:focus{border-bottom-color:var(--ink)}
+.jump input::-webkit-search-cancel-button{display:none}
+.jump kbd{position:absolute;right:0;pointer-events:none;font:400 11px/1 var(--mono);
+  color:var(--ink4);border:1px solid var(--rule);padding:2px 4px}
+.jump input:focus~kbd{display:none}
+/* One rule around a list is a panel, not a card. */
+.jump-out{position:absolute;top:calc(100% + var(--s2));right:0;width:min(420px,92vw);
+  background:var(--bg);border:1px solid var(--ink);z-index:80;max-height:60vh;overflow:auto}
+.jump-out a{display:grid;grid-template-columns:34px minmax(0,1fr);gap:var(--s3);
+  align-items:baseline;padding:var(--s3) var(--s4);text-decoration:none;
+  border-bottom:1px solid var(--rule2);font-size:var(--t-sub)}
+.jump-out a:last-child{border-bottom:0}
+.jump-out a i{font-style:normal;font-family:var(--mono);font-size:var(--m-lab);
+  color:var(--c,var(--ink3))}
+.jump-out a span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.jump-out a.on,.jump-out a:hover{background:var(--fill)}
+.jump-out p{margin:0;padding:var(--s4);color:var(--ink3);font-size:var(--t-sub)}
+
+/* The pages menu: a native disclosure, not a hamburger. It works with
+   no script, and on a phone it is the whole second tier. */
+.pages{position:relative}
+.pages>summary{list-style:none;cursor:pointer;display:flex;align-items:center;
+  height:28px;padding:0 var(--s2);font:400 var(--m-lab)/1 var(--mono);
+  letter-spacing:var(--tr-lab);text-transform:uppercase;color:var(--ink3)}
+.pages>summary::-webkit-details-marker{display:none}
+.pages>summary::after{content:'+';margin-left:var(--s2);font-size:14px}
+.pages[open]>summary::after{content:'\2212'}
+.pages>summary:hover{color:var(--ink);background:var(--fill)}
+.pages nav{position:absolute;top:calc(100% + var(--s2));right:0;width:260px;
+  background:var(--bg);border:1px solid var(--ink);z-index:80;display:flex;
+  flex-direction:column}
+.pages nav a{padding:var(--s3) var(--s4);text-decoration:none;font-size:var(--t-sub);
+  color:var(--ink2);border-bottom:1px solid var(--rule2);min-height:44px;
+  display:flex;align-items:center}
+.pages nav a:last-child{border-bottom:0}
+.pages nav a:hover{background:var(--fill);color:var(--ink)}
+.pages nav a[aria-current]{color:var(--ink);box-shadow:inset 3px 0 0 var(--ink)}
+
+/* ---------- the progress spine ----------------------------------- */
+/* Seven segments, one per stage, each as wide as that stage has Moves,
+   filled in the stage's own colour as they are ticked. The printed
+   book's fore-edge tab, laid flat under the chrome. It is a rule and
+   some space, it costs 3px, and it is the only progress readout the
+   122 Move pages have ever had. */
+.spine{display:grid;height:3px;background:var(--fill)}
+.spine i{position:relative;background:var(--rule2)}
+.spine i+i{box-shadow:-1px 0 0 var(--bg)}
+.spine b{display:block;height:100%;width:var(--f,0);background:var(--c)}
+.spine i.here::after{content:'';position:absolute;inset:-3px 0 auto;height:3px;
+  background:var(--c)}
+
+/* ================================================================
+   THE MASTHEAD - index.html only
+   ================================================================ */
+.mast{border-top:5px solid var(--ink);padding-bottom:var(--s2)}
+.mast-in{display:flex;align-items:baseline;gap:var(--s7);padding:var(--s5) 0 var(--s4);
+  flex-wrap:wrap}
+.mast .wordmark{margin:0;font-size:var(--d-mast);font-variation-settings:'wdth' 76;
+  font-weight:800;text-transform:uppercase;letter-spacing:-.022em;line-height:.86;
+  text-decoration:none;display:block;flex:none}
 .mast em{font-style:normal;color:var(--accent)}
-.mast-sub{flex:1 1 300px;min-width:0;padding-bottom:6px}
-.mast-sub p{margin:0;font-size:15px;line-height:1.5;color:var(--ink2);max-width:52ch}
-.edition{display:flex;flex-wrap:wrap;gap:0 26px;padding:9px 0;
-  border-bottom:1px solid var(--rule);font-family:'JetBrains Mono',monospace;
-  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
+.mast-sub{flex:0 1 var(--measure);min-width:0}
+.mast-sub p{margin:0;font-size:var(--t-lede);line-height:var(--lh-lede);color:var(--ink2)}
+.edition{border-top:1px solid var(--rule);border-bottom:1px solid var(--ink)}
+.edition-in{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s5);padding:var(--s2) var(--gut);
+  font:400 var(--m-lab)/1.6 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;color:var(--ink3)}
 .edition b{font-weight:400;color:var(--ink)}
+.edition a{color:inherit}
 
-/* ---------- nav --------------------------------------------------------- */
-.nav{position:sticky;top:0;z-index:60;background:var(--bg);
-  border-bottom:1px solid var(--ink);padding:0 var(--gut);display:flex;
-  align-items:stretch;gap:0;overflow-x:auto}
-.nav a{display:flex;align-items:center;padding:10px 15px 10px 0;margin-right:15px;
-  text-decoration:none;color:var(--ink3);font-family:'JetBrains Mono',monospace;
-  font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;white-space:nowrap;
-  border-bottom:2px solid transparent}
-.nav a:hover{color:var(--ink)}
-.nav a.on{color:var(--ink);border-bottom-color:var(--ink)}
-
-/* ---------- shell ------------------------------------------------------- */
+/* ================================================================
+   THE SHELL - one grid, every page
+   The rail column is reserved on all 131 pages, so the text column
+   starts in the same place everywhere and the page stops jumping
+   230px sideways between the front page and the checklist.
+   ================================================================ */
 .shell{display:grid;grid-template-columns:var(--rail) minmax(0,1fr);
-  gap:0 var(--gut);padding:0 var(--gut) 0 var(--gut);align-items:start}
-@media (max-width:940px){.shell{grid-template-columns:1fr}.rail{display:none}}
-/* Only the checklist and a Move carry the rail: on a page you read rather than
-   work through, a second navigation is furniture. */
-.shell.solo{grid-template-columns:minmax(0,1fr)}
-.rail{position:sticky;top:41px;padding:26px 0 40px}
-/* The Part rail is the printed book's fore-edge tab, stood on its side. */
-.rail a{display:block;text-decoration:none;padding:9px 0 9px 12px;
-  border-left:4px solid var(--c);margin-bottom:2px}
-.rail a:hover{background:var(--fill)}
-.rail a.on{background:var(--fill)}
-.rail a.on .r-t{color:var(--c)}
-.rail .r-n{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.16em;
-  color:var(--ink4)}
-.rail .r-t{font-variation-settings:'wdth' 80;font-weight:750;text-transform:uppercase;
-  font-size:13px;line-height:1.14;letter-spacing:-.005em;margin-top:2px}
-.rail .r-w{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink3);
-  margin-top:2px}
-.main{padding:26px 0 0;min-width:0}
+  gap:0 var(--s6);align-items:start}
+.main{padding:var(--s6) 0 0;min-width:0}
 
-/* ---------- the roadmap ------------------------------------------------- */
-.rm-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
-  flex-wrap:wrap;padding-bottom:10px;border-bottom:2px solid var(--ink)}
-.rm-head h2{margin:0;font-size:clamp(26px,3.4vw,40px)}
-.rm-lede{margin:16px 0 22px;font-size:16px;line-height:1.6;color:var(--ink2);max-width:74ch}
-.rm-note{margin:26px 0 0;font-size:14.5px;line-height:1.55;color:var(--ink3);max-width:76ch}
-/* Four pre-rendered charts, toggled with radios: the scheduling runs once, on the
-   server, so the drawing and the printed book cannot disagree, and it all works
-   with JavaScript off. */
-.rm-pick{display:flex;align-items:center;gap:0;padding-bottom:8px}
-/* The radios have to be siblings of both the label row and the views for the
-   :checked~ selectors to reach them, so they sit outside .rm-pick and are hidden
-   here rather than there. Kept focusable: the labels are the visible control and
-   the keyboard still drives them. */
+/* ---------- the rail --------------------------------------------- */
+/* The printed book's fore-edge tab, stood on its side, and now the
+   site's primary navigation: on every page, not two, and expanding
+   into the current stage's Moves so any Move is one click from any
+   other Move beside it. */
+.rail{position:sticky;top:var(--anchor);padding:var(--s6) 0 var(--s7);
+  max-height:calc(100vh - var(--anchor));overflow-y:auto;overscroll-behavior:contain}
+.r-s{display:block;text-decoration:none;padding:var(--s2) 0 var(--s2) var(--s3);
+  border-left:3px solid var(--c)}
+.r-s:hover{background:var(--fill)}
+.r-s.on{background:var(--fill);border-left-width:6px;padding-left:calc(var(--s3) - 3px)}
+.r-s.on .r-t{color:var(--c)}
+.r-n{display:block;font:400 var(--m-lab)/1.2 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;color:var(--ink3)}
+.r-t{display:block;font-variation-settings:'wdth' 80;font-weight:750;
+  text-transform:uppercase;font-size:var(--d-sub);line-height:1.12;margin-top:2px}
+.r-w{display:flex;align-items:center;gap:var(--s2);margin-top:var(--s1);
+  font:400 11px/1.4 var(--mono);color:var(--ink3);font-variant-numeric:tabular-nums}
+.r-w .track{flex:1;height:3px;background:var(--rule2);position:relative;max-width:70px}
+.r-w .track i{position:absolute;inset:0 auto 0 0;background:var(--c);width:var(--f,0)}
+/* The current stage opens into its own Moves. */
+.r-moves{list-style:none;margin:0 0 var(--s2);padding:var(--s2) 0 var(--s2) var(--s4);
+  border-left:1px solid var(--rule2)}
+.r-moves a{display:grid;grid-template-columns:26px minmax(0,1fr);gap:var(--s2);
+  align-items:baseline;padding:3px 0;text-decoration:none;font-size:13px;
+  line-height:1.3;color:var(--ink3)}
+.r-moves a:hover{color:var(--ink)}
+.r-moves a i{font-style:normal;font-family:var(--mono);font-size:11px;
+  font-variant-numeric:tabular-nums}
+.r-moves a span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.r-moves a[aria-current]{color:var(--ink);font-weight:600}
+.r-moves a[aria-current] i{color:var(--c)}
+.r-moves li.done a{color:var(--ink4);text-decoration:line-through}
+/* Second zone: every page on the site, with the one you are on marked.
+   Kit, What replaces what and About used to be reachable only from a
+   10px strip at the bottom of a seven-screen scroll. */
+.r-pages{margin-top:var(--s5);padding-top:var(--s4);border-top:1px solid var(--rule)}
+.r-pages a{display:flex;align-items:center;min-height:32px;text-decoration:none;
+  font-size:var(--t-sub);color:var(--ink3);padding-left:var(--s3);
+  border-left:2px solid transparent}
+.r-pages a:hover{color:var(--ink)}
+.r-pages a[aria-current]{color:var(--ink);border-left-color:var(--ink);font-weight:600}
+.r-h{margin:0 0 var(--s2)}
+
+/* ================================================================
+   COMMON FURNITURE
+   Five page-heading components became one; six section rules became
+   one; and a section opens at --s7 wherever it appears.
+   ================================================================ */
+.phead{padding-top:var(--s2)}
+.phead h1{margin:0;font-size:var(--d-page);max-width:16em}
+.phead .lede{margin:var(--s4) 0 0;font-size:var(--t-lede);line-height:var(--lh-lede);
+  color:var(--ink2);max-width:var(--measure-lede);
+  font-variation-settings:'wdth' 94;font-weight:500}
+.phead .lbl{display:block;margin-bottom:var(--s3)}
+
+.sec{margin-top:var(--s7)}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s4);
+  flex-wrap:wrap;padding-bottom:var(--s2);border-bottom:2px solid var(--ink)}
+.sec-h h2,.sec-h h3{margin:0;font-size:var(--d-sect)}
+.sec-h.c{border-bottom-color:var(--c)}
+.sec-h .s-w{margin-left:auto}
+.sec-b{margin:var(--s3) 0 0;font-size:var(--t-sub);line-height:var(--lh-sub);
+  color:var(--ink3);max-width:var(--measure)}
+
+.prose{max-width:var(--measure-lede);margin-top:var(--s6)}
+.prose p{font-size:var(--t-lede);line-height:var(--lh-lede);color:var(--ink2);
+  margin:0 0 var(--s5)}
+.prose b{color:var(--ink);font-weight:700}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);
+  min-height:44px;padding:0 var(--s4);font:400 var(--m-lab)/1 var(--mono);
+  letter-spacing:var(--tr-lab);text-transform:uppercase;text-decoration:none;
+  cursor:pointer;border:1px solid var(--ink);background:transparent;color:var(--ink)}
+.btn:hover{background:var(--ink);color:var(--bg)}
+.btn-p{background:var(--ink);color:var(--bg)}
+.btn-p:hover{background:transparent;color:var(--ink)}
+.btn-w{border-color:var(--warn);color:var(--warn)}
+.btn-w:hover{background:var(--warn);color:var(--bg)}
+.actions{display:flex;gap:var(--s3);flex-wrap:wrap;margin-top:var(--s5)}
+.lnk{border:0;background:none;padding:0;font:inherit;color:var(--accent);
+  cursor:pointer;border-bottom:1px solid currentColor}
+
+/* The figure strip: one big mono number per fact. */
+/* One row where they fit, and the cells share the width rather than
+   leaving a sixth figure stranded on a line of its own. */
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(112px,100%),1fr));
+  gap:0 var(--s5);border-top:1px solid var(--rule);
+  border-bottom:2px solid var(--ink);margin-top:var(--s5)}
+.figs>div{padding:var(--s4) var(--s4) var(--s4) 0}
+.figs b{display:block;font:400 var(--m-fig)/1 var(--mono);color:var(--ink);
+  font-variant-numeric:tabular-nums}
+.figs span{display:block;margin-top:var(--s2);font:400 var(--m-lab)/1.3 var(--mono);
+  letter-spacing:var(--tr-lab);text-transform:uppercase;color:var(--ink3)}
+
+/* Two columns: one component, used by the Move page and the planner. */
+.work{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,var(--aside));
+  gap:0 var(--s7);align-items:start}
+.work>aside{border-left:1px solid var(--rule2);padding-left:var(--s5);align-self:start}
+
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));
+  gap:0 var(--s7);border-top:2px solid var(--ink);margin-top:var(--s5)}
+.gcard{padding:var(--s5) 0;border-bottom:1px solid var(--rule2)}
+.gcard h3,.gcard h4{margin:0 0 var(--s2);font-size:var(--t-item-lg);
+  font-variation-settings:'wdth' 88;font-weight:600;color:var(--ink)}
+.gcard p{margin:0;font-size:var(--t-sub);line-height:var(--lh-sub);color:var(--ink2);
+  max-width:var(--measure-sm)}
+
+.pnote{font-size:var(--t-sub);line-height:var(--lh-sub);color:var(--ink3);
+  margin-top:var(--s4);max-width:var(--measure)}
+
+/* The risk words. Risk stopped being a third hue set: the ordering is
+   carried by the bar glyph beside it, so the colour only has to say
+   "this one is the dangerous one". */
+.r-low{color:var(--ink3)}
+.r-medium{color:var(--ink2)}
+.r-high{color:var(--warn)}
+
+/* ================================================================
+   THE FRONT PAGE - one question, one answer
+   ================================================================ */
+.answer{padding:var(--s5) 0 var(--s5) var(--s4);border-left:4px solid var(--c);
+  margin-top:var(--s5)}
+.answer:focus:not(:focus-visible){outline:none}
+.ans-k{margin:0;font:400 var(--m-lab)/1.3 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;color:var(--c)}
+.ans-note{margin:var(--s3) 0 0;font-size:var(--t-sub);line-height:var(--lh-sub);
+  color:var(--ink3);max-width:var(--measure)}
+.ans-hd{display:flex;align-items:baseline;gap:var(--s4);margin-top:var(--s3);flex-wrap:wrap}
+.ans-n{font:400 var(--m-fig)/1 var(--mono);color:var(--c);font-variant-numeric:tabular-nums}
+.ans-t{margin:0;font-size:var(--d-page);line-height:1.06;
+  font-variation-settings:'wdth' 88;font-weight:600;flex:0 1 var(--col-text);min-width:0}
+.ans-t a{text-decoration:none}
+.ans-t a:hover,.ans-t a:focus-visible{text-decoration:underline;text-underline-offset:4px}
+.ans-hook{margin:var(--s4) 0 0;font-size:var(--t-lede);line-height:var(--lh-lede);
+  color:var(--ink2);max-width:var(--measure-lede)}
+/* Label then value, lower case, no tracking: the figures recede by
+   typography rather than by a grey nobody can read. */
+.ans-facts{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s5);margin:var(--s4) 0 0;
+  font-family:var(--mono);font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.ans-facts i{font-style:normal;color:var(--ink3);margin-right:var(--s2)}
+.ans-then{margin:var(--s3) 0 0;font-size:var(--t-sub);color:var(--ink3)}
+.ans-then a{text-decoration:none;border-bottom:1px solid var(--rule)}
+.ans-then a:hover{border-color:var(--ink)}
+.ans-act{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;margin:var(--s5) 0 0}
+.ans-all{font-size:var(--t-sub);color:var(--ink3);text-decoration:none;
+  border-bottom:1px solid var(--rule)}
+.ans-all:hover{color:var(--ink);border-color:var(--ink)}
+.ans-nojs{margin:var(--s3) 0 0;font-size:var(--t-sub);color:var(--ink3)}
+html.js .ans-nojs{display:none}
+
+/* Where you say you are. A button, not a link that lies about where it
+   goes, and the one you picked stays marked when you come back a week
+   later - otherwise the page silently excludes seventy Moves and
+   nothing on screen says why. */
+.routes{border:0;margin:var(--s4) 0 0;padding:0;max-width:640px}
+.routes legend{padding:0}
+.route{display:block;width:100%;text-align:left;background:transparent;cursor:pointer;
+  padding:var(--s3) var(--s3) var(--s3) var(--s4);border:0;
+  border-left:4px solid var(--c);border-bottom:1px solid var(--rule2);font:inherit}
+.route:hover{background:var(--fill)}
+.route.on{border-left-width:8px;padding-left:var(--s3);background:var(--fill)}
+.rt-s{display:block;font-size:var(--t-item-lg);line-height:1.3;
+  font-variation-settings:'wdth' 94;font-weight:500;color:var(--ink)}
+.rt-m{display:block;margin-top:2px;font:400 var(--m-lab)/1.4 var(--mono);
+  letter-spacing:var(--tr-lab);text-transform:uppercase;color:var(--ink3)}
+.route.on .rt-m::after{content:' \00b7 your starting point';color:var(--c)}
+
+.syms{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr));
+  gap:0 var(--s7);border-top:2px solid var(--ink);margin-top:var(--s5)}
+.sym{padding:var(--s4) 0;border-bottom:1px solid var(--rule2)}
+.sym .sq{font-size:var(--t-item-lg);line-height:1.34;margin-bottom:var(--s2);
+  font-variation-settings:'wdth' 90;font-weight:600}
+.sym .sl{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s4)}
+.sym .sl a{display:flex;gap:var(--s2);align-items:baseline;font-size:13px;
+  color:var(--ink2);text-decoration:none;min-height:28px}
+.sym .sl a:hover{color:var(--ink);text-decoration:underline}
+.sym .sl b{font-family:var(--mono);color:var(--accent);font-weight:400;flex:none;
+  font-variant-numeric:tabular-nums}
+
+.tail{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));
+  margin-top:var(--s7);border-top:2px solid var(--ink)}
+.tail a{display:block;padding:var(--s5) var(--s5) var(--s5) 0;text-decoration:none;
+  border-right:1px solid var(--rule2)}
+.tail a:last-child{border-right:0}
+.tail a:hover{background:var(--fill)}
+.tl-t{display:block;font-size:var(--t-item-lg);font-weight:600;
+  font-variation-settings:'wdth' 92}
+.tl-s{display:block;margin-top:var(--s1);font-size:13px;line-height:1.45;color:var(--ink3)}
+
+/* ================================================================
+   THE CHECKLIST
+   ================================================================ */
+.ck-lede{margin:var(--s4) 0 0;font-size:var(--t-lede);line-height:var(--lh-lede);
+  color:var(--ink2);max-width:var(--measure-lede)}
+.ck-lede a{font-weight:700;font-variation-settings:'wdth' 90}
+.ck-lede b{font-family:var(--mono);font-weight:400;color:var(--accent)}
+
+/* The filter row, in the slot the site has had since the search bar was
+   removed and its stylesheet left behind. */
+.filters{position:sticky;top:var(--bar);z-index:50;background:var(--bg);
+  border-bottom:1px solid var(--ink);margin-top:var(--s5);padding:var(--s2) 0;
+  display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2)}
+.chip{min-height:32px;padding:0 var(--s3);border:1px solid var(--rule);
+  background:transparent;color:var(--ink3);cursor:pointer;font:400 var(--m-lab)/1 var(--mono);
+  letter-spacing:var(--tr-lab);text-transform:uppercase;--c:var(--ink)}
+.chip:hover{color:var(--ink);background:var(--fill)}
+.chip[aria-pressed="true"]{background:var(--c);border-color:var(--c);color:var(--on-c)}
+.fcount{margin-left:auto;font:400 var(--m-lab)/1 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;color:var(--ink3);font-variant-numeric:tabular-nums}
+
+.nums-l{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;margin-top:var(--s5)}
+.nums-l label{min-height:32px;display:inline-flex;align-items:center;padding:0 var(--s3);
+  border:1px solid var(--rule);cursor:pointer;font:400 var(--m-lab)/1 var(--mono);
+  letter-spacing:var(--tr-lab);text-transform:uppercase;color:var(--ink3)}
+.nums-l label:hover{color:var(--ink);background:var(--fill)}
+#nums:checked+.nums-l label{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.nums-l span{font-size:var(--t-sub);color:var(--ink3)}
+/* The input sits beside the stages, not inside the label, because the
+   sibling combinator that reveals the figures needs a shared parent. */
+#nums{position:absolute;width:1px;height:1px;margin:-1px;opacity:0;
+  clip-path:inset(50%);pointer-events:none}
+#nums:focus-visible+.nums-l label{outline:2px solid var(--accent);outline-offset:2px}
+
+details.stg{margin-top:var(--s7);scroll-margin-top:var(--anchor)}
+/* display:flex also removes the disclosure triangle in Chrome and
+   Safari; the affordance is the mono +/- in the gutter instead. */
+details.stg>summary.stg-h{display:flex;align-items:baseline;gap:var(--s3);flex-wrap:wrap;
+  padding:var(--s2) 0;border-bottom:3px solid var(--c);list-style:none;cursor:pointer;
+  position:sticky;top:var(--bar);background:var(--bg);z-index:40}
+details.stg>summary::-webkit-details-marker{display:none}
+.stg-mk{font-family:var(--mono);font-size:13px;color:var(--ink3);width:11px}
+.stg-mk::after{content:'+'}
+details[open]>summary .stg-mk::after{content:'\2212'}
+.stg-h h2{margin:0;font-size:var(--d-sect)}
+.stg-prog{margin-left:auto;display:flex;align-items:center;gap:var(--s2)}
+.stg-prog .track{width:80px;height:6px;background:var(--fill);position:relative;overflow:hidden}
+.stg-prog .track i{position:absolute;inset:0 auto 0 0;background:var(--c);width:var(--f,0)}
+.stg-prog .cnt{font:400 11px/1 var(--mono);color:var(--ink3);font-variant-numeric:tabular-nums}
+.stg-done{margin:var(--s4) 0 0;font-size:var(--t-sub);line-height:var(--lh-sub);
+  color:var(--ink3);max-width:var(--measure)}
+.stg-done b,.stg-lead b{font:400 var(--m-lab)/1 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;color:var(--c);display:inline-block;margin-right:var(--s2)}
+/* Lead time is the one figure worth promoting out of the hidden strip:
+   nobody is working during a wait, so a Move ordered late holds up
+   everything behind it. */
+.stg-lead{margin:var(--s2) 0 0;font-family:var(--mono);font-size:12px;line-height:1.7;
+  color:var(--ink3)}
+.stg.done .stg-h{border-bottom-color:var(--ink4)}
+
+ol.ck{list-style:none;margin:var(--s4) 0 0;padding:0;max-width:760px}
+ol.ck>li{display:grid;grid-template-columns:auto minmax(0,1fr) max-content;
+  gap:0 var(--s4);align-items:baseline;border-bottom:1px solid var(--rule2);
+  scroll-margin-top:var(--anchor)}
+ol.ck>li:hover,ol.ck>li:focus-within{background:var(--fill)}
+ol.ck>li[hidden]{display:none}
+.ck-b{display:inline-flex;align-items:center;gap:var(--s3);cursor:pointer;
+  padding:var(--s3) var(--s3) var(--s3) 0;min-height:44px}
+ol.ck input{width:20px;height:20px;accent-color:var(--c);margin:0;flex:none}
+.ck-n{font-family:var(--mono);font-size:13px;color:var(--c);font-variant-numeric:tabular-nums}
+.ck-t{font-size:var(--t-item);line-height:1.35;font-variation-settings:'wdth' 92;
+  font-weight:500;padding:var(--s3) 0;text-decoration:none;align-self:center}
+.ck-t:hover,.ck-t:focus-visible{text-decoration:underline;text-underline-offset:3px}
+ol.ck li.done .ck-t{color:var(--ink4);text-decoration:line-through}
+ol.ck li.done .ck-n{color:var(--ink4)}
+/* One row on the page says which one you are on, and says it in the
+   gutter rather than inside the title, where it used to land in the
+   checkbox's accessible name and move sideways on every row. */
+li.ck-next{box-shadow:inset 4px 0 0 var(--c)}
+li.ck-next .ck-b{padding-left:var(--s2)}
+.ck-flag{padding:var(--s3) 0;font-family:var(--mono);font-size:12px;color:var(--ink3);
+  white-space:nowrap;align-self:center}
+.ck-flag.warn{color:var(--warn)}
+.ck-r{display:none;grid-column:2/-1;padding:0 0 var(--s3);
+  grid-template-columns:repeat(auto-fit,minmax(88px,max-content));gap:var(--s1) var(--s5);
+  font:400 11px/1.4 var(--mono);letter-spacing:.04em;text-transform:uppercase;
+  color:var(--ink3);font-variant-numeric:tabular-nums}
+/* Two shapes carry rows: the checklist wraps each stage in a <details>, a
+   stage page has the list directly. The toggle is a sibling of the container
+   in both, so both are named here. */
+#nums:checked~.stg .ck-r,#nums:checked~ol.ck .ck-r{display:grid}
+/* A prerequisite that is not ticked yet is marked where it is being
+   read, and only once something has been ticked: on a fresh checklist
+   119 of 122 rows are waiting on something, and 119 marks is wallpaper
+   rather than a warning. Nothing is ever disabled - the reader may
+   well know better than the graph does. */
+.ck-blocked{color:var(--warn)}
+.ck-tools{display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap;
+  padding-top:var(--s4);border-top:1px solid var(--rule);margin-top:var(--s7)}
+
+/* ================================================================
+   A MOVE
+   Reordered so the executable part is first. The first runbook step
+   used to begin 1,093px down a desktop page, and "Before you start"
+   rendered 2,548px BELOW the runbook it is a prerequisite for.
+   ================================================================ */
+.mv-head{border-bottom:2px solid var(--c);padding-bottom:var(--s4)}
+.mv-pos{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s4);margin-bottom:var(--s3)}
+.mv-hd{display:flex;align-items:baseline;gap:var(--s4);flex-wrap:wrap}
+.mv-n{font:400 var(--m-fig)/1 var(--mono);color:var(--c);font-variant-numeric:tabular-nums}
+.mv-head h1{margin:0;font-size:var(--d-page);flex:0 1 var(--col-text)}
+.mv-spec{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(124px,100%),1fr));
+  gap:0 var(--s5);border-top:1px solid var(--rule);margin-top:var(--s5)}
+.mv-spec>div{padding:var(--s3) var(--s4) var(--s3) 0}
+.mv-spec .k{font:400 var(--m-lab)/1.3 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;color:var(--ink3);margin-bottom:var(--s1)}
+.mv-spec .v{font-family:var(--mono);font-size:13px;color:var(--ink);display:flex;
+  align-items:center;gap:var(--s2);font-variant-numeric:tabular-nums}
+.mv-spec .v a{color:var(--accent)}
+.mv-spec .warn .v{color:var(--warn)}
+.hook{margin:var(--s5) 0 0;font-size:var(--t-lede);line-height:var(--lh-lede);
+  border-left:3px solid var(--c);padding-left:var(--s4);max-width:var(--measure-lede);
+  font-variation-settings:'wdth' 92;font-weight:500}
+/* Thirteen Moves cannot be undone. The checklist and the rollback page
+   both said so louder than the Move itself did. */
+.noway{margin:var(--s5) 0 0;padding:var(--s3) 0 var(--s3) var(--s4);
+  border-left:3px solid var(--warn);color:var(--warn);font-size:var(--t-sub);
+  max-width:var(--measure)}
+.noway b{font:400 var(--m-lab)/1.6 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;display:block}
+
+/* Section heads. Six of these were unlinkable <p>s, so the whole Move
+   was one heading in the document outline. */
+h2.blab,h3.blab{font:400 var(--m-lab)/1.3 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;color:var(--c);padding-bottom:var(--s2);
+  border-bottom:1px solid currentColor;margin:var(--s7) 0 var(--s4)}
+/* The runbook is the page. It gets the only display-size section head
+   and the only 3px rule in the body. */
+h2.blab-hi{font:800 var(--d-sect)/var(--lh-d) var(--fam);font-variation-settings:'wdth' 79;
+  letter-spacing:var(--tr-d);text-transform:uppercase;color:var(--ink);
+  border-bottom-width:3px;border-bottom-color:var(--c);
+  display:flex;align-items:baseline;justify-content:space-between;gap:var(--s4);
+  flex-wrap:wrap}
+h2.blab-hi .lbl{font-weight:400}
+
+.orow{display:grid;grid-template-columns:96px minmax(0,240px) minmax(0,1fr);gap:var(--s5);
+  padding:var(--s3) 0;border-bottom:1px solid var(--rule2);align-items:baseline}
+.orow:first-of-type{border-top:1px solid var(--rule)}
+.orow .oc{font:400 var(--m-lab)/1.4 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;color:var(--ink3)}
+.orow .os{font-weight:700;font-size:var(--t-item);font-variation-settings:'wdth' 90;
+  line-height:1.3}
+.orow .on{font-size:var(--t-sub);line-height:var(--lh-sub);color:var(--ink2)}
+
+.why{font-size:var(--t-body);line-height:var(--lh-body);color:var(--ink2);margin:0;
+  max-width:var(--measure)}
+
+/* The runbook. One continuous hairline down the ordinal gutter, over-
+   painted in the Part colour for every step ticked: a rule filling, not
+   a disc, not a box, and the same idea as the spine at another scale. */
+.steps{list-style:none;margin:0;padding:0;position:relative}
+.steps::before{content:'';position:absolute;left:38px;top:8px;bottom:14px;width:1px;
+  background:var(--rule2)}
+.step{display:grid;grid-template-columns:clamp(30px,7vw,38px) minmax(0,1fr);
+  padding-bottom:var(--s5)}
+.sdone{align-self:start;border:0;background:none;color:var(--c);cursor:pointer;
+  font-family:var(--mono);font-size:var(--m-val);padding:var(--s1) var(--s2) var(--s1) 0;
+  text-align:left;min-width:34px;font-variant-numeric:tabular-nums}
+.sdone:hover{text-decoration:underline}
+.stext{font-size:var(--t-body);line-height:var(--lh-body);color:var(--ink2);
+  padding-left:var(--s5);border-left:3px solid transparent;margin-left:-1px;
+  max-width:var(--measure)}
+.step.done .sdone{color:var(--ink4)}
+.step.done .stext{border-left-color:var(--c);color:var(--ink3)}
+
+.rollback{margin-top:var(--s5);padding-top:var(--s5);border-top:3px solid var(--c)}
+.rollback.warn{border-top-color:var(--warn)}
+.rollback b{display:block;font:400 var(--m-lab)/1 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;color:var(--c);margin-bottom:var(--s3)}
+.rollback.warn b{color:var(--warn)}
+.rollback p{margin:0;font-size:var(--t-body);line-height:var(--lh-body);color:var(--ink2);
+  max-width:var(--measure)}
+
+/* Everything below this rule is read rather than run. */
+.cut{border:0;border-top:2px solid var(--ink);margin:var(--s8) 0 var(--s2)}
+
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));
+  gap:0 var(--s6);border-top:1px solid var(--rule)}
+.note{padding:var(--s4) 0;border-bottom:1px solid var(--rule2)}
+.note b{display:block;font:400 var(--m-lab)/1.3 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;color:var(--c);margin-bottom:var(--s1)}
+.note p{margin:0;font-size:var(--t-sub);line-height:var(--lh-sub);color:var(--ink2)}
+
+.prelist{list-style:none;margin:0;padding:0}
+.prelist li{border-bottom:1px solid var(--rule2)}
+.prelist label{display:flex;gap:var(--s3);align-items:flex-start;font-size:var(--t-sub);
+  line-height:var(--lh-sub);color:var(--ink2);cursor:pointer;padding:var(--s3) 0;
+  min-height:44px}
+.prelist input{margin:2px 0 0;accent-color:var(--c);flex:none;width:20px;height:20px}
+.prelist input:checked+span{color:var(--ink4);text-decoration:line-through}
+.pre-h{font:400 var(--m-lab)/1.3 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;color:var(--ink3);margin:var(--s5) 0 var(--s2)}
+.pre-h:first-child{margin-top:0}
+/* One group is one object: the heading and the list it heads travel
+   together, or a two-column layout puts a heading beside somebody
+   else's items. */
+.precols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));
+  gap:0 var(--s7);align-items:start}
+.pregroup{break-inside:avoid}
+.deplist a{display:grid;grid-template-columns:32px minmax(0,1fr);gap:var(--s2);
+  align-items:baseline;text-decoration:none;font-size:var(--t-sub);color:var(--ink2);
+  line-height:1.4;padding:var(--s2) 0;border-bottom:1px solid var(--rule2);min-height:36px}
+.deplist a:hover{color:var(--ink)}
+.deplist i{font-style:normal;font-family:var(--mono);font-size:12px;flex:none;
+  color:var(--c);font-variant-numeric:tabular-nums}
+.turnoff{font-size:var(--t-sub);line-height:var(--lh-sub);color:var(--ink3);
+  margin-top:var(--s4);max-width:var(--measure)}
+.turnoff b{display:block;font:400 var(--m-lab)/1.3 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;color:var(--c);margin-bottom:var(--s1)}
+
+.mvnav{display:flex;justify-content:space-between;gap:var(--s4);padding:var(--s5) 0 var(--s7);
+  border-top:1px solid var(--ink);margin-top:var(--s7)}
+.mvnav a{text-decoration:none;font-size:var(--t-sub);color:var(--ink2);max-width:46%;
+  min-height:44px;display:flex;flex-direction:column;justify-content:center}
+.mvnav a:hover{color:var(--ink)}
+.mvnav a:last-child{text-align:right}
+.mvnav b{display:block;font:400 var(--m-lab)/1.4 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;color:var(--ink3);margin-bottom:2px}
+
+/* ================================================================
+   THE ROADMAP
+   ================================================================ */
+/* Four pre-rendered charts, toggled with radios: the scheduling runs
+   once, on the server, so the drawing and the printed book cannot
+   disagree, and it all works with JavaScript off. */
 input[name="crew"]{position:absolute;width:1px;height:1px;opacity:0;
   clip-path:inset(50%);pointer-events:none}
-input[name="crew"]:focus-visible+.rm-pick label{outline:2px solid var(--accent)}
-.rm-pick label{padding:6px 12px;border:1px solid var(--rule);border-right:0;cursor:pointer;
-  font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.13em;
-  text-transform:uppercase;color:var(--ink3)}
+.rm-pick{display:flex;flex-wrap:wrap;align-items:center;gap:0;border:0;padding:0;
+  margin:var(--s6) 0 0}
+.rm-pick legend{padding:0;margin-bottom:var(--s2)}
+.rm-pick label{min-height:44px;display:inline-flex;align-items:center;padding:0 var(--s4);
+  border:1px solid var(--rule);border-right:0;cursor:pointer;font:400 var(--m-lab)/1 var(--mono);
+  letter-spacing:var(--tr-lab);text-transform:uppercase;color:var(--ink3)}
 .rm-pick label:last-of-type{border-right:1px solid var(--rule)}
 .rm-pick label:hover{color:var(--ink);background:var(--fill)}
-.rm-views>figure{display:none;margin:0}
+/* Target the label by id, not by adjacency: the four radios are written
+   consecutively, so the sibling after #w1 is #w2 and the ring landed on a
+   1x1 invisible box. Same shape as the :checked rules below. */
+#w1:focus-visible~.rm-pick label[for=w1],#w2:focus-visible~.rm-pick label[for=w2],
+#w3:focus-visible~.rm-pick label[for=w3],#w6:focus-visible~.rm-pick label[for=w6]{
+  outline:2px solid var(--accent);outline-offset:-2px}
+.rm-views>figure{display:none;margin:var(--s5) 0 0}
 #w1:checked~.rm-views>.v1,#w2:checked~.rm-views>.v2,
 #w3:checked~.rm-views>.v3,#w6:checked~.rm-views>.v6{display:block}
 #w1:checked~.rm-pick label[for=w1],#w2:checked~.rm-pick label[for=w2],
 #w3:checked~.rm-pick label[for=w3],#w6:checked~.rm-pick label[for=w6]{
   background:var(--ink);border-color:var(--ink);color:var(--bg)}
-.rm-wrap{overflow-x:auto;padding:6px 0 2px}
+/* The answer, at the size of an answer. It used to sit at 10px in a
+   caption while a number that does not move with the control was set
+   at 26px above it. */
+.rm-ans{margin:0 0 var(--s4);font-size:var(--d-sect);font-variation-settings:'wdth' 79;
+  font-weight:800;text-transform:uppercase;letter-spacing:var(--tr-d);line-height:var(--lh-d)}
+.rm-ans span{color:var(--ink3)}
+.rm-wrap{overflow-x:auto;padding:var(--s1) 0}
 .rm{min-width:660px}
-.rm text{font-family:'JetBrains Mono',monospace}
-.rm-wk{font-size:9px;fill:var(--ink4);text-anchor:middle}
-.rm-axis{font-size:8.5px;fill:var(--ink4);letter-spacing:.18em}
-.rm-part{font-size:9px;letter-spacing:.1em}
+.rm text{font-family:var(--mono)}
+.rm-wk{font-size:10px;fill:var(--ink3);text-anchor:middle}
+.rm-axis{font-size:10px;fill:var(--ink3);letter-spacing:.12em}
+.rm-part{font-size:10px;letter-spacing:.08em}
 .rm-partn{font-size:11px;fill:var(--ink3)}
-.rm-n{font-size:8.5px;fill:#fff}
+.rm-n{font-size:9px;fill:var(--on-c)}
 .rm a rect{transition:none}
 .rm a:hover rect{fill:var(--ink)}
-.rm-cap{display:flex;gap:26px;flex-wrap:wrap;padding:9px 0 0;
-  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--ink4)}
-.rm-cap i{font-style:normal;display:inline-block;width:16px;height:9px;
-  background:var(--ink);margin-right:6px;vertical-align:0}
-.rm-cap i.out{background:transparent;border:1.4px solid var(--ink)}
-
-/* ---------- figure strip ------------------------------------------------ */
-.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:0;
-  border-top:1px solid var(--rule);border-bottom:2px solid var(--ink);margin:26px 0 0}
-.figs>div{padding:14px 16px 15px 0;border-right:1px solid var(--rule2)}
-.figs>div:last-child{border-right:0}
-.figs b{display:block;font-family:'JetBrains Mono',monospace;font-size:26px;
-  font-weight:400;line-height:1;color:var(--ink)}
-.figs span{display:block;margin-top:7px;font-family:'JetBrains Mono',monospace;
-  font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink4)}
-
-/* ---------- stages and the Move table ----------------------------------- */
-/* Clears both sticky bars - the nav and the filter row - so an anchored
-   stage heading is not parked underneath them. */
-.stage{padding:52px 0 0;scroll-margin-top:98px}
-.stage-h{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;
-  padding-bottom:9px;border-bottom:3px solid var(--c)}
-.stage-h .s-n{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.16em;
-  color:var(--c)}
-.stage-h h3{margin:0;font-size:clamp(24px,3vw,34px)}
-.stage-h .s-w{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;
-  letter-spacing:.11em;text-transform:uppercase;color:var(--ink3)}
-.stage-b{margin:13px 0 18px;font-size:14.5px;line-height:1.55;color:var(--ink3);max-width:80ch}
-table.mv{width:100%;border-collapse:collapse;font-size:14.5px}
-table.mv th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:9.5px;
-  letter-spacing:.15em;text-transform:uppercase;color:var(--ink4);font-weight:400;
-  padding:0 14px 7px 0;border-bottom:1px solid var(--rule)}
-table.mv td{padding:11px 14px 11px 0;border-bottom:1px solid var(--rule2);
-  vertical-align:baseline}
-table.mv tr:hover td{background:var(--fill)}
-table.mv .c-n{width:44px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--c)}
-table.mv .c-t a{text-decoration:none;font-variation-settings:'wdth' 90;font-weight:700;
-  line-height:1.3;display:block}
-table.mv .c-t a:hover{text-decoration:underline;text-underline-offset:3px}
-table.mv .c-t p{margin:3px 0 0;font-size:13.5px;line-height:1.45;color:var(--ink3);
-  max-width:68ch}
-table.mv .c-after{width:118px;font-family:'JetBrains Mono',monospace;font-size:11px;
-  color:var(--ink4);line-height:1.5}
-table.mv .c-r{width:88px;font-family:'JetBrains Mono',monospace;font-size:11px;
-  letter-spacing:.09em;text-transform:uppercase}
-table.mv .c-c{width:74px;text-align:right;font-family:'JetBrains Mono',monospace;
-  font-size:13px;color:var(--ink2)}
-table.mv .c-c.zero{color:var(--ink4)}
-table.mv .c-e{width:62px;text-align:right;font-family:'JetBrains Mono',monospace;
-  font-size:12px;color:var(--ink3)}
-.r-low{color:#14655A}.r-medium{color:#8A6112}.r-high{color:#A32E1F}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .r-low{color:#7FC4B2}
-  :root:not([data-theme="light"]) .r-medium{color:#DDB26A}
-  :root:not([data-theme="light"]) .r-high{color:#E39A7B}}
-.oneway{display:inline-block;margin-left:7px;padding:1px 5px;background:#A32E1F;color:#fff;
-  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.08em;
-  text-transform:uppercase;vertical-align:1px}
-@media (max-width:860px){
-  table.mv .c-after,table.mv .c-e,table.mv thead{display:none}
-  table.mv .c-r{width:64px}
-}
-
-/* ---------- filters ----------------------------------------------------- */
-.filters{position:sticky;top:41px;z-index:50;background:var(--bg);
-  border-bottom:1px solid var(--ink);margin:0 0 0;padding:9px 0 8px;
-  display:flex;flex-wrap:wrap;align-items:center;gap:0 4px}
-#q{flex:1 1 230px;min-width:0;padding:6px 0;border:0;background:transparent;
-  color:var(--ink);font:inherit;font-size:14.5px}
-#q::placeholder{color:var(--ink4)}
-.chip{padding:6px 11px;border:1px solid var(--rule);background:transparent;
-  color:var(--ink3);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;
-  letter-spacing:.12em;text-transform:uppercase;--c:var(--ink3)}
-.chip:hover{color:var(--ink);background:var(--fill)}
-.chip[aria-pressed="true"]{background:var(--c);border-color:var(--c);color:#fff}
-.chip i{font-style:normal;opacity:.65;margin-left:5px}
-.fcount{margin-left:auto;padding-left:14px;font-family:'JetBrains Mono',monospace;
-  font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink4)}
-.clear{border:0;background:none;color:var(--accent);cursor:pointer;padding:0 0 0 14px;
-  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;
-  text-transform:uppercase;text-decoration:underline;text-underline-offset:3px}
-.empty{padding:52px 0;color:var(--ink3)}
-
-/* ---------- a Move page ------------------------------------------------- */
-.mv-head{border-bottom:2px solid var(--c);padding:26px 0 14px}
-.mv-n{font-family:'JetBrains Mono',monospace;font-size:30px;color:var(--c);line-height:1}
-.mv-head h1{margin:8px 0 0;font-size:clamp(27px,4.2vw,46px)}
-.mv-spec{display:grid;grid-template-columns:repeat(auto-fit,minmax(124px,1fr));gap:0;
-  border-top:1px solid var(--rule);margin-top:20px}
-.mv-spec>div{padding:12px 14px 13px 0;border-right:1px solid var(--rule2)}
-.mv-spec>div:last-child{border-right:0}
-.mv-spec .k{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.15em;
-  text-transform:uppercase;color:var(--ink4);margin-bottom:6px}
-.mv-spec .v{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink);
-  display:flex;align-items:center;gap:6px}
-.hook{margin:24px 0 0;font-size:clamp(17px,2vw,21px);line-height:1.42;
-  border-left:3px solid var(--c);padding-left:18px;max-width:74ch;
-  font-variation-settings:'wdth' 92;font-weight:500}
-.blab{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--c);padding-bottom:7px;
-  border-bottom:1px solid currentColor;margin:34px 0 15px}
-.orow{display:grid;grid-template-columns:92px 236px minmax(0,1fr);gap:18px;padding:12px 0;
-  border-bottom:1px solid var(--rule2);align-items:baseline}
-.orow:first-of-type{border-top:1px solid var(--rule)}
-.orow .oc{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.13em;
+.rm a:hover .rm-n{fill:var(--bg)}
+.rm a:focus-visible rect{stroke:var(--accent);stroke-width:3}
+.rm-cap{display:flex;gap:var(--s5);flex-wrap:wrap;padding-top:var(--s3);
+  font:400 var(--m-lab)/1.4 var(--mono);letter-spacing:var(--tr-lab);
   text-transform:uppercase;color:var(--ink3)}
-.orow .os{font-weight:700;font-size:14.5px;font-variation-settings:'wdth' 90;line-height:1.3}
-.orow .on{font-size:14px;line-height:1.5;color:var(--ink2)}
-@media (max-width:720px){.orow{grid-template-columns:1fr;gap:3px}}
-.two{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:0}
-.two>div:first-child{padding-right:38px;border-right:1px solid var(--rule2)}
-.two>aside{padding-left:32px}
-@media (max-width:900px){.two{grid-template-columns:1fr}
-  .two>div:first-child{padding-right:0;border-right:0}
-  .two>aside{padding-left:0;border-top:1px solid var(--rule);margin-top:30px;padding-top:24px}}
-.why{font-size:16px;line-height:1.66;color:var(--ink2);margin:0;max-width:74ch}
-.steps{list-style:none;margin:0;padding:0}
-.step{display:grid;grid-template-columns:52px minmax(0,1fr);padding:0 0 22px}
-.sdone{align-self:start;border:0;background:none;color:var(--c);cursor:pointer;
-  font-family:'JetBrains Mono',monospace;font-size:15px;padding:0;text-align:left}
-.sdone:hover{text-decoration:underline}
-.step.done .sdone,.step.done .stext{color:var(--ink4)}
-.step.done .stext{text-decoration:line-through}
-.stext{font-size:15.5px;line-height:1.62;color:var(--ink2);padding-left:20px;
-  border-left:1px solid var(--rule2)}
-.rollback{margin:24px 0 0;padding:20px 0 0;border-top:3px solid var(--c)}
-.rollback b{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;
-  letter-spacing:.18em;text-transform:uppercase;color:var(--c);margin-bottom:10px}
-.rollback p{margin:0;font-size:15.5px;line-height:1.6;color:var(--ink2);max-width:76ch}
-.notes{display:grid;grid-template-columns:1fr 1fr;gap:0 30px;border-top:1px solid var(--rule)}
-@media (max-width:640px){.notes{grid-template-columns:1fr}}
-.note{padding:15px 0;border-bottom:1px solid var(--rule2)}
-.note b{display:block;font-family:'JetBrains Mono',monospace;font-size:9.5px;
-  letter-spacing:.15em;text-transform:uppercase;color:var(--c);margin-bottom:5px}
-.note p{margin:0;font-size:14px;line-height:1.55;color:var(--ink2)}
-.prelist{list-style:none;margin:0;padding:0}
-.prelist li{border-bottom:1px solid var(--rule2)}
-.prelist label{display:flex;gap:9px;align-items:flex-start;font-size:13.5px;line-height:1.45;
-  color:var(--ink2);cursor:pointer;padding:7px 0}
-.prelist input{margin:3px 0 0;accent-color:var(--c);flex:none;width:13px;height:13px}
-.prelist input:checked+span{color:var(--ink4);text-decoration:line-through}
-.pre-h{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.15em;
-  text-transform:uppercase;color:var(--ink4);margin:20px 0 5px}
-.pre-h:first-child{margin-top:0}
-.deplist a{display:flex;gap:9px;align-items:baseline;text-decoration:none;font-size:13.5px;
-  color:var(--ink2);line-height:1.4;padding:7px 0;border-bottom:1px solid var(--rule2)}
-.deplist a:hover{color:var(--ink)}
-.deplist i{font-style:normal;font-family:'JetBrains Mono',monospace;font-size:11.5px;flex:none}
-.turnoff{font-size:14px;line-height:1.55;color:var(--ink3);margin:13px 0 0}
-.turnoff b{display:block;font-family:'JetBrains Mono',monospace;font-size:9.5px;
-  letter-spacing:.15em;text-transform:uppercase;color:var(--c);margin-bottom:4px}
-.mvnav{display:flex;justify-content:space-between;gap:16px;padding:22px 0 50px;
-  border-top:1px solid var(--ink);margin-top:34px}
-.mvnav a{text-decoration:none;font-size:14px;color:var(--ink2);max-width:46%}
-.mvnav a:hover{color:var(--ink)}
-.mvnav b{display:block;font-family:'JetBrains Mono',monospace;font-size:9.5px;
-  letter-spacing:.15em;text-transform:uppercase;color:var(--ink4);margin-bottom:4px}
+.rm-cap i{font-style:normal;display:inline-block;width:16px;height:9px;
+  background:var(--ink);margin-right:var(--s2);vertical-align:0}
+.rm-cap i.out{background:transparent;border:1.4px solid var(--ink)}
+/* The same schedule as rows: keyboard-reachable, printable, and the
+   twenty-nine bars too narrow to carry a number become findable. */
+.rm-table{width:100%;border-collapse:collapse;font-size:var(--t-sub);margin-top:var(--s4)}
+.rm-table th{text-align:left;font:400 var(--m-lab)/1.3 var(--mono);
+  letter-spacing:var(--tr-lab);text-transform:uppercase;color:var(--ink3);
+  padding:0 var(--s4) var(--s2) 0;border-bottom:1px solid var(--rule)}
+.rm-table td{padding:var(--s2) var(--s4) var(--s2) 0;border-bottom:1px solid var(--rule2);
+  color:var(--ink2);vertical-align:baseline}
+.rm-table .w{font-family:var(--mono);font-size:12px;color:var(--ink3);white-space:nowrap;
+  font-variant-numeric:tabular-nums}
+.rm-table .n{font-family:var(--mono);font-size:12px;color:var(--c);
+  font-variant-numeric:tabular-nums}
+.rm-table a{text-decoration:none}
+.rm-table a:hover{text-decoration:underline}
+.fold{margin-top:var(--s5)}
+.fold>summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;
+  gap:var(--s2);min-height:44px;color:var(--ink3);font:400 var(--m-lab)/1 var(--mono);
+  letter-spacing:var(--tr-lab);text-transform:uppercase}
+.fold>summary::-webkit-details-marker{display:none}
+.fold>summary::before{content:'+';font-size:14px}
+.fold[open]>summary::before{content:'\2212'}
+.fold>summary:hover{color:var(--ink)}
 
-/* ---------- generic prose pages ---------------------------------------- */
-.phead{padding:30px 0 0}
-.phead h1{margin:0;font-size:clamp(30px,5vw,54px)}
-.phead .lede{margin:16px 0 0;font-size:16.5px;line-height:1.58;color:var(--ink2);max-width:70ch}
-.prose{max-width:72ch;margin-top:22px}
-.prose p{font-size:16px;line-height:1.68;color:var(--ink2);margin:0 0 19px}
-.prose b{color:var(--ink);font-weight:700}
-.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:0 34px;
-  border-top:2px solid var(--ink);margin-top:20px}
-.gcard{padding:19px 0;border-bottom:1px solid var(--rule2)}
-.gcard h4{margin:0 0 7px;font-family:'JetBrains Mono',monospace;font-size:10px;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
-.gcard p{margin:0;font-size:14.5px;line-height:1.6;color:var(--ink2)}
-.shelves{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0 34px}
-.shelf{padding-top:22px}
-.shelf h4{margin:0 0 9px;font-family:'JetBrains Mono',monospace;font-size:10px;
-  letter-spacing:.15em;text-transform:uppercase;color:var(--accent);padding-bottom:7px;
-  border-bottom:1px solid var(--rule)}
-.shelf label{display:flex;gap:9px;align-items:flex-start;font-size:13.5px;line-height:1.45;
-  color:var(--ink2);cursor:pointer;padding:6px 0;border-bottom:1px solid var(--rule2)}
-.shelf input{margin:3px 0 0;accent-color:var(--accent);flex:none;width:13px;height:13px}
-.shelf input:checked+span{color:var(--ink4);text-decoration:line-through}
-.rules{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:0 38px;
-  border-top:2px solid var(--ink);margin-top:20px}
-.rule{display:grid;grid-template-columns:34px minmax(0,1fr);gap:11px;padding:17px 0;
-  border-bottom:1px solid var(--rule2)}
-.rule .rn{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--ink4)}
-.rule p{margin:0;font-size:14.5px;line-height:1.58;color:var(--ink2)}
-.rule b{color:var(--ink);font-weight:700}
-.tablewrap{overflow-x:auto;margin-top:20px;border-top:2px solid var(--ink)}
-table.eq{border-collapse:collapse;width:100%;min-width:780px;font-size:14px}
-table.eq th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:9.5px;
-  letter-spacing:.15em;text-transform:uppercase;color:var(--ink4);font-weight:400;
-  padding:11px 16px 11px 0;border-bottom:1px solid var(--rule)}
-table.eq td{padding:10px 16px 10px 0;border-bottom:1px solid var(--rule2);color:var(--ink2);
-  line-height:1.45;vertical-align:top}
-table.eq td:first-child{font-weight:700;color:var(--ink);white-space:nowrap}
-table.eq td.yours{color:var(--ink)}
-table.eq tr.keep td.yours{font-weight:700;color:#A32E1F}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) table.eq tr.keep td.yours{color:#E39A7B}}
-.syms{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(400px,100%),1fr));gap:0 38px;
-  border-top:2px solid var(--ink);margin-top:20px}
-.sym{padding:15px 0;border-bottom:1px solid var(--rule2)}
-.sym .sq{font-size:16px;line-height:1.34;margin-bottom:7px;
-  font-variation-settings:'wdth' 90;font-weight:600}
-.sym .sl{display:flex;flex-wrap:wrap;gap:4px 17px}
-.sym .sl a{display:flex;gap:6px;align-items:baseline;font-size:13px;color:var(--ink2);
-  text-decoration:none}
-.sym .sl a:hover{color:var(--ink);text-decoration:underline}
-.sym .sl b{font-family:'JetBrains Mono',monospace;color:var(--accent);font-weight:400;flex:none}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;
-  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;
-  text-transform:uppercase;text-decoration:none;cursor:pointer;
-  border:1px solid var(--ink);background:transparent;color:var(--ink)}
-.btn:hover{background:var(--ink);color:var(--bg)}
-.btn-p{background:var(--ink);color:var(--bg)}
-.btn-p:hover{background:transparent;color:var(--ink)}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
-
-/* ---------- planner ----------------------------------------------------- */
-.planwrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:0;padding-bottom:50px}
-.planwrap>div:first-child{padding-right:38px;border-right:1px solid var(--rule2)}
-.planwrap>aside{padding-left:32px}
-@media (max-width:980px){.planwrap{grid-template-columns:1fr}
-  .planwrap>div:first-child{padding-right:0;border-right:0}
-  .planwrap>aside{padding-left:0;border-top:2px solid var(--ink);margin-top:32px;padding-top:24px}}
-.pk{display:grid;grid-template-columns:18px 46px minmax(0,1fr);gap:11px;padding:9px 0;
-  border-bottom:1px solid var(--rule2);cursor:pointer;font-size:14px;align-items:baseline}
+/* ================================================================
+   THE PLANNER
+   ================================================================ */
+.planwrap{--aside:340px;padding-bottom:var(--s7)}
+.pk{display:grid;grid-template-columns:20px 44px minmax(0,1fr);gap:var(--s3);
+  padding:var(--s2) 0;border-bottom:1px solid var(--rule2);cursor:pointer;
+  font-size:var(--t-sub);align-items:baseline;min-height:44px}
 .pk:hover{background:var(--fill)}
-.pk input{accent-color:var(--accent);width:13px;height:13px;margin:0}
-.pk .pn{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--ink3)}
-.pk small{display:block;font-family:'JetBrains Mono',monospace;color:var(--ink4);
-  font-size:10px;letter-spacing:.09em;text-transform:uppercase;margin-top:2px}
-.planout{position:sticky;top:52px}
-.psum{display:grid;grid-template-columns:1fr 1fr;border-top:2px solid var(--ink);margin:16px 0}
-.psum>div{padding:12px 12px 13px 0;border-right:1px solid var(--rule2);
+/* plan.js has toggled this class since the page was written and there
+   has never been a rule behind it, so ticking produced no selection. */
+.pk.on{background:var(--fill);box-shadow:inset 3px 0 0 var(--c)}
+.pk input{accent-color:var(--c);width:20px;height:20px;margin:0}
+.pk .pn{font-family:var(--mono);font-size:12px;color:var(--ink3);
+  font-variant-numeric:tabular-nums}
+.pk b{font-weight:500;font-size:var(--t-item)}
+.pk small{display:block;font-size:13px;color:var(--ink3);margin-top:2px;
+  max-width:var(--measure)}
+.planout{position:sticky;top:var(--anchor)}
+.psum{display:grid;grid-template-columns:1fr 1fr;border-top:2px solid var(--ink);
+  margin:var(--s4) 0}
+.psum>div{padding:var(--s3) var(--s3) var(--s3) 0;border-right:1px solid var(--rule2);
   border-bottom:1px solid var(--rule2)}
 .psum>div:nth-child(2n){border-right:0}
-.psum b{display:block;font-family:'JetBrains Mono',monospace;font-size:21px;font-weight:400;
-  line-height:1.05;color:var(--accent)}
-.psum span{display:block;font-family:'JetBrains Mono',monospace;font-size:9.5px;
-  letter-spacing:.13em;text-transform:uppercase;color:var(--ink4);margin-top:5px}
+.psum b{display:block;font:400 21px/1.05 var(--mono);color:var(--accent);
+  font-variant-numeric:tabular-nums}
+.psum span{display:block;font:400 var(--m-lab)/1.3 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;color:var(--ink3);margin-top:var(--s1)}
 .porder{list-style:none;margin:0;padding:0;max-height:50vh;overflow:auto}
-.porder li{display:flex;gap:10px;align-items:baseline;padding:6px 0;font-size:13px;
+.porder li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:var(--s2);
+  align-items:baseline;padding:var(--s2) 0;font-size:13px;
   border-bottom:1px solid var(--rule2)}
-.porder i{font-style:normal;font-family:'JetBrains Mono',monospace;font-size:11.5px;width:24px;
-  flex:none}
-.porder .pulled{color:var(--ink4)}
+.porder i{font-style:normal;font-family:var(--mono);font-size:12px;
+  font-variant-numeric:tabular-nums}
+.porder .pulled{color:var(--ink3)}
 .porder a{text-decoration:none}
 .porder a:hover{text-decoration:underline}
-.pnote{font-size:12.5px;line-height:1.5;color:var(--ink4);margin-top:14px}
+.pk-h{display:flex;align-items:baseline;gap:var(--s3);flex-wrap:wrap;margin-top:var(--s7);
+  padding-bottom:var(--s2);border-bottom:3px solid var(--c)}
+.pk-h h2{margin:0;font-size:var(--d-sect)}
+.pk-h .clear{margin-left:auto}
+.clear{border:1px solid var(--rule);background:none;color:var(--ink3);cursor:pointer;
+  min-height:32px;padding:0 var(--s3);font:400 var(--m-lab)/1 var(--mono);
+  letter-spacing:var(--tr-lab);text-transform:uppercase}
+.clear:hover{color:var(--ink);background:var(--fill)}
 
-/* ---------- footer ------------------------------------------------------ */
-.foot{border-top:5px solid var(--ink);margin-top:56px;padding:26px var(--gut) 54px}
-/* The reference pages and the downloads, out of the sticky bar and into the
-   one place a reader looks when they have finished reading. */
-.foot-links{display:flex;flex-wrap:wrap;gap:8px 24px;padding-bottom:16px;margin-bottom:18px;
-  border-bottom:1px solid var(--rule2);font-family:'JetBrains Mono',monospace;
-  font-size:10px;letter-spacing:.14em;text-transform:uppercase}
-.foot .foot-links a{color:var(--ink3);text-decoration:none}
+/* ================================================================
+   KIT, WHAT REPLACES WHAT, ROLLBACK, ABOUT
+   ================================================================ */
+.shelves{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));
+  gap:0 var(--s7)}
+.shelf{padding-top:var(--s5)}
+.shelf.wide{grid-column:1/-1}
+.shelf.wide .shelf-list{display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:0 var(--s7)}
+.shelf h3{margin:0 0 var(--s2);display:flex;align-items:baseline;gap:var(--s3);
+  padding-bottom:var(--s2);border-bottom:1px solid var(--rule);
+  font:400 var(--m-lab)/1.3 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;color:var(--ink)}
+.shelf h3 .cnt{margin-left:auto;color:var(--ink3);font-variant-numeric:tabular-nums}
+.shelf label{display:flex;gap:var(--s3);align-items:flex-start;font-size:var(--t-sub);
+  line-height:var(--lh-sub);color:var(--ink2);cursor:pointer;padding:var(--s2) 0;
+  border-bottom:1px solid var(--rule2);min-height:44px}
+.shelf input{margin:2px 0 0;accent-color:var(--accent);flex:none;width:20px;height:20px}
+.shelf input:checked+span{color:var(--ink4);text-decoration:line-through}
+
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr));
+  gap:0 var(--s7);border-top:2px solid var(--ink);margin-top:var(--s5)}
+.rule-i{display:grid;grid-template-columns:34px minmax(0,1fr);gap:var(--s3);
+  padding:var(--s4) 0;border-bottom:1px solid var(--rule2)}
+.rule-i .rn{font-family:var(--mono);font-size:var(--m-val);color:var(--ink3);
+  font-variant-numeric:tabular-nums}
+.rule-i p{margin:0;font-size:var(--t-sub);line-height:var(--lh-sub);color:var(--ink2)}
+.rule-i b{color:var(--ink);font-weight:700}
+
+.tablewrap{overflow-x:auto;margin-top:var(--s5);border-top:2px solid var(--ink)}
+.tablewrap:focus-visible{outline:2px solid var(--accent)}
+table.eq{border-collapse:collapse;width:100%;min-width:820px;font-size:var(--t-sub)}
+table.eq caption{text-align:left;padding-bottom:var(--s2)}
+table.eq th{text-align:left;font:400 var(--m-lab)/1.3 var(--mono);
+  letter-spacing:var(--tr-lab);text-transform:uppercase;color:var(--ink3);font-weight:400;
+  padding:var(--s3) var(--s4) var(--s3) 0;border-bottom:1px solid var(--rule);
+  position:sticky;top:var(--bar);background:var(--bg);z-index:20}
+table.eq td{padding:var(--s3) var(--s4) var(--s3) 0;border-bottom:1px solid var(--rule2);
+  color:var(--ink2);line-height:1.45;vertical-align:top}
+table.eq td:first-child{font-weight:700;color:var(--ink)}
+table.eq td.yours{color:var(--ink)}
+table.eq tr.keep td.yours{font-weight:700;color:var(--warn)}
+table.eq tr:hover td{background:var(--fill)}
+
+table.mv{width:100%;border-collapse:collapse;font-size:var(--t-sub);margin-top:var(--s4)}
+table.mv td{padding:var(--s3) var(--s4) var(--s3) 0;border-bottom:1px solid var(--rule2);
+  vertical-align:baseline}
+table.mv tr:hover td{background:var(--fill)}
+table.mv .c-n{width:44px;font-family:var(--mono);font-size:13px;color:var(--c);
+  font-variant-numeric:tabular-nums}
+table.mv .c-t a{text-decoration:none;font-variation-settings:'wdth' 90;font-weight:700;
+  line-height:1.3;display:block;font-size:var(--t-item)}
+table.mv .c-t a:hover{text-decoration:underline;text-underline-offset:3px}
+table.mv .c-t p{margin:var(--s1) 0 0;font-size:13px;line-height:1.45;color:var(--ink3);
+  max-width:var(--measure)}
+
+.facts{list-style:none;margin:0;padding:0}
+.facts li{display:flex;justify-content:space-between;gap:var(--s3);padding:var(--s2) 0;
+  border-bottom:1px solid var(--rule2);font-family:var(--mono);font-size:12px;
+  color:var(--ink3);font-variant-numeric:tabular-nums}
+.facts b{font-weight:400;color:var(--ink)}
+
+/* ================================================================
+   THE FOOTER
+   ================================================================ */
+.foot{border-top:5px solid var(--ink);margin-top:var(--s9)}
+.foot-in{padding-top:var(--s5);padding-bottom:var(--s8)}
+.foot-links{display:flex;flex-wrap:wrap;gap:0 var(--s6);padding-bottom:var(--s3);
+  margin-bottom:var(--s5);border-bottom:1px solid var(--rule2)}
+.foot .foot-links a{color:var(--ink3);text-decoration:none;font-size:var(--t-sub);
+  display:inline-flex;align-items:center;min-height:44px}
 .foot .foot-links a:hover{color:var(--ink)}
-.foot p{margin:0 0 11px;font-size:13.5px;line-height:1.6;color:var(--ink3);max-width:84ch}
+.foot p{margin:0 0 var(--s3);font-size:var(--t-sub);line-height:var(--lh-sub);
+  color:var(--ink3);max-width:var(--measure)}
 .foot .ft{font-variation-settings:'wdth' 79;font-weight:800;text-transform:uppercase;
-  font-size:17px;color:var(--ink)}
+  font-size:var(--d-sub);color:var(--ink);letter-spacing:var(--tr-d)}
 .foot a{color:var(--accent)}
-.ver{font-family:'JetBrains Mono',monospace}
-@media print{
-  .nav,.filters,.rail,.mvnav,.rm-pick,.foot,.ck-tools,.nums-l,.ans-act{display:none}
-  body{background:#fff;color:#000}
-  .shell{grid-template-columns:1fr}.planout,.two>aside{position:static}
-  .rm-views>figure{display:block!important}
-  /* app.js opens every stage before the dialog appears; this is the belt to
-     that pair of braces, for a reader printing with no script at all. */
-  details.stg::details-content{content-visibility:visible!important;block-size:auto!important}
-  .ck-r{display:flex!important}
+.foot kbd{border:1px solid var(--rule);padding:1px 5px;color:var(--ink2)}
+.ver{font-family:var(--mono)}
+
+/* ================================================================
+   RESPONSIVE - three breakpoints, not seven
+   1180  the container reaches its cap
+   900   the rail becomes the stage strip; two columns become one
+   640   phone
+   ================================================================ */
+@media (max-width:1180px){
+  :root{--rail:184px;--aside:280px}
 }
-
-/* =====================================================================
-   THE FRONT PAGE
-   One question, one answer. The page used to be the whole checklist - seven
-   stages and a hundred and twenty-two rows carrying six figures each, all of
-   it on screen before the reader had decided anything. The checklist has its
-   own page now and this one answers the question the reader arrived with.
-   ===================================================================== */
-.q-head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
-  flex-wrap:wrap;padding-bottom:10px;border-bottom:2px solid var(--ink)}
-.q-head h1{margin:0;font-size:clamp(26px,3.4vw,40px)}
-.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
-  flex-wrap:wrap;margin-top:52px;padding-bottom:9px;border-bottom:2px solid var(--ink)}
-.sec-h h2{margin:0;font-size:clamp(19px,2.3vw,26px)}
-.sec-b{margin:14px 0 0;font-size:14.5px;line-height:1.55;color:var(--ink3);max-width:76ch}
-
-/* A panel is a rule and some space. Colour appears twice on this block: the
-   numeral, and the rule that closes it. */
-.answer{padding:26px 0 24px;border-bottom:3px solid var(--c);outline:none;
-  scroll-margin-top:60px}
-.sec-h{scroll-margin-top:60px}
-.ans-k{margin:0;font-family:'JetBrains Mono',monospace;font-size:11px;
-  letter-spacing:.16em;text-transform:uppercase;color:var(--c)}
-.ans-note{margin:12px 0 0;font-size:14px;line-height:1.5;color:var(--ink3);max-width:72ch}
-.ans-hd{display:flex;align-items:baseline;gap:18px;margin-top:12px;flex-wrap:wrap}
-.ans-n{font-family:'JetBrains Mono',monospace;font-feature-settings:'tnum' 1;
-  font-size:clamp(32px,5vw,52px);line-height:1;color:var(--c)}
-.ans-t{margin:0;font-size:clamp(24px,3.6vw,42px);line-height:1.06;font-weight:600;
-  font-variation-settings:'wdth' 88;flex:1 1 300px;min-width:0}
-.ans-t a{text-decoration:none}
-.ans-t a:hover,.ans-t a:focus-visible{text-decoration:underline;text-underline-offset:4px}
-.ans-hook{margin:16px 0 0;font-size:17px;line-height:1.52;color:var(--ink2);max-width:70ch}
-/* Label then value, lower case, no tracking: the figures recede by typography
-   rather than by a grey nobody can read. */
-.ans-facts{display:flex;flex-wrap:wrap;gap:5px 26px;margin:18px 0 0;
-  font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--ink2)}
-.ans-facts i{font-style:normal;color:var(--ink4);margin-right:7px}
-.ans-then{margin:12px 0 0;font-family:'JetBrains Mono',monospace;font-size:11px;
-  letter-spacing:.06em;color:var(--ink4)}
-.ans-act{display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin:22px 0 0}
-.ans-all{font-size:13.5px;color:var(--ink3);text-decoration:none;
-  border-bottom:1px solid var(--rule)}
-.ans-all:hover{color:var(--ink);border-color:var(--ink)}
-.ans-nojs{margin:14px 0 0;font-size:12.5px;color:var(--ink4)}
-html.js .ans-nojs{display:none}
-.lnk{border:0;background:none;padding:0;font:inherit;color:var(--accent);cursor:pointer;
-  border-bottom:1px solid currentColor}
-
-.prog{display:flex;align-items:center;gap:14px;margin-top:20px}
-.prog .track{flex:1;height:2px;background:var(--rule2);position:relative}
-.prog .track i{position:absolute;inset:0 auto 0 0;background:var(--ink);width:0}
-.prog .pct{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink3);
-  white-space:nowrap}
-.prog-note{margin:8px 0 0;font-family:'JetBrains Mono',monospace;font-size:10px;
-  letter-spacing:.15em;text-transform:uppercase;color:var(--ink4)}
-
-/* The fore-edge tab again, moved to where it is doing work. */
-.routes{margin-top:4px}
-.route{display:block;padding:13px 0 13px 15px;text-decoration:none;
-  border-left:4px solid var(--c);border-bottom:1px solid var(--rule2)}
-.route:hover{background:var(--fill)}
-.rt-s{display:block;font-size:16px;line-height:1.3;font-variation-settings:'wdth' 94;
-  font-weight:500}
-.rt-m{display:block;margin-top:4px;font-family:'JetBrains Mono',monospace;font-size:10px;
-  letter-spacing:.11em;text-transform:uppercase;color:var(--ink4)}
-
-.tail{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-  margin-top:52px;border-top:2px solid var(--ink)}
-.tail a{display:block;padding:18px 20px 20px 0;text-decoration:none;
-  border-right:1px solid var(--rule2)}
-.tail a:last-child{border-right:0}
-.tail a:hover{background:var(--fill)}
-.tl-t{display:block;font-size:16px;font-weight:600;font-variation-settings:'wdth' 92}
-.tl-s{display:block;margin-top:5px;font-size:13px;line-height:1.45;color:var(--ink3)}
-@media (max-width:760px){
-  .tail{grid-template-columns:1fr}
-  .tail a{border-right:0;border-bottom:1px solid var(--rule2)}}
-
-/* =====================================================================
-   THE CHECKLIST
-   Every Move in order, with a tick box each. A row is a tick box, a number,
-   a title and - only where the fact changes what the reader does - one flag.
-   The six figures that used to sit on every row are still built; they are
-   hidden until asked for, because a column reading `0 min` on a hundred and
-   ten rows out of a hundred and twenty-two is not information.
-   ===================================================================== */
-.ck-lede{margin:16px 0 0;font-size:16.5px;line-height:1.5;color:var(--ink2);max-width:74ch}
-.ck-lede a{font-weight:700;font-variation-settings:'wdth' 90}
-.ck-lede b{font-family:'JetBrains Mono',monospace;font-weight:400;color:var(--accent)}
-
-.nums-l{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:26px 0 0;
-  padding-bottom:12px;border-bottom:1px solid var(--rule)}
-.nums-l label{padding:6px 12px;border:1px solid var(--rule);cursor:pointer;
-  font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.13em;
-  text-transform:uppercase;color:var(--ink3)}
-.nums-l label:hover{color:var(--ink);background:var(--fill)}
-#nums:checked+.nums-l label{background:var(--ink);border-color:var(--ink);color:var(--bg)}
-.nums-l span{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.13em;
-  text-transform:uppercase;color:var(--ink4)}
-/* The input sits beside the stages rather than inside the label, because the
-   sibling combinator that reveals the figures needs them to share a parent.
-   Same technique as the roadmap's four pre-rendered charts. */
-#nums{position:absolute;width:1px;height:1px;margin:-1px;opacity:0;
-  clip-path:inset(50%);pointer-events:none}
-#nums:focus-visible+.nums-l label{outline:2px solid var(--accent);outline-offset:2px}
-
-details.stg{padding:44px 0 0;scroll-margin-top:60px}
-/* display:flex also removes the disclosure triangle in Chrome and Safari; the
-   affordance is the mono +/- in the gutter instead, because a chevron is not
-   one of the two families this book sets. */
-details.stg>summary.stg-h{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
-  padding-bottom:9px;border-bottom:3px solid var(--c);list-style:none;cursor:pointer}
-details.stg>summary::-webkit-details-marker{display:none}
-.stg-mk{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink4);width:11px}
-.stg-mk::after{content:'+'}
-details[open]>summary .stg-mk::after{content:'\2212'}
-.stg-n{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--c)}
-.stg-h h2{margin:0;font-size:clamp(21px,2.6vw,30px)}
-.stg-part{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.11em;
-  text-transform:uppercase;color:var(--ink4)}
-.stg-prog{margin-left:auto;display:flex;align-items:center;gap:10px}
-.stg-prog .track{width:96px;height:6px;background:var(--fill);position:relative;
-  overflow:hidden}
-.stg-prog .track i{position:absolute;inset:0 auto 0 0;background:var(--c);width:0}
-.stg-prog .cnt{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink3)}
-.stg-done{margin:12px 0 4px;font-size:14.5px;line-height:1.5;color:var(--ink3);max-width:78ch}
-.stg-done b,.stg-lead b{font-family:'JetBrains Mono',monospace;font-weight:400;font-size:10px;
-  letter-spacing:.15em;text-transform:uppercase;color:var(--c);
-  display:inline-block;margin-right:8px}
-/* Lead time is the one figure worth promoting out of the hidden strip: nobody
-   is working during a wait, so a Move ordered late holds up everything behind
-   it, and that is the mistake this book exists to stop somebody making. */
-.stg-lead{margin:4px 0 0;font-family:'JetBrains Mono',monospace;font-size:11px;
-  line-height:1.7;color:var(--ink3)}
-.stg.done .stg-h{border-bottom-color:var(--ink4)}
-
-ol.ck{list-style:none;margin:14px 0 0;padding:0}
-ol.ck>li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:0 14px;
-  align-items:baseline;border-bottom:1px solid var(--rule2);scroll-margin-top:60px}
-ol.ck>li:hover{background:var(--fill)}
-.ck-b{display:inline-flex;align-items:baseline;gap:11px;cursor:pointer;
-  padding:11px 8px 11px 0}
-ol.ck input{width:15px;height:15px;accent-color:var(--c);margin:0}
-.ck-n{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--c)}
-.ck-t{font-size:16px;line-height:1.35;font-variation-settings:'wdth' 92;font-weight:500;
-  padding:11px 0;text-decoration:none}
-.ck-t:hover,.ck-t:focus-visible{text-decoration:underline;text-underline-offset:3px}
-ol.ck li.done .ck-t{color:var(--ink4);text-decoration:line-through}
-ol.ck li.done .ck-n{color:var(--ink4)}
-/* One row on the page says which one you are on. */
-li.ck-next .ck-t::after{content:' \00b7 next';font-family:'JetBrains Mono',monospace;
-  font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);
-  white-space:nowrap}
-/* One flag, and only on the rows where the fact changes what you do: thirteen
-   Moves cannot be undone, twelve take the site down, and the other hundred and
-   nine say nothing, which is the correct rendering of nothing happening. */
-.ck-f{padding:11px 0;font-family:'JetBrains Mono',monospace;font-size:11px;
-  color:var(--ink3);white-space:nowrap}
-.ck-warn{color:var(--warn)}
-.ck-r{display:none;grid-column:2/-1;padding:0 0 11px;gap:12px;align-items:baseline;
-  font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--ink4);flex-wrap:wrap}
-#nums:checked~.stg .ck-r{display:flex}
-/* A prerequisite that is not ticked yet is marked where it is being read - in
-   the figures strip, which the reader opened on purpose - and only once
-   something has been ticked. On a fresh checklist a hundred and nineteen of a
-   hundred and twenty-two rows are waiting on something, and a hundred and
-   nineteen marks is wallpaper rather than a warning. Nothing is ever disabled:
-   the reader may well know better than the graph does. */
-.ck-blocked{color:var(--warn)}
-@media (max-width:760px){
-  ol.ck>li{grid-template-columns:auto minmax(0,1fr);gap:0 10px}
-  .ck-f{grid-column:2;padding:0 0 11px}
+@media (max-width:900px){
+  :root{--anchor:calc(var(--bar) + var(--strip) + var(--s4))}
+  .shell{grid-template-columns:minmax(0,1fr);gap:0}
+  /* The fore-edge tab, in the axis a phone has. Seven cells, all
+     visible at 320px, no scroll and nothing to discover by swiping.
+     The rail used to be display:none here, which left the checklist
+     as 11,364px of blind scroll. */
+  .rail{position:sticky;top:var(--bar);z-index:60;display:grid;
+    grid-template-columns:repeat(7,1fr);height:var(--strip);padding:0;overflow:visible;
+    max-height:none;background:var(--bg);border-bottom:1px solid var(--ink);
+    margin-inline:calc(-1 * var(--gut))}
+  .r-s{display:flex;align-items:center;justify-content:center;height:var(--strip);
+    padding:0;border-left:0;border-bottom:4px solid var(--c);opacity:.45}
+  .r-s:hover,.r-s.on{opacity:1;background:var(--fill)}
+  .r-s.on{padding-left:0;border-left:0}
+  .r-n{font-size:var(--m-lab);letter-spacing:0;color:var(--ink)}
+  .r-n .w{display:none}
+  .r-t,.r-w,.r-moves,.r-pages,.r-h,.rail .fold{display:none}
+  .main{padding-top:var(--s5)}
+  .work,.planwrap{grid-template-columns:minmax(0,1fr)}
+  .work>aside{border-left:0;padding-left:0;border-top:1px solid var(--rule);
+    margin-top:var(--s6);padding-top:var(--s5)}
+  .planout{position:static}
+  details.stg>summary.stg-h{top:calc(var(--bar) + var(--strip))}
+  .filters{top:calc(var(--bar) + var(--strip))}
+  table.eq th{top:calc(var(--bar) + var(--strip))}
+  /* Below the rail the second zone has to live somewhere, so the
+     footer carries every destination in full. */
+  .foot-links{gap:0 var(--s5)}
+}
+@media (max-width:640px){
+  .bar-in{gap:var(--s2)}
+  /* The breadcrumb is the page's own <h1> two inches lower, so on a phone
+     the bar spends its width on the jump box instead of a truncation. With
+     no script there is no jump box, so it keeps both readouts rather than
+     clearing a space for something that is not coming. */
+  html.js .crumb{display:none}
+  html.js .bar-pct{display:none}
+  .crumb b{font-size:11px}
+  .jump input{width:100%}
+  .jump{flex:1 1 auto}
+  .bar-tools{flex:1 1 auto;justify-content:flex-end}
+  .mast .wordmark{font-size:38px}
+  .mast-in{gap:var(--s3);padding:var(--s4) 0 var(--s3)}
+  .mast-sub p{font-size:var(--t-body)}
+  .edition-in{padding:var(--s2) var(--gut);gap:0 var(--s4)}
+  .mv-spec{grid-template-columns:1fr 1fr}
+  .figs{grid-template-columns:1fr 1fr}
+  .orow{grid-template-columns:minmax(0,1fr);gap:2px}
+  .orow .oc{margin-top:var(--s2)}
+  /* The runbook gutter rotates: 72px back into the measure, taking it
+     from about thirty characters to about forty-six. */
+  .step{grid-template-columns:minmax(0,1fr)}
+  .steps::before{display:none}
+  .stext{border-left:0;border-top:3px solid transparent;padding-left:0;
+    padding-top:var(--s2);margin-left:0}
+  .step.done .stext{border-left-color:transparent;border-top-color:var(--c)}
+  .sdone{padding-bottom:0}
+  ol.ck>li{grid-template-columns:auto minmax(0,1fr);gap:0 var(--s2)}
+  .ck-flag{grid-column:2;padding:0 0 var(--s3)}
   .ck-r{grid-column:1/-1}
+  .rm-pick{display:grid;grid-template-columns:1fr 1fr}
+  .rm-pick label{border-right:1px solid var(--rule);justify-content:center}
+  .tail a{border-right:0;border-bottom:1px solid var(--rule2)}
+  /* The four-column lookup table becomes one record per row: 41% of it
+     was visible before, and the column carrying the answer was not. */
+  table.eq{min-width:0}
+  table.eq thead{display:none}
+  table.eq,table.eq tbody,table.eq tr,table.eq td{display:block;width:auto}
+  table.eq tr{border-bottom:1px solid var(--rule);padding:var(--s4) 0}
+  table.eq td{border:0;padding:var(--s1) 0}
+  table.eq td:first-child{font-size:var(--t-item-lg)}
+  table.eq td:not(:first-child)::before{content:attr(data-h);display:block;
+    font:400 var(--m-lab)/1.4 var(--mono);letter-spacing:var(--tr-lab);
+    text-transform:uppercase;color:var(--ink3)}
+  /* A caption inside a display:block table collapses to its longest word. */
+  table.eq caption{display:block;width:auto;padding-bottom:var(--s3)}
+  .tablewrap{overflow-x:visible}
 }
-.ck-tools{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:16px 0 0;
-  border-top:1px solid var(--rule);margin-top:34px}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;
+    scroll-behavior:auto!important}
+}
+
+/* ================================================================
+   PRINT
+   The tokens are redeclared rather than the body patched: Firefox and
+   Safari keep matching prefers-color-scheme:dark while printing, so a
+   reader in a dark browser was getting #B2B8BC prose on white paper.
+   ================================================================ */
+@media print{
+  :root{
+    --ink:#000; --ink2:#1A1A1A; --ink3:#3A3A3A; --ink4:#5A5A5A;
+    --bg:#fff; --fill:#fff; --rule:#666; --rule2:#BBB;
+    --accent:#1F4E79; --warn:#A32E1F; --on-c:#fff}
+  .bar,.rail,.mvnav,.rm-pick,.foot,.ck-tools,.nums-l,.ans-act,
+  .routes,.tail,.jump,.chip,.filters,.mast,.skip,.pages{display:none}
+  .shell,.work,.planwrap{grid-template-columns:1fr;gap:0}
+  .work>aside{border-left:0;padding-left:0}
+  .planout,.rail{position:static}
+  .picker{display:none}
+  .rm-views>figure{display:none}
+  #w1:checked~.rm-views>.v1,#w2:checked~.rm-views>.v2,
+  #w3:checked~.rm-views>.v3,#w6:checked~.rm-views>.v6{display:block}
+  /* app.js opens every stage before the dialog appears; this is the
+     belt to that pair of braces, for a reader with no script at all. */
+  details.stg::details-content{content-visibility:visible!important;block-size:auto!important}
+  .fold::details-content{content-visibility:visible!important;block-size:auto!important}
+  .step,ol.ck>li,.gcard,.orow,.rule-i,.sym,.note,.prelist li,.shelf label{break-inside:avoid}
+  h1,h2,h3,.blab,.sec-h,.phead,.stg-h,.pk-h{break-after:avoid}
+  a[href^="http"]::after{content:' (' attr(href) ')';font-size:11px;color:#3A3A3A}
+}

@@ -5,6 +5,106 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-09-07
+
+The website rebuilt as an instrument rather than a document. No Move changed; the 122
+Moves, the schedule and the arithmetic are the same. This is presentation, navigation and
+one factual correction.
+
+### Added
+- **A chrome on every page.** A 48px bar carrying the wordmark, a breadcrumb saying where
+  you are, previous and next on a Move, a box that takes a Move number, how far you have
+  got, and a menu of every page. It replaced a 265px masthead that was reprinted on all
+  130 pages — a book cover glued to the top of every page of the book it wraps, and 39%
+  of a phone's viewport before a word of content. The masthead now appears once, on the
+  front page, where a cover belongs.
+- **A way to name a Move.** There was none: no search, no jump, and the only routes to an
+  arbitrary Move were to scroll a 7,600px checklist or hit a bar on the schedule drawing.
+  The chrome now takes `87` or a title, `/` focuses it, and every Move has a numeric
+  address — `m/87.html` — that resolves with no script and from a `file://` URL, so a
+  Move is something you can say out loud in a datacentre.
+- **The progress spine.** Seven segments under the chrome, one per stage, each as wide as
+  that stage has Moves and filled in that stage's own colour as they are ticked. It is
+  the printed book's fore-edge tab laid flat, it is a rule and some space, and it gives
+  the 122 Move pages the progress readout they have never had.
+- **A page per stage,** at `s/<stage>.html`. The book's own organising unit had no
+  address, so the rail, the front page's starting points and every cross-reference
+  pointed at a fragment of one very long document. Each carries the stage's figures, its
+  lead times and its Moves, against the same ticks the checklist reads.
+- **A page for the symptom index,** which was reachable only by scrolling the front page.
+- **Keyboard navigation:** `/` for the jump box, `1`–`7` for a stage, arrows to turn the
+  page on a Move. Stated once, in the footer.
+- **Persistence where the work happens.** A Move page can tick its own runbook steps, its
+  own pre-flight boxes and the Move itself; the kit page remembers its 46 procurement
+  boxes. The page a reader spends most of their time on was the only one that wrote
+  nothing, and a half-run runbook did not survive a reload.
+- **The checklist can be filtered** by stage and by what is not done, remembers which
+  stages you folded, and asks before clearing every tick.
+- **A link gate in the build.** Every internal link and every fragment must resolve to a
+  file and an id that exist, or the build fails.
+
+### Changed
+- **The rail is the primary navigation and is on every page** rather than two, and the
+  stage you are in opens into its own Moves, so any Move is one click from any other Move
+  beside it. Its second zone carries every page on the site with the current one marked —
+  which is where Kit, What replaces what and About stop being reachable only from a 10px
+  strip at the bottom of a seven-screen scroll.
+- **Below 900px the rail becomes a seven-cell stage strip** across the top. It used to be
+  `display:none`, which left the checklist as 11,364px of blind scroll on a phone with no
+  landmark of any kind. Chrome on a phone falls from 330px to 92px.
+- **A Move page leads with the runbook.** The first step used to begin 1,093px down the
+  page, and "Before you start" rendered 2,548px *below* the runbook it is a prerequisite
+  for. The order is now the order you work in: what you need, then the steps, then the
+  rollback, then a rule and everything that is read rather than run. The runbook gets the
+  only display-size heading and a rule down the ordinal gutter that fills as you tick.
+- **A spec cell whose value is an em dash is not printed.** Sixty-five Moves were
+  rendering three blank cells to say nothing three times.
+- **A design system, where there were 33 spacing literals and 33 type sizes.** Nine
+  spacing steps, nine type sizes, one label recipe in place of 42, three breakpoints in
+  place of seven, and a container: prose ran to 274 characters a line at 2560px because
+  nothing on the site had a maximum width.
+- **The planner works from a `file://` URL.** It fetched its data, which is blocked there,
+  so the page the navigation calls "Plan yours" was a grey apology in exactly the medium
+  this book says it has to work in. The payload is inlined, as the front page's already
+  was. Its rows are sentence case, its selected state is visible at last, and it says
+  plainly that it needs JavaScript instead of printing an instruction nobody can obey.
+- **The schedule answers first.** "242 working weeks — about 5.3 years with 3 engineers"
+  is set at the size of an answer and follows the control; the drawing's week ruler is
+  spaced from the room it has rather than a fixed step, which had put 61 three-digit
+  labels into 1,060 units of drawing.
+- **The roadmap has a table as well as a drawing**, because 29 of the bars are too narrow
+  to carry their own number and a drawing is not reachable by keyboard.
+- **The lookup table stacks on a phone.** 41% of it was visible, and the column carrying
+  the answer — what you run instead — was not.
+
+### Fixed
+- **The seven Part colours were unreadable in the dark theme.** One hex per Part was
+  inlined into the markup and used in both themes, so every Part signal — a numeral, a
+  section rule, a rail tab, a bar on the schedule — landed between 2.2:1 and 3.6:1 on the
+  dark ground, below the floor for a graphic and nowhere near what a numeral set in it
+  needs. `parse.LAYERS` now carries both hexes, the markup carries `data-part` instead of
+  a colour, and the stylesheet picks. Every rendered text pair on the site now passes
+  WCAG AA in both themes; `--ink4`, which carried most of the site's labels, was 2.58:1.
+- **The rollback page said three Moves cannot be undone. Thirteen can not.** The number
+  was spelled out in prose in a repository whose rule is that no total is. It is now
+  passed in and counted, so the print edition, the EPUB and the website cannot disagree
+  with each other or with the Moves.
+- The crew picker on the schedule page had a focus rule that could never match, so the
+  one keyboard control on the page was invisible when focused.
+- The rail never marked the current stage on the checklist — the one page where position
+  is the whole question — and its links threw a reader out of the Move they were reading.
+- Filtering the checklist after folding it showed a closed summary bar and a count of
+  rows that were not on screen.
+- The step ordinals were ARIA toggle buttons in the markup, so with no script every Move
+  page offered 797 buttons that could not be pressed. They are upgraded by script now.
+- The front page rendered its seven starting points twice with no script.
+- The figures a stage page renders had no control that could reveal them.
+- `<` is escaped in the inlined payload, so a Move title could not close the script
+  element it sits in.
+- Dead weight removed: a 58 KB asset nothing loaded, five unused imports — one of which
+  ran the whole print builder as a side effect — and every CSS rule that matched no
+  markup, including the stylesheet of a search bar removed two releases ago.
+
 ## [1.2.0] - 2026-09-07
 
 Nothing about the book changed; `site/` is byte-identical to 1.1.0. This is how the book

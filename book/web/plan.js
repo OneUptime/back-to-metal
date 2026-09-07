@@ -8,6 +8,11 @@
  *
  * The selection lives in the address bar, so a plan is a link you can send to
  * the person who has to approve it.
+ *
+ * The payload is inlined by the build, the way the front page's is. It used to
+ * be fetched, which meant the one page the navigation calls "Plan yours" was a
+ * grey apology from a file:// URL - in exactly the medium this book says it has
+ * to work in.
  */
 (() => {
   'use strict';
@@ -21,8 +26,12 @@
     count: $('#p-count'), cut: $('#p-cut'), weeks: $('#p-weeks'),
     save: $('#p-save'),
   };
-  let MOVES = [], BY = {};
   const chosen = new Set();
+
+  const data = window.BTM && window.BTM.records();
+  if (!data) return;
+  const esc = window.BTM.esc;
+  const BY = Object.fromEntries(data.map(m => [m.n, m]));
 
   /* Effort arrives already in days from the build, so the planner and the
      roadmap cannot disagree about what a Move costs. */
@@ -70,14 +79,20 @@
       cut += m.cut;
       if (m.was != null && m.now != null) save += m.was - m.now;
       const pulled = chosen.has(n) ? '' : ' class="pulled"';
-      return `<li${pulled}><i style="color:${m.c}">${m.n}</i>` +
-             `<a href="m/${m.slug}.html">${m.t}</a></li>`;
+      return `<li${pulled} data-part="${m.p}"><i style="color:var(--c)">${m.n}</i>` +
+             `<a href="m/${m.slug}.html">${esc(m.t)}</a></li>`;
     }).join('');
 
     out.count.textContent = full.length;
     out.cut.textContent = cut;
     out.weeks.textContent = Math.max(1, Math.round(weeksFor(full)));
     out.save.textContent = money(save);
+
+    $$('[data-all]').forEach(b => {
+      const boxes = $$(`.pk[data-layer="${b.dataset.all}"] input`);
+      const on = boxes.every(c => c.checked);
+      b.textContent = `${on ? 'Clear' : 'Select'} all ${boxes.length}`;
+    });
 
     const q = full.length ? '?m=' + [...chosen].sort((a, b) => (+a) - (+b)).join(',') : location.pathname;
     history.replaceState(null, '', full.length ? q : location.pathname);
@@ -104,23 +119,10 @@
   });
   $('#p-print').addEventListener('click', () => window.print());
 
-  fetch('assets/moves.json')
-    .then(r => r.json())
-    .then(data => {
-      MOVES = data;
-      BY = Object.fromEntries(data.map(m => [m.n, m]));
-      const pre = new URLSearchParams(location.search).get('m');
-      if (pre) {
-        const want = new Set(pre.split(',').filter(Boolean));
-        $$('.pk input').forEach(c => { if (want.has(c.value)) setBox(c, true); });
-      }
-      render();
-    })
-    .catch(() => {
-      /* The plan is an enhancement, not the content: if the payload cannot be
-         fetched (opened from a file:// URL, say) the picker stays usable and
-         says so rather than sitting silently broken. */
-      out.empty.textContent = 'The planner needs to be served over http to load its data. '
-        + 'The Moves themselves work either way.';
-    });
+  const pre = new URLSearchParams(location.search).get('m');
+  if (pre) {
+    const want = new Set(pre.split(',').filter(Boolean));
+    $$('.pk input').forEach(c => { if (want.has(c.value)) setBox(c, true); });
+  }
+  render();
 })();

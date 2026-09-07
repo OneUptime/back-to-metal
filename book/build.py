@@ -19,7 +19,7 @@ from parse import load_all, LAYERS, ORDER, CUTOVER_CAP, inline
 from icons import icon, meter, risk_bars, anatomy, cost_chart
 from deps import needs as dep_needs, unlocks as dep_unlocks, DEPS
 from kit import SHELVES, KIT, RULES, REFERENCE, HOMELAB, HOMELAB_KIT
-from rollback_data import INTRO as RB_INTRO, POINTS as RB_POINTS, DISCLAIMER as RB_DISC
+from rollback_data import intro as rb_intro, POINTS as RB_POINTS, DISCLAIMER as RB_DISC
 from equivalents import ROWS as EQ_ROWS, CLOUDS
 from symptoms import SYMPTOMS
 from version import VERSION
@@ -52,12 +52,6 @@ FONTS = f"""
 """
 
 CSS = (HERE / 'style.css').read_text()
-
-# On the near-black divider and cover pages the layer colours have to lift off
-# the ink rather than sit in it.
-DARK = {'Iron': '#A8B0B8', 'Site': '#C9B29E', 'Cluster': '#8FB4D6',
-        'Platform': '#A996D8', 'Data': '#E39A7B', 'Edge': '#7FC4B2',
-        'Watch': '#DDB26A'}
 
 PART_BLURB = {
     'Iron': 'What to buy. Cores, memory, disks, network cards, switches, optics and '
@@ -420,11 +414,12 @@ def build(moves):
     """, 'TEN RULES'))
 
     # ---------- the rollback page: the most important in the book
+    oneway = sum(1 for m in moves if m['oneway'])
     rp = ''.join(f'<div class="pcard"><h4>{esc(t)}</h4><p>{esc(b)}</p></div>' for t, b in RB_POINTS)
     pages.append(page('', '#A32E1F', f"""
     <div class="pkicker">The one page to read twice</div>
     <h2 class="ptitle d">Before You Touch Anything</h2>
-    <p class="pintro">{esc(RB_INTRO)}</p>
+    <p class="pintro">{esc(rb_intro(oneway))}</p>
     <div class="hrule" style="margin:5.5mm 0"></div>
     <div class="pan">{rp}</div>
     <div class="kitwrap">

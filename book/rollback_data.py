@@ -10,13 +10,21 @@ This is the most important page in the book. Everything else costs money when it
 goes wrong; this costs data.
 """
 
-INTRO = (
-    'Every Move in this book changes something that is running. Most are reversible '
-    'for a stated window, a few are reversible only until a particular step, and '
-    'three are not reversible at all. The difference between a migration and an '
-    'incident is almost never the technique - it is whether somebody worked out the '
-    'way back before they started, and whether anybody had ever tested it.'
-)
+def intro(oneway):
+    """The opening paragraph, with the count of irreversible Moves passed in.
+
+    It used to spell the number out, and the number it spelled was three while
+    the book had thirteen - the failure this repository has a rule against, sat
+    on the one page where being wrong costs data. Every output counts the Moves
+    it is rendering and hands the answer in, the way mission.py takes the total.
+    """
+    return (
+        'Every Move in this book changes something that is running. Most are reversible '
+        'for a stated window, a few are reversible only until a particular step, and '
+        f'{oneway} are not reversible at all. The difference between a migration and an '
+        'incident is almost never the technique - it is whether somebody worked out the '
+        'way back before they started, and whether anybody had ever tested it.'
+    )
 
 POINTS = [
     ('Read the rollback first',
