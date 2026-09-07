@@ -5,6 +5,65 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-09-07
+
+**The startup edition.** The book is rewritten from 122 Moves to 20, and the website from
+sixteen page types to five. It is the same argument at a size somebody can act on.
+
+The previous edition was correct and unusable. Computed from its own Move files it was 975
+person-days of labour and a critical path of 160 weeks — 242 weeks with three engineers, 201
+with six. Four and a half years is not a plan; it is a reason to do nothing. A startup with
+two or three engineers and a $24,000 monthly bill has no way in to a document like that, and
+the document is what the reader was actually blocked on.
+
+### Changed
+- **Twenty Moves, in five stages of four.** Decide, Buy, Build, Move, Run. Around 70
+  person-days of labour and about half a year end to end for two engineers, and most of the
+  calendar is hardware lead time rather than work. Every figure is computed from the Move
+  files as before; none is typed.
+- **Stages are verbs, not layers.** The seven Parts named after the system diagram — Iron,
+  Site, Cluster, Platform, Data, Edge, Watch — are gone. An architect thinks in layers;
+  somebody halfway through the work thinks about their week. "Stage 3 · Build" answers
+  *where am I* without a diagram.
+- **The reference build is one site, five machines and a spare,** at 32 cores and 256 GB a
+  node. It was two sites and twelve. Two sites doubles the hardware, doubles the operational
+  surface and is the most common reason a repatriation runs out of energy; one site with
+  proven off-site backups is the honest answer at this size.
+- **The cost model is a startup's.** A $24,000 monthly bill against $11,151 owned, of which
+  $7,917 is the salary line. Half an engineer of ongoing work, not one and a half — five
+  machines in one cage is not a platform team, and a book that asks a startup to hire two
+  people to save $3,000 of hardware is asking it to lose money.
+- **Move 07 says plainly that renting dedicated machines by the month is often the right
+  answer,** and that at five machines it costs about the same as owning, because a quarter
+  rack's fixed costs do not amortise over a small fleet. You own hardware when the fleet is
+  big enough to carry the room.
+- **Move 03 gives the reader permission to stop.** If the owned column does not come in a
+  third under the rented one, three Moves and a week of work is the whole cost of finding
+  out — against a programme abandoned in month five with two platforms live.
+- **Ten rules became seven.** What survived being written for a company with two engineers.
+
+### Removed
+- **The website is five pages plus one per Move,** down from nine top-level pages, seven
+  stage pages and 244 Move pages. About 50 files, down from 267.
+- **The left rail, the sticky chrome, the spine, the jump box and the dependency planner.**
+  All of them were instruments for somebody running a four-year programme. With twenty
+  Moves in a fixed order, the order is the plan, and the checklist replaces the planner
+  outright.
+- **The roadmap, plan, symptoms, rollback, kit and replaces pages,** folded into the five
+  that remain. The stage pages go with them: a stage is four Moves, and four Moves do not
+  need an address of their own.
+- **`docs/manifest.json` and `docs/manifest-critique.md`** — 273 KB of specification for the
+  122 Moves that no longer exist. A repository carrying a detailed plan that contradicts its
+  own contents is worse than one carrying none; both are in the history.
+
+### Added
+- **One "next" link, in the header of every page** — the lowest-numbered Move you have not
+  ticked. The build renders Move 01 into it, which is correct for every reader on a first
+  visit, so the answer is right before any script runs. That single line is the whole
+  "what do I do next" experience, and it replaced a page.
+- **A cost page that shows its working:** the three-way comparison, the salary line called
+  out, where the money goes Move by Move, and what replaces what.
+
 ## [1.3.0] - 2026-09-07
 
 The website rebuilt as an instrument rather than a document. No Move changed; the 122

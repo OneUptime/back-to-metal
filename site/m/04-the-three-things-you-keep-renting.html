@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>04 · The three things you keep renting — Back to Metal</title>
+<meta name="description" content="Three capabilities do not come home: the edge, outbound mail and volumetric scrubbing. Naming them now keeps the plan honest.">
+<meta name="theme-color" content="#FCFCFB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14181A" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="../assets/style.css?v=2.0.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+<script>document.documentElement.className='js'</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="bar"><div class="bar-in"><a class="wm" href="../index.html">Back to <em>Metal</em></a><nav class="nav" aria-label="Sections"><a href="../index.html">The guide</a><a href="../cost.html">What it costs</a><a href="../checklist.html">Your checklist</a><a href="../start.html">Before you start</a><a href="../about.html">About</a></nav><a class="next" id="next" href="../m/01-the-bill-and-the-three-lines-that-are-most-of-it.html"><span class="lbl">Next</span><b class="next-n">01</b><span class="next-t">The bill, and the three lines that are most of it</span></a></div></header>
+<main id="main" class="shell">
+<article class="move" data-part="decide">
+  <header class="mh">
+    <p class="lbl">Stage 1 &middot; Decide &middot; Move 04 of 20</p>
+    <h1 class="d page">The three things you keep renting</h1>
+    <p class="hook">Three capabilities do not come home: the edge, outbound mail and volumetric scrubbing. Naming them now keeps the plan honest.</p>
+    <dl class="facts"><div><dt class="lbl">Cutover</dt><dd>0 min</dd></div><div><dt class="lbl">Risk</dt><dd>Low <svg class="ico" viewBox="0 0 13.4 14" height="1em" width="1em" style="width:auto" aria-hidden="true"><rect x="0" y="4" width="3.4" height="6" fill="currentColor"/><rect x="5" y="2" width="3.4" height="10" fill="currentColor" fill-opacity="0.22"/><rect x="10" y="0" width="3.4" height="14" fill="currentColor" fill-opacity="0.22"/></svg></dd></div><div><dt class="lbl">Effort</dt><dd>2 days</dd></div><div><dt class="lbl">Then wait</dt><dd>—</dd></div><div><dt class="lbl">Back out</dt><dd>Immediately</dd></div><div><dt class="lbl">Leaving</dt><dd>Nothing — this Move decides what stays rented</dd></div></dl>
+    <p class="needs">Needs <a href="02-what-you-actually-run.html" aria-label="Move 02 &middot; What you actually run">02</a> <a href="03-the-number-that-decides-it.html" aria-label="Move 03 &middot; The number that decides it">03</a></p>
+  </header>
+
+  <section class="sec"><h2 class="d sect">The runbook</h2>
+    <ol class="steps" data-n="04"><li><span class="sn" data-step="1">1</span><div>Price the edge. Take the delivery and egress figures off the invoice from Move 01 and quote three independent vendors against that volume. A content network in front of a rack is the same arrangement as in front of the cloud.</div></li><li><span class="sn" data-step="2">2</span><div>Price outbound mail on its own. Transactional sending goes to a provider whose only business is deliverability, and the sending domain's SPF, DKIM and DMARC records point at it. Marketing sends take a separate subdomain.</div></li><li><span class="sn" data-step="3">3</span><div>Price mitigation upstream of your transit, the only place it works. Ask the facility and each transit vendor what is included, at what capacity and how it triggers: a hundred-gigabit attack against a ten-gigabit port is decided before it reaches your equipment.</div></li><li><span class="sn" data-step="4">4</span><div>Sign all three contracts before the hardware ships, confirming each notice period and minimum term. Mail warm-up takes weeks and cannot begin during an incident.</div></li><li><span class="sn" data-step="5">5</span><div>Write the total, about $1,400 a month, into the comparison from Move 03 as a permanent line. Then name the fourth item: whatever the business depends on that nobody here has run, such as a payments integration.</div></li></ol></section>
+
+  <section class="sec"><h2 class="d sect">Before you start</h2>
+    <div class="pre"><div class="pre-g"><h3 class="lbl">Access</h3><ul><li>The three invoice lines for edge, mail and mitigation, and authority to sign</li></ul></div><div class="pre-g"><h3 class="lbl">Software</h3><ul><li>The comparison from Move 03, open for a new permanent line</li><li>The sending domain's current SPF, DKIM and DMARC records</li></ul></div><div class="pre-g"><h3 class="lbl">People</h3><ul><li>Whoever owns the marketing sends, who shares the reputation</li><li>An engineer willing to name the fourth item honestly</li></ul></div></div></section>
+
+  <section class="sec"><h2 class="d sect">What you are leaving</h2>
+    <ul class="clouds"><li data-cloud="aws"><b>AWS</b><span class="svc">CloudFront and Shield</span><span class="dif">Shield Advanced bills $3,000 a month on a twelve-month term and attaches only to AWS resources, so it protects a distribution and never a rack.</span></li><li data-cloud="gcp"><b>Google Cloud</b><span class="svc">Cloud CDN and Cloud Armor</span><span class="dif">Cloud CDN is a mode on a load balancer backend, so a colocated origin must first become an internet network endpoint group.</span></li><li data-cloud="azure"><b>Azure</b><span class="svc">Front Door and its web application firewall</span><span class="dif">managed rule sets need the Premium tier, and the firewall policy is a resource that outlives its profile.</span></li></ul></section>
+
+  <section class="sec"><h2 class="d sect">Why this works</h2>
+    <p>A plan that pretends everything comes home fails in Stage 5, when somebody notices password resets landing in spam folders and no schedule is left. Three capabilities are bought rather than built, because building them badly is worse than renting them well: a hundred points of presence, a decade of sender reputation, and absorption capacity upstream of your transit. None is expensive next to what it prevents, and all three are worth paying for after the move on the terms you pay now. Deciding here costs two days and removes the largest late surprise.</p></section>
+
+  <section class="sec"><h2 class="d sect">Operator&rsquo;s notes</h2>
+    <dl class="notes"><div><dt>Swap</dt><dd>One vendor covering delivery and mitigation halves the contracts, and one outage then takes both.</dd></div><div><dt>Do it faster</dt><dd>Ask each vendor for the contract and onboarding checklist in the first message.</dd></div><div><dt>Watch out</dt><dd>Facility-included protection is often a null route with a better name. Get in writing what it does to your address.</dd></div><div><dt>Leftovers</dt><dd>The cloud edge stays in front of the cloud origin until Move 18 shifts traffic, so two edge bills overlap.</dd></div></dl></section>
+
+  <section class="sec warn"><h2 class="d sect">Rollback</h2>
+    <p>Nothing here touches a running system, so backing out is cancelling inside a notice period. The point of no return arrives later, when the sending domain's records point at the new provider: reputation then accrues on their addresses, and the old standing cannot be restored by changing the records back.</p></section>
+
+  <section class="sec"><h2 class="d sect">The numbers</h2>
+    <table class="nums"><thead><tr><th scope="col">Was</th><th scope="col">Now</th><th scope="col">Saved</th><th scope="col">Cutover</th><th scope="col">Effort</th><th scope="col">Wait</th></tr></thead><tbody><tr><td>$1,400/mo</td><td>$1,400/mo</td><td>0%</td><td>0 min</td><td>2 days</td><td>—</td></tr></tbody></table>
+    <p class="turnoff"><span class="lbl">What you can turn off</span>
+      Nothing, and that is the point. The cloud's versions switch off in Moves 18 and 20; these three stay on the invoice permanently.</p></section>
+
+  <footer class="mf">
+    <label class="ck big"><input type="checkbox" class="ck-box" data-n="04">
+      Mark Move 04 as done</label>
+    <nav class="pn" aria-label="Moves"><a class="prev" rel="prev" href="03-the-number-that-decides-it.html">03 &middot; The number that decides it</a><a class="nxt" rel="next" href="05-from-rented-vcpus-to-cores-you-own.html">05 &middot; From rented vCPUs to cores you own</a></nav>
+    
+  </footer>
+</article>
+</main>
+<footer class="foot"><div class="foot-in"><nav class="foot-nav" aria-label="Every page"><a href="../index.html">The guide</a><a href="../cost.html">What it costs</a><a href="../checklist.html">Your checklist</a><a href="../start.html">Before you start</a><a href="../about.html">About</a><a href="../Back-to-Metal.pdf" download>PDF</a><a href="../Back-to-Metal.epub" download>EPUB</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav><p class="foot-note">Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves&rsquo; own effort figures and the dependency graph rather than asserted, and every price is a public list rate observed while writing. <a href="../start.html">Read the safety page</a> before running anything.</p><p class="foot-note">By the makers of OneUptime &mdash; <a href="https://oneuptime.com">oneuptime.com</a>, an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Stage 5, and the interest is declared on the <a href="../about.html">about page</a>.</p><p class="foot-note">Open source: the Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> &mdash; software MIT, text CC BY 4.0. <span class="ver">v2.0.0</span></p></div></footer>
+<script src="../assets/moves-index.js?v=2.0.0" defer></script>
+<script src="../assets/app.js?v=2.0.0" defer></script>
+</body>
+</html>

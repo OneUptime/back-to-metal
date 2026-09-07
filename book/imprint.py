@@ -13,7 +13,7 @@ KDP's own printing-cost calculator before setting a price.
 import re
 
 TITLE = 'Back to Metal'
-SUBTITLE = 'Leaving the cloud with Kubernetes'
+SUBTITLE = 'How a startup leaves the cloud, in twenty moves'
 AUTHOR = 'Nawaz Dhandala'
 PUBLISHER = 'HackerBay'
 PUBLISHER_SITE = 'HackerBay.io'
@@ -184,7 +184,7 @@ DISCLAIMER = (
 DISCLOSURE = (
     'Disclosure: the author founded OneUptime, which this book recommends for '
     'alerting, on-call, incidents and status pages. It is recommended because it is '
-    'Apache-2.0 licensed, self-hostable, and does in one place what that Part would '
+    'Apache-2.0 licensed, self-hostable, and does in one place what that Move would '
     'otherwise ask you to assemble from four separate tools. The alternatives named '
     'beside it are real ones, and a reader who prefers them loses nothing else in '
     'this book.'

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>06 · Five machines, and the one on the shelf — Back to Metal</title>
+<meta name="description" content="Three nodes is a quorum; five survives losing one; the sixth is bought with them and never plugged in, because iron does not autoscale">
+<meta name="theme-color" content="#FCFCFB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14181A" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="../assets/style.css?v=2.0.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+<script>document.documentElement.className='js'</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="bar"><div class="bar-in"><a class="wm" href="../index.html">Back to <em>Metal</em></a><nav class="nav" aria-label="Sections"><a href="../index.html">The guide</a><a href="../cost.html">What it costs</a><a href="../checklist.html">Your checklist</a><a href="../start.html">Before you start</a><a href="../about.html">About</a></nav><a class="next" id="next" href="../m/01-the-bill-and-the-three-lines-that-are-most-of-it.html"><span class="lbl">Next</span><b class="next-n">01</b><span class="next-t">The bill, and the three lines that are most of it</span></a></div></header>
+<main id="main" class="shell">
+<article class="move" data-part="buy">
+  <header class="mh">
+    <p class="lbl">Stage 2 &middot; Buy &middot; Move 06 of 20</p>
+    <h1 class="d page">Five machines, and the one on the shelf</h1>
+    <p class="hook">Three nodes is a quorum; five survives losing one; the sixth is bought with them and never plugged in, because iron does not autoscale</p>
+    <dl class="facts"><div><dt class="lbl">Cutover</dt><dd>0 min</dd></div><div><dt class="lbl">Risk</dt><dd>High <svg class="ico" viewBox="0 0 13.4 14" height="1em" width="1em" style="width:auto" aria-hidden="true"><rect x="0" y="4" width="3.4" height="6" fill="currentColor"/><rect x="5" y="2" width="3.4" height="10" fill="currentColor"/><rect x="10" y="0" width="3.4" height="14" fill="currentColor"/></svg></dd></div><div><dt class="lbl">Effort</dt><dd>3 days</dd></div><div><dt class="lbl">Then wait</dt><dd>4 weeks</dd></div><div><dt class="lbl">Back out</dt><dd>Until the order is signed</dd></div><div><dt class="lbl">Leaving</dt><dd>Elastic node capacity and cluster autoscaling</dd></div></dl>
+    <p class="needs">Needs <a href="02-what-you-actually-run.html" aria-label="Move 02 &middot; What you actually run">02</a> <a href="05-from-rented-vcpus-to-cores-you-own.html" aria-label="Move 05 &middot; From rented vCPUs to cores you own">05</a></p>
+  </header>
+
+  <section class="sec"><h2 class="d sect">The runbook</h2>
+    <ol class="steps" data-n="06"><li><span class="sn" data-step="1">1</span><div>Put the per-node sizing from Move 05 beside the service inventory from Move 02, add one whole machine of failure headroom, and divide by what a node holds. The reference estate lands on five.</div></li><li><span class="sn" data-step="2">2</span><div>Write the specification on one page: dual-socket, 32 physical cores, 256 GB of ECC memory with every channel populated, four 3.84 TB mixed-use NVMe drives plus a mirrored boot pair, redundant power supplies, two 25 GbE ports, and a controller speaking Redfish.</div></li><li><span class="sn" data-step="3">3</span><div>Send that page to three vendors, marking line by line what may be refurbished: chassis and processors two generations old run Kubernetes as well as new ones at half the price, while drives and power supplies wear and are bought new. Take each quote into the comparison sheet, ship date beside price.</div></li><li><span class="sn" data-step="4">4</span><div>Add the sixth node, identical to the other five: burned in with the rest, then pulled and shelved. It is the only capacity on site that does not arrive by courier.</div></li><li><span class="sn" data-step="5">5</span><div>Raise the purchase order, have the person who signs capital expenditure sign it, and put the ship date in the calendar. Moves 07 and 08 run against that date.</div></li></ol></section>
+
+  <section class="sec"><h2 class="d sect">Before you start</h2>
+    <div class="pre"><div class="pre-g"><h3 class="lbl">Access</h3><ul><li>The per-node sizing from Move 05 and the service inventory from Move 02</li><li>Authority to raise a purchase order in the tens of thousands</li></ul></div><div class="pre-g"><h3 class="lbl">Software</h3><ul><li>A quote comparison sheet with three vendors priced line by line</li></ul></div><div class="pre-g"><h3 class="lbl">People</h3><ul><li>A vendor account manager who will price a configured node, not a parts list</li><li>Whoever signs capital expenditure, warned four weeks ahead</li></ul></div></div></section>
+
+  <section class="sec"><h2 class="d sect">What you are leaving</h2>
+    <ul class="clouds"><li data-cloud="aws"><b>AWS</b><span class="svc">EC2 Auto Scaling groups</span><span class="dif">the fleet ceiling is a per-region vCPU quota, raised by support ticket.</span></li><li data-cloud="gcp"><b>Google Cloud</b><span class="svc">Managed instance groups</span><span class="dif">the instance template is immutable, so a shape change means a rolling replace.</span></li><li data-cloud="azure"><b>Azure</b><span class="svc">Virtual Machine Scale Sets</span><span class="dif">the platform fault domain count is fixed at creation and cannot be edited.</span></li></ul></section>
+
+  <section class="sec"><h2 class="d sect">Why this works</h2>
+    <p>Five is the smallest fleet that makes the arithmetic of failure tolerable. Three nodes give a control plane its quorum and nothing more: lose one and a third of the capacity goes, while the survivors carry a load nobody sized them for. At five, a dead machine costs twenty per cent. The sixth is not in the rack. It is built, burned in, configured identically and then unplugged, because the replacement path left behind was an API call and the one ahead is a return authorisation and three weeks. Those weeks cost more than the machine that prevents them.</p></section>
+
+  <section class="sec"><h2 class="d sect">Operator&rsquo;s notes</h2>
+    <dl class="notes"><div><dt>Swap</dt><dd>Lease the six machines over three years. The total is higher, but the monthly line resembles the cloud bill it replaces.</dd></div><div><dt>Do it faster</dt><dd>Ask for a configuration the vendor stocks. Wanting 288 GB because the model said 240 turns a two-week delivery into an eight-week build.</dd></div><div><dt>Watch out</dt><dd>Rails, power leads, 25 GbE optics and the support contract are quoted separately. A bill of materials listing only servers is short by thousands.</dd></div><div><dt>Leftovers</dt><dd>A spare helps only if it stays current. Firmware and the Talos version drift within a quarter, so the shelf machine boots and updates with the rest.</dd></div></dl></section>
+
+  <section class="sec warn"><h2 class="d sect">Rollback</h2>
+    <p>Everything before the purchase order is a document, and an unaccepted quote expires harmlessly. The point of no return is the signature: configured servers are built to order and rarely returnable. Afterwards they still hold about half their value second-hand.</p></section>
+
+  <section class="sec"><h2 class="d sect">The numbers</h2>
+    <table class="nums"><thead><tr><th scope="col">Was</th><th scope="col">Now</th><th scope="col">Saved</th><th scope="col">Cutover</th><th scope="col">Effort</th><th scope="col">Wait</th></tr></thead><tbody><tr><td>—</td><td>—</td><td>—</td><td>0 min</td><td>3 days</td><td>4 weeks</td></tr></tbody></table>
+    <p class="turnoff"><span class="lbl">What you can turn off</span>
+      Nothing for months. The EC2 Auto Scaling groups carry production until Move 18 shifts the traffic; this Move only commits money.</p></section>
+
+  <footer class="mf">
+    <label class="ck big"><input type="checkbox" class="ck-box" data-n="06">
+      Mark Move 06 as done</label>
+    <nav class="pn" aria-label="Moves"><a class="prev" rel="prev" href="05-from-rented-vcpus-to-cores-you-own.html">05 &middot; From rented vCPUs to cores you own</a><a class="nxt" rel="next" href="07-a-cage-not-a-data-centre.html">07 &middot; A cage, not a data centre</a></nav>
+    <p class="unlocks">Unlocks <a href="09-racking-day.html" aria-label="Move 09 &middot; Racking day">09</a></p>
+  </footer>
+</article>
+</main>
+<footer class="foot"><div class="foot-in"><nav class="foot-nav" aria-label="Every page"><a href="../index.html">The guide</a><a href="../cost.html">What it costs</a><a href="../checklist.html">Your checklist</a><a href="../start.html">Before you start</a><a href="../about.html">About</a><a href="../Back-to-Metal.pdf" download>PDF</a><a href="../Back-to-Metal.epub" download>EPUB</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav><p class="foot-note">Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves&rsquo; own effort figures and the dependency graph rather than asserted, and every price is a public list rate observed while writing. <a href="../start.html">Read the safety page</a> before running anything.</p><p class="foot-note">By the makers of OneUptime &mdash; <a href="https://oneuptime.com">oneuptime.com</a>, an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Stage 5, and the interest is declared on the <a href="../about.html">about page</a>.</p><p class="foot-note">Open source: the Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> &mdash; software MIT, text CC BY 4.0. <span class="ver">v2.0.0</span></p></div></footer>
+<script src="../assets/moves-index.js?v=2.0.0" defer></script>
+<script src="../assets/app.js?v=2.0.0" defer></script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>16 · Postgres, the one that matters — Back to Metal</title>
+<meta name="description" content="Fifteen minutes of stopped writes, at the end of a week in which the new cluster was caught up, backed up, and restored once on purpose.">
+<meta name="theme-color" content="#FCFCFB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14181A" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="../assets/style.css?v=2.0.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+<script>document.documentElement.className='js'</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="bar"><div class="bar-in"><a class="wm" href="../index.html">Back to <em>Metal</em></a><nav class="nav" aria-label="Sections"><a href="../index.html">The guide</a><a href="../cost.html">What it costs</a><a href="../checklist.html">Your checklist</a><a href="../start.html">Before you start</a><a href="../about.html">About</a></nav><a class="next" id="next" href="../m/01-the-bill-and-the-three-lines-that-are-most-of-it.html"><span class="lbl">Next</span><b class="next-n">01</b><span class="next-t">The bill, and the three lines that are most of it</span></a></div></header>
+<main id="main" class="shell">
+<article class="move" data-part="move">
+  <header class="mh">
+    <p class="lbl">Stage 4 &middot; Move &middot; Move 16 of 20</p>
+    <h1 class="d page">Postgres, the one that matters</h1>
+    <p class="hook">Fifteen minutes of stopped writes, at the end of a week in which the new cluster was caught up, backed up, and restored once on purpose.</p>
+    <dl class="facts"><div><dt class="lbl">Cutover</dt><dd>15 min</dd></div><div><dt class="lbl">Risk</dt><dd>High <svg class="ico" viewBox="0 0 13.4 14" height="1em" width="1em" style="width:auto" aria-hidden="true"><rect x="0" y="4" width="3.4" height="6" fill="currentColor"/><rect x="5" y="2" width="3.4" height="10" fill="currentColor"/><rect x="10" y="0" width="3.4" height="14" fill="currentColor"/></svg></dd></div><div><dt class="lbl">Effort</dt><dd>6 days</dd></div><div><dt class="lbl">Then wait</dt><dd>—</dd></div><div><dt class="lbl">Back out</dt><dd>7 days</dd></div><div><dt class="lbl">Leaving</dt><dd>Managed PostgreSQL</dd></div></dl>
+    <p class="needs">Needs <a href="12-disks-what-goes-local-what-goes-on-ceph.html" aria-label="Move 12 &middot; Disks: what goes local, what goes on Ceph">12</a> <a href="13-images-secrets-and-one-command-deploys.html" aria-label="Move 13 &middot; Images, secrets and one-command deploys">13</a> <a href="15-buckets-cache-and-queues.html" aria-label="Move 15 &middot; Buckets, cache and queues">15</a></p>
+  </header>
+
+  <section class="sec"><h2 class="d sect">The runbook</h2>
+    <ol class="steps" data-n="16"><li><span class="sn" data-step="1">1</span><div>List the extensions and roles on the managed instance with <code>psql</code>. What exists only on the provider's fork is replaced, re-expressed, or blocks the Move.</div></li><li><span class="sn" data-step="2">2</span><div>Copy the schema with <code>pg_dump --schema-only</code> onto a CloudNativePG cluster of one primary and two standbys on local NVMe, deferring the biggest indexes.</div></li><li><span class="sn" data-step="3">3</span><div>Create the logical replication publication and subscription and let it run for days. Read <code>pg_stat_subscription</code> each morning: a stalled subscriber fills the source's disk.</div></li><li><span class="sn" data-step="4">4</span><div>Declare the object store as the cluster's backup destination so the Barman Cloud plugin drives it, turn on continuous archiving, watch the first write-ahead log segments arrive in the bucket, and only then take the full backup.</div></li><li><span class="sn" data-step="5">5</span><div>Restore that backup into a scratch cluster, replay to a chosen timestamp, and count rows against production. Time it. The cutover waits until this passes.</div></li><li><span class="sn" data-step="6">6</span><div>Open the window. Stop writes at the application, wait for lag to reach zero, advance every sequence, promote, repoint, start writes.</div></li></ol></section>
+
+  <section class="sec"><h2 class="d sect">Before you start</h2>
+    <div class="pre"><div class="pre-g"><h3 class="lbl">Access</h3><ul><li>Logical decoding enabled on the managed instance, with the reboot taken</li><li>Credentials for a bucket on the object gateway from Move 12, separate from the cluster's</li></ul></div><div class="pre-g"><h3 class="lbl">Software</h3><ul><li>CloudNativePG 1.25 or newer, failed over by hand at least once already</li><li>The Barman Cloud plugin for CloudNativePG, pinned, because the operator writes <code>archive_command</code> itself and will not take one from you</li><li><code>psql</code> and <code>pg_dump</code> no older than the managed server</li></ul></div><div class="pre-g"><h3 class="lbl">People</h3><ul><li>The application owner, present for the window when writes stop</li></ul></div></div></section>
+
+  <section class="sec"><h2 class="d sect">What you are leaving</h2>
+    <ul class="clouds"><li data-cloud="aws"><b>AWS</b><span class="svc">RDS for PostgreSQL</span><span class="dif">the default parameter group cannot be edited, so <code>rds.logical_replication</code> needs a custom group and a reboot.</span></li><li data-cloud="gcp"><b>Google Cloud</b><span class="svc">Cloud SQL for PostgreSQL</span><span class="dif">storage auto-grows to hold retained write-ahead log and never shrinks, so it bills at the high-water mark.</span></li><li data-cloud="azure"><b>Azure</b><span class="svc">Database for PostgreSQL flexible server</span><span class="dif"><code>CREATE EXTENSION</code> fails until the name is in the static <code>azure.extensions</code> parameter, which needs a restart.</span></li></ul></section>
+
+  <section class="sec"><h2 class="d sect">Why this works</h2>
+    <p>Nothing here is new except the data. The local NVMe and the object gateway the backups go to both came up in Move 12, that gateway has carried the application's own buckets since Move 15, and the application has run on the cluster since Move 14. CloudNativePG supplies the part nobody wants to write: a primary, two standbys, and an operator that promotes one without a human awake at three in the morning. The copy is a stream, not a dump, so the new cluster is caught up and dull for days before anyone books a window. The rehearsed restore is what makes the fifteen minutes safe.</p></section>
+
+  <section class="sec"><h2 class="d sect">Operator&rsquo;s notes</h2>
+    <dl class="notes"><div><dt>Swap</dt><dd>Leave the managed instance subscribed to the new cluster for the week, replicating backwards. One more week of the old bill turns rollback into a repoint.</dd></div><div><dt>Do it faster</dt><dd>Split the publication into several subscriptions grouped by table size, so the initial copy runs in parallel, not table by table.</dd></div><div><dt>Watch out</dt><dd>Replication carries rows only. Sequences, large objects, schema changes and tuned parameters stay behind, and a sequence left at one collides on the first insert.</dd></div><div><dt>Leftovers</dt><dd>The replication slot on the source outlives its subscription and retains write-ahead log for a reader that has gone.</dd></div></dl></section>
+
+  <section class="sec warn"><h2 class="d sect">Rollback</h2>
+    <p>Until writes resume, backing out is releasing the pause. The point of no return is the first commit on the new cluster: after that the two have diverged, and going back means replaying those writes or losing them. The managed instance stays up with its backups on for seven days, a copy that can still be restored to a timestamp.</p></section>
+
+  <section class="sec"><h2 class="d sect">The numbers</h2>
+    <table class="nums"><thead><tr><th scope="col">Was</th><th scope="col">Now</th><th scope="col">Saved</th><th scope="col">Cutover</th><th scope="col">Effort</th><th scope="col">Wait</th></tr></thead><tbody><tr><td>$4,900/mo</td><td>$0/mo</td><td>100%</td><td>15 min</td><td>6 days</td><td>—</td></tr></tbody></table>
+    <p class="turnoff"><span class="lbl">What you can turn off</span>
+      The managed instance, its read replicas and their snapshots, after the seven days and once an invoice shows the line gone.</p></section>
+
+  <footer class="mf">
+    <label class="ck big"><input type="checkbox" class="ck-box" data-n="16">
+      Mark Move 16 as done</label>
+    <nav class="pn" aria-label="Moves"><a class="prev" rel="prev" href="15-buckets-cache-and-queues.html">15 &middot; Buckets, cache and queues</a><a class="nxt" rel="next" href="17-the-front-door.html">17 &middot; The front door</a></nav>
+    <p class="unlocks">Unlocks <a href="17-the-front-door.html" aria-label="Move 17 &middot; The front door">17</a> <a href="19-backups-you-have-restored-and-the-pager.html" aria-label="Move 19 &middot; Backups you have restored, and the pager">19</a></p>
+  </footer>
+</article>
+</main>
+<footer class="foot"><div class="foot-in"><nav class="foot-nav" aria-label="Every page"><a href="../index.html">The guide</a><a href="../cost.html">What it costs</a><a href="../checklist.html">Your checklist</a><a href="../start.html">Before you start</a><a href="../about.html">About</a><a href="../Back-to-Metal.pdf" download>PDF</a><a href="../Back-to-Metal.epub" download>EPUB</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav><p class="foot-note">Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves&rsquo; own effort figures and the dependency graph rather than asserted, and every price is a public list rate observed while writing. <a href="../start.html">Read the safety page</a> before running anything.</p><p class="foot-note">By the makers of OneUptime &mdash; <a href="https://oneuptime.com">oneuptime.com</a>, an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Stage 5, and the interest is declared on the <a href="../about.html">about page</a>.</p><p class="foot-note">Open source: the Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> &mdash; software MIT, text CC BY 4.0. <span class="ver">v2.0.0</span></p></div></footer>
+<script src="../assets/moves-index.js?v=2.0.0" defer></script>
+<script src="../assets/app.js?v=2.0.0" defer></script>
+</body>
+</html>

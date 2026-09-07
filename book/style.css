@@ -3,7 +3,7 @@
    The visual language is a technical datasheet crossed with an
    operations checklist: hairline rules instead of boxes, no rounded
    corners, no shadows, no tinted cards. Data is set in mono, prose in
-   a grotesque, and colour is a signal - a Part tab, a rule, a numeral -
+   a grotesque, and colour is a signal - a stage tab, a rule, a numeral -
    never a decorative fill.
 
    8.25 x 11in trim plus 0.125in bleed on the top, bottom and outer
@@ -39,7 +39,7 @@ body{font-family:'Archivo',Helvetica,Arial,sans-serif;color:var(--ink);
 
 /* ---- page furniture: a hairline head rule and a thumb index ---------------
    The tab is printed hard against the outer edge and steps down the page by
-   Part, so the closed book shows five bands on the fore-edge. It replaces the
+   stage, so the closed book shows one band a stage on the fore-edge. It replaces the
    full-width colour bar, which was decoration; this is navigation. */
 .topbar{position:absolute;top:0;left:0;right:0;height:1.6mm;}
 .tab{position:absolute;right:0;width:9mm;height:26mm;}
@@ -398,7 +398,7 @@ body{font-family:'Archivo',Helvetica,Arial,sans-serif;color:var(--ink);
 .colo-edition{margin-top:4mm;padding-top:2.6mm;border-top:.3mm solid var(--rule);
   font-family:'JetBrains Mono',monospace;font-size:6.2pt;color:var(--ink4);text-align:center;}
 
-/* The Part numeral on a divider: set large, in the ink's own near-black, so it
+/* The stage numeral on a divider: set large, in the ink's own near-black, so it
    reads as a structural marker rather than a headline competing with the name. */
 .divider .partno{margin:6mm 0 -6mm;}
 

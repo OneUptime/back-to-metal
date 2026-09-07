@@ -1,4 +1,4 @@
-"""The book's marks: one glyph per Part, the cutover dial, the risk bars, and the
+"""The book's marks: one glyph per stage, the cutover dial, the risk bars, and the
 page-anatomy diagram printed in the foreword.
 
 Drawn rather than fetched. Every one is a stroked 24x24 path so it inherits
@@ -9,33 +9,27 @@ import math
 from flatten import mix
 
 ICONS = {
-    # A chassis, front on: drive bays and a vent. The machine itself.
-    'iron':   '<rect x="2.2" y="6.6" width="19.6" height="10.8" rx="1"/>'
+    # Decide: an invoice with a total ruled off at the foot of it. The whole of
+    # Stage 1 is reading a number somebody else wrote down.
+    'decide': '<path d="M4.6 2.6h14.8v18.8l-2.5-1.6-2.4 1.6-2.5-1.6-2.5 1.6-2.4-1.6-2.5 1.6z"/>'
+              '<path d="M8 7.6h8M8 11.2h8M8 14.8h4.4"/>',
+    # Buy: a chassis, front on - drive bays and a vent. The machine itself.
+    'buy':    '<rect x="2.2" y="6.6" width="19.6" height="10.8" rx="1"/>'
               '<path d="M5.2 9.6h5.6M5.2 12h5.6M5.2 14.4h5.6"/>'
               '<path d="M14.6 10.4h4.6M14.6 13.6h4.6"/>'
               '<path d="M4.6 17.4v2M19.4 17.4v2"/>',
-    # A building with a plant deck: the facility, whoever owns it.
-    'site':   '<path d="M3 20.6V8.4l7.2-3.8 7.2 3.8v12.2"/><path d="M1.6 20.6h20.8"/>'
-              '<path d="M8.2 20.6v-5.2h4.4v5.2"/><path d="M18.4 20.6v-7.4h3.2v7.4"/>'
-              '<path d="M7.4 10.4h1.2M12 10.4h1.2"/>',
-    # Nodes that know about each other. Not a rack - the rack is Iron.
-    'cluster': '<circle cx="12" cy="4.8" r="2.6"/><circle cx="5" cy="17.6" r="2.6"/>'
-               '<circle cx="19" cy="17.6" r="2.6"/>'
-               '<path d="M10.7 7.2 6.3 15.2M13.3 7.2l4.4 8M7.6 17.6h8.8"/>',
-    # A database: the cylinder everyone draws, because everyone recognises it.
-    'data':   '<ellipse cx="12" cy="5.6" rx="7.6" ry="2.9"/>'
-              '<path d="M4.4 5.6v12.8c0 1.6 3.4 2.9 7.6 2.9s7.6-1.3 7.6-2.9V5.6"/>'
-              '<path d="M4.4 12c0 1.6 3.4 2.9 7.6 2.9s7.6-1.3 7.6-2.9"/>',
-    # The edge: a node with traffic arriving from outside it.
-    'edge':   '<circle cx="12" cy="12" r="4.2"/>'
-              '<path d="M12 1.8v3.4M12 18.8v3.4M1.8 12h3.4M18.8 12h3.4"/>'
-              '<path d="M4.8 4.8l2.4 2.4M16.8 16.8l2.4 2.4M19.2 4.8l-2.4 2.4'
-              'M7.2 16.8l-2.4 2.4"/>',
-    # The platform: layers, with the top one being the part developers see.
-    'platform': '<path d="M12 2.6 21.4 7.4 12 12.2 2.6 7.4z"/>'
-                '<path d="M2.6 12.2 12 17l9.4-4.8"/><path d="M2.6 16.6 12 21.4l9.4-4.8"/>',
-    # The watch: a trace on a screen, with the spike somebody has to answer.
-    'watch':  '<rect x="2.4" y="4.2" width="19.2" height="15.6" rx="1"/>'
+    # Build: nodes that know about each other. Not a rack - the rack is Buy.
+    'build':  '<circle cx="12" cy="4.8" r="2.6"/><circle cx="5" cy="17.6" r="2.6"/>'
+              '<circle cx="19" cy="17.6" r="2.6"/>'
+              '<path d="M10.7 7.2 6.3 15.2M13.3 7.2l4.4 8M7.6 17.6h8.8"/>',
+    # Move: the database cylinder everyone draws, with an arrow leaving it,
+    # because everyone recognises both.
+    'move':   '<ellipse cx="9.4" cy="5.6" rx="6.6" ry="2.6"/>'
+              '<path d="M2.8 5.6v12.8c0 1.4 3 2.6 6.6 2.6 1.1 0 2.2-.1 3.1-.3"/>'
+              '<path d="M2.8 12c0 1.4 3 2.6 6.6 2.6"/>'
+              '<path d="M15 12.6h6.2M18.4 9.8l2.8 2.8-2.8 2.8"/>',
+    # Run: a trace on a screen, with the spike somebody has to answer.
+    'run':    '<rect x="2.4" y="4.2" width="19.2" height="15.6" rx="1"/>'
               '<path d="M5.4 14.4h2.6l1.8-4.6 2.4 6.4 2-3.4h4.4"/>',
 }
 

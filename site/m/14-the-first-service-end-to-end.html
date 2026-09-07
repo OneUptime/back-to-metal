@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>14 · The first service, end to end — Back to Metal</title>
+<meta name="description" content="The cheapest stateless service goes first, running on your hardware against the cloud database across the link, with a DNS weight as the way back">
+<meta name="theme-color" content="#FCFCFB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14181A" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="../assets/style.css?v=2.0.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+<script>document.documentElement.className='js'</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="bar"><div class="bar-in"><a class="wm" href="../index.html">Back to <em>Metal</em></a><nav class="nav" aria-label="Sections"><a href="../index.html">The guide</a><a href="../cost.html">What it costs</a><a href="../checklist.html">Your checklist</a><a href="../start.html">Before you start</a><a href="../about.html">About</a></nav><a class="next" id="next" href="../m/01-the-bill-and-the-three-lines-that-are-most-of-it.html"><span class="lbl">Next</span><b class="next-n">01</b><span class="next-t">The bill, and the three lines that are most of it</span></a></div></header>
+<main id="main" class="shell">
+<article class="move" data-part="move">
+  <header class="mh">
+    <p class="lbl">Stage 4 &middot; Move &middot; Move 14 of 20</p>
+    <h1 class="d page">The first service, end to end</h1>
+    <p class="hook">The cheapest stateless service goes first, running on your hardware against the cloud database across the link, with a DNS weight as the way back</p>
+    <dl class="facts"><div><dt class="lbl">Cutover</dt><dd>0 min</dd></div><div><dt class="lbl">Risk</dt><dd>Medium <svg class="ico" viewBox="0 0 13.4 14" height="1em" width="1em" style="width:auto" aria-hidden="true"><rect x="0" y="4" width="3.4" height="6" fill="currentColor"/><rect x="5" y="2" width="3.4" height="10" fill="currentColor"/><rect x="10" y="0" width="3.4" height="14" fill="currentColor" fill-opacity="0.22"/></svg></dd></div><div><dt class="lbl">Effort</dt><dd>5 days</dd></div><div><dt class="lbl">Then wait</dt><dd>1 week</dd></div><div><dt class="lbl">Back out</dt><dd>Immediately</dd></div><div><dt class="lbl">Leaving</dt><dd>Managed container compute</dd></div></dl>
+    <p class="needs">Needs <a href="13-images-secrets-and-one-command-deploys.html" aria-label="Move 13 &middot; Images, secrets and one-command deploys">13</a></p>
+  </header>
+
+  <section class="sec"><h2 class="d sect">The runbook</h2>
+    <ol class="steps" data-n="14"><li><span class="sn" data-step="1">1</span><div>Choose the cheapest stateless service, not the most interesting one. The right candidate is one whose failure is a shrug and whose owner will not escalate over a slow hour.</div></li><li><span class="sn" data-step="2">2</span><div>Commit its manifests to the Argo CD repository and let <code>argocd</code> sync them. Keep the connection string on the cloud database, swap anything reading instance metadata for a real credential, and tell the partners who filter on egress addresses.</div></li><li><span class="sn" data-step="3">3</span><div>With no live traffic, drive synthetic requests at the new copy and compare latency percentiles against the cloud copy. Write the added milliseconds down.</div></li><li><span class="sn" data-step="4">4</span><div>Ramp the weighted record: one per cent, ten, fifty, all of it. Hold each step a business day, confirm the split with <code>dig</code>, and stop on any rise in error rate or the ninety-ninth percentile.</div></li><li><span class="sn" data-step="5">5</span><div>Soak a week at full weight, watching node disk with <code>kubectl</code>: scratch files that were ephemeral on the managed runtime still are, but now they fill a machine you own.</div></li><li><span class="sn" data-step="6">6</span><div>Then repeat across the stateless estate, two services a week. After the third, nobody asks for a plan.</div></li></ol></section>
+
+  <section class="sec"><h2 class="d sect">Before you start</h2>
+    <div class="pre"><div class="pre-g"><h3 class="lbl">Access</h3><ul><li>Write access to the Argo CD repository holding the cluster's application manifests</li><li>Permission to edit the weighted DNS records for the service's hostname</li></ul></div><div class="pre-g"><h3 class="lbl">Software</h3><ul><li><code>kubectl</code> and <code>argocd</code>, both already pointed at the new cluster</li><li><code>dig</code> for confirming what public resolvers return during the ramp</li></ul></div><div class="pre-g"><h3 class="lbl">People</h3><ul><li>The service owner, told which week the ramp runs and what would stop it</li><li>Whoever maintains egress allowlists on partner systems, warned in advance</li></ul></div></div></section>
+
+  <section class="sec"><h2 class="d sect">What you are leaving</h2>
+    <ul class="clouds"><li data-cloud="aws"><b>AWS</b><span class="svc">ECS on Fargate</span><span class="dif">task credentials come from the metadata endpoint at 169.254.170.2, which does not exist on your nodes.</span></li><li data-cloud="gcp"><b>Google Cloud</b><span class="svc">Cloud Run</span><span class="dif">between requests the CPU is throttled to almost nothing unless it is always allocated, so idle timers stop firing.</span></li><li data-cloud="azure"><b>Azure</b><span class="svc">Container Apps</span><span class="dif">the outbound address belongs to the environment, not the app, so rebuilding it changes what partners must allowlist.</span></li></ul></section>
+
+  <section class="sec"><h2 class="d sect">Why this works</h2>
+    <p>The first service to leave is chosen for how little it matters, because its job is to produce evidence rather than savings. Its database stays in the cloud, so the only new variables are the platform, the network path and the identity model. The link adds latency, and the number measured here decides which later services can live with a database on the far side of it and which must move in the same window as their data. The exit is a weighted DNS record: one value, one cache expiry. Nothing else returns as much for as little exposure.</p></section>
+
+  <section class="sec"><h2 class="d sect">Operator&rsquo;s notes</h2>
+    <dl class="notes"><div><dt>Swap</dt><dd>If the service sits behind a proxy you already control, shift weight there rather than in DNS; the abort is then immediate, not TTL-bound.</dd></div><div><dt>Do it faster</dt><dd>Ramp on a Tuesday morning with the owner beside you. Two people reading one graph is most of what the first one is for.</dd></div><div><dt>Watch out</dt><dd>A mean response time stays flat while one pod in four times out. Alert on percentiles and status codes, not averages.</dd></div><div><dt>Leftovers</dt><dd>The old record sits at zero weight and the allowlists carry both ranges. Both are free and both get forgotten, so date each.</dd></div></dl></section>
+
+  <section class="sec warn"><h2 class="d sect">Rollback</h2>
+    <p>Every step before the ramp is additive: two copies exist and the cloud copy carries the traffic. Backing out is setting the weighted record to zero and waiting one TTL. There is no point of no return here — no state has moved, so there is nothing to restore. The exception is a partner's allowlist entry: leave the old address in place for the week.</p></section>
+
+  <section class="sec"><h2 class="d sect">The numbers</h2>
+    <table class="nums"><thead><tr><th scope="col">Was</th><th scope="col">Now</th><th scope="col">Saved</th><th scope="col">Cutover</th><th scope="col">Effort</th><th scope="col">Wait</th></tr></thead><tbody><tr><td>$6,800/mo</td><td>$0/mo</td><td>100%</td><td>0 min</td><td>5 days</td><td>1 week</td></tr></tbody></table>
+    <p class="turnoff"><span class="lbl">What you can turn off</span>
+      The managed container service, its task revisions and its log retention, once the ramp has held at full weight for a week.</p></section>
+
+  <footer class="mf">
+    <label class="ck big"><input type="checkbox" class="ck-box" data-n="14">
+      Mark Move 14 as done</label>
+    <nav class="pn" aria-label="Moves"><a class="prev" rel="prev" href="13-images-secrets-and-one-command-deploys.html">13 &middot; Images, secrets and one-command deploys</a><a class="nxt" rel="next" href="15-buckets-cache-and-queues.html">15 &middot; Buckets, cache and queues</a></nav>
+    <p class="unlocks">Unlocks <a href="15-buckets-cache-and-queues.html" aria-label="Move 15 &middot; Buckets, cache and queues">15</a> <a href="17-the-front-door.html" aria-label="Move 17 &middot; The front door">17</a></p>
+  </footer>
+</article>
+</main>
+<footer class="foot"><div class="foot-in"><nav class="foot-nav" aria-label="Every page"><a href="../index.html">The guide</a><a href="../cost.html">What it costs</a><a href="../checklist.html">Your checklist</a><a href="../start.html">Before you start</a><a href="../about.html">About</a><a href="../Back-to-Metal.pdf" download>PDF</a><a href="../Back-to-Metal.epub" download>EPUB</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav><p class="foot-note">Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves&rsquo; own effort figures and the dependency graph rather than asserted, and every price is a public list rate observed while writing. <a href="../start.html">Read the safety page</a> before running anything.</p><p class="foot-note">By the makers of OneUptime &mdash; <a href="https://oneuptime.com">oneuptime.com</a>, an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Stage 5, and the interest is declared on the <a href="../about.html">about page</a>.</p><p class="foot-note">Open source: the Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> &mdash; software MIT, text CC BY 4.0. <span class="ver">v2.0.0</span></p></div></footer>
+<script src="../assets/moves-index.js?v=2.0.0" defer></script>
+<script src="../assets/app.js?v=2.0.0" defer></script>
+</body>
+</html>

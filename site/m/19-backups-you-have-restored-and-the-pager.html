@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>19 · Backups you have restored, and the pager — Back to Metal</title>
+<meta name="description" content="Velero, a continuous database archive and a copy somewhere you are not leaving — then the drill that turns a guessed recovery time into a measured one.">
+<meta name="theme-color" content="#FCFCFB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14181A" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="../assets/style.css?v=2.0.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+<script>document.documentElement.className='js'</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="bar"><div class="bar-in"><a class="wm" href="../index.html">Back to <em>Metal</em></a><nav class="nav" aria-label="Sections"><a href="../index.html">The guide</a><a href="../cost.html">What it costs</a><a href="../checklist.html">Your checklist</a><a href="../start.html">Before you start</a><a href="../about.html">About</a></nav><a class="next" id="next" href="../m/01-the-bill-and-the-three-lines-that-are-most-of-it.html"><span class="lbl">Next</span><b class="next-n">01</b><span class="next-t">The bill, and the three lines that are most of it</span></a></div></header>
+<main id="main" class="shell">
+<article class="move" data-part="run">
+  <header class="mh">
+    <p class="lbl">Stage 5 &middot; Run &middot; Move 19 of 20</p>
+    <h1 class="d page">Backups you have restored, and the pager</h1>
+    <p class="hook">Velero, a continuous database archive and a copy somewhere you are not leaving — then the drill that turns a guessed recovery time into a measured one.</p>
+    <dl class="facts"><div><dt class="lbl">Cutover</dt><dd>0 min</dd></div><div><dt class="lbl">Risk</dt><dd>High <svg class="ico" viewBox="0 0 13.4 14" height="1em" width="1em" style="width:auto" aria-hidden="true"><rect x="0" y="4" width="3.4" height="6" fill="currentColor"/><rect x="5" y="2" width="3.4" height="10" fill="currentColor"/><rect x="10" y="0" width="3.4" height="14" fill="currentColor"/></svg></dd></div><div><dt class="lbl">Effort</dt><dd>5 days</dd></div><div><dt class="lbl">Then wait</dt><dd>—</dd></div><div><dt class="lbl">Back out</dt><dd>Immediately</dd></div><div><dt class="lbl">Leaving</dt><dd>Managed backup, alarms and a rented paging service</dd></div></dl>
+    <p class="needs">Needs <a href="16-postgres-the-one-that-matters.html" aria-label="Move 16 &middot; Postgres, the one that matters">16</a> <a href="18-go-live-and-how-you-abort.html" aria-label="Move 18 &middot; Go-live, and how you abort">18</a></p>
+  </header>
+
+  <section class="sec"><h2 class="d sect">The runbook</h2>
+    <ol class="steps" data-n="19"><li><span class="sn" data-step="1">1</span><div>Schedule <code>velero</code> nightly for cluster objects, and let the Barman Cloud plugin archive the database from Move 16 continuously, both into the Ceph object gateway built in Move 12.</div></li><li><span class="sn" data-step="2">2</span><div>Copy that store out with <code>rclone</code> to a provider that is neither the rack nor the account being closed, with object lock on and append-only credentials, so one identity cannot reach both copies.</div></li><li><span class="sn" data-step="3">3</span><div>Do the drill. On the spare machine from Move 06, from the Git repository and those backups alone, build a cluster, restore the database and bring one service up, with nothing touching the original. Time it: that number is the recovery time objective, and the plan that disagrees is wrong.</div></li><li><span class="sn" data-step="4">4</span><div>Stand Prometheus and Loki up on your own nodes against the series budget, with drop rules at scrape time. A monitoring bill that outgrows the estate it watches is a cloud habit that follows you home.</div></li><li><span class="sn" data-step="5">5</span><div>Put the alerting where the cluster cannot take it down. OneUptime runs the probes, the rota, the escalation and the status page from outside; the author of this book founded OneUptime, and the copyright page says so. Add a dead-man's-switch heartbeat.</div></li><li><span class="sn" data-step="6">6</span><div>Write the rota. Three engineers is the minimum that survives leave and illness; most teams here have two. Name the second person, buy a hardware support contract, and record which alerts may wait until morning.</div></li></ol></section>
+
+  <section class="sec"><h2 class="d sect">Before you start</h2>
+    <div class="pre"><div class="pre-g"><h3 class="lbl">Access</h3><ul><li>An account at an object storage provider unrelated to the cloud you are closing, with object lock</li><li>Five days of one engineer's time for the rebuild drill, on a date nobody may move</li></ul></div><div class="pre-g"><h3 class="lbl">Software</h3><ul><li><code>velero</code> 1.15 and the Barman Cloud plugin from Move 16, both pinned in the repository from Move 13</li><li><code>rclone</code> 1.68 for the copy out to the third provider</li><li>Prometheus and Loki with a series budget agreed before the first scrape</li></ul></div><div class="pre-g"><h3 class="lbl">People</h3><ul><li>A named second person behind the escalation, and a rule about what waits until morning</li></ul></div></div></section>
+
+  <section class="sec"><h2 class="d sect">What you are leaving</h2>
+    <ul class="clouds"><li data-cloud="aws"><b>AWS</b><span class="svc">AWS Backup and CloudWatch alarms</span><span class="dif">a vault under compliance-mode lock cannot be shortened or removed until its retention expires.</span></li><li data-cloud="gcp"><b>Google Cloud</b><span class="svc">Backup and DR Service and Cloud Monitoring</span><span class="dif">its plans run on a console and appliances you deploy on Compute Engine, so the product is instances you pay for.</span></li><li data-cloud="azure"><b>Azure</b><span class="svc">Azure Backup and Azure Monitor alerts</span><span class="dif">a Recovery Services vault protects only resources in its own region, and soft delete holds removed items for fourteen days.</span></li></ul></section>
+
+  <section class="sec"><h2 class="d sect">Why this works</h2>
+    <p>Two failures end a startup here: the data cannot be got back, and nobody was woken. Schedules are cheap and worthless until somebody has rebuilt from them, so the deliverable is the drill — an estate reconstructed from the repository and the object store while production carries on untouched, with a stopwatch running. That figure is the recovery time objective, and it is usually several times the number in the plan. Monitoring runs on hardware you own; the alerting deliberately does not, because a cluster that has failed cannot report its own failure.</p></section>
+
+  <section class="sec"><h2 class="d sect">Operator&rsquo;s notes</h2>
+    <dl class="notes"><div><dt>Swap</dt><dd>If the drill on the spare machine is disruptive, rent a dedicated server by the month and rebuild into that instead.</dd></div><div><dt>Do it faster</dt><dd>Make the drill a script, not a document. The second run then takes an afternoon rather than a week.</dd></div><div><dt>Watch out</dt><dd>Cluster objects without volume data restore an estate that starts cleanly and holds nothing. Count rows before calling the drill a pass.</dd></div><div><dt>Leftovers</dt><dd>Backup vaults bill after the resources they protected are gone, and one under a retention lock stays until it expires.</dd></div></dl></section>
+
+  <section class="sec warn"><h2 class="d sect">Rollback</h2>
+    <p>Nothing here alters what serves traffic, so backing out is removing two schedules and leaving the managed alarms enabled. The point of no return is the day the provider's vaults age out: after that the only copy of last month is the one you wrote. Keep them until a restore from your own has been timed.</p></section>
+
+  <section class="sec"><h2 class="d sect">The numbers</h2>
+    <table class="nums"><thead><tr><th scope="col">Was</th><th scope="col">Now</th><th scope="col">Saved</th><th scope="col">Cutover</th><th scope="col">Effort</th><th scope="col">Wait</th></tr></thead><tbody><tr><td>$1,100/mo</td><td>$340/mo</td><td>69%</td><td>0 min</td><td>5 days</td><td>—</td></tr></tbody></table>
+    <p class="turnoff"><span class="lbl">What you can turn off</span>
+      Managed backup vaults, their cross-region copies, the alarms and their ingestion, and the rented pager seats — once a restore of your own has been timed and one real page has woken somebody.</p></section>
+
+  <footer class="mf">
+    <label class="ck big"><input type="checkbox" class="ck-box" data-n="19">
+      Mark Move 19 as done</label>
+    <nav class="pn" aria-label="Moves"><a class="prev" rel="prev" href="18-go-live-and-how-you-abort.html">18 &middot; Go-live, and how you abort</a><a class="nxt" rel="next" href="20-closing-the-account.html">20 &middot; Closing the account</a></nav>
+    <p class="unlocks">Unlocks <a href="20-closing-the-account.html" aria-label="Move 20 &middot; Closing the account">20</a></p>
+  </footer>
+</article>
+</main>
+<footer class="foot"><div class="foot-in"><nav class="foot-nav" aria-label="Every page"><a href="../index.html">The guide</a><a href="../cost.html">What it costs</a><a href="../checklist.html">Your checklist</a><a href="../start.html">Before you start</a><a href="../about.html">About</a><a href="../Back-to-Metal.pdf" download>PDF</a><a href="../Back-to-Metal.epub" download>EPUB</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav><p class="foot-note">Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves&rsquo; own effort figures and the dependency graph rather than asserted, and every price is a public list rate observed while writing. <a href="../start.html">Read the safety page</a> before running anything.</p><p class="foot-note">By the makers of OneUptime &mdash; <a href="https://oneuptime.com">oneuptime.com</a>, an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Stage 5, and the interest is declared on the <a href="../about.html">about page</a>.</p><p class="foot-note">Open source: the Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> &mdash; software MIT, text CC BY 4.0. <span class="ver">v2.0.0</span></p></div></footer>
+<script src="../assets/moves-index.js?v=2.0.0" defer></script>
+<script src="../assets/app.js?v=2.0.0" defer></script>
+</body>
+</html>

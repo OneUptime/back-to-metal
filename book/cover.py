@@ -101,24 +101,26 @@ def geometry(pages):
 def back_panel_html(moves):
     """The back-cover copy. Shared by the paperback wrap and the hardback case."""
     zero = sum(1 for m in moves if m['cutover'] == 0)
-    oneway = sum(1 for m in moves if m['oneway'])
+    import roadmap as RM
+    effort = sum(RM.effort_days(m) for m in moves)
     return f"""
     <div class="inner">
-      <p class="bk-k">AWS, Google Cloud and Azure out &nbsp;&middot;&nbsp; Kubernetes you run yourself</p>
-      <h2 class="bk-h d">Repatriation is a method,<br><em>not a decision.</em></h2>
-      <p class="bk-p">The reason cloud repatriations fail is rarely the technology. It is that
-      they are attempted as one decision, executed as one project, and abandoned in the middle
-      with two platforms running and nobody able to say whether it is going well.</p>
+      <p class="bk-k">For a startup &nbsp;&middot;&nbsp; AWS, Google Cloud and Azure out</p>
+      <h2 class="bk-h d">Leaving is a method,<br><em>not a decision.</em></h2>
+      <p class="bk-p">The reason leaving the cloud fails is rarely the technology. It is that it
+      is attempted as one decision, executed as one project, and abandoned in the middle with two
+      platforms running and nobody able to say whether it is going well.</p>
       <p class="bk-p">This book is {len(moves)} Moves. Each is one job with a stated cutover, a
       stated risk and a rollback that has been thought about. Each can be done on a Tuesday and
       undone on a Wednesday, and you can stop after any of them and still be somewhere coherent.
-      Three of them tell you to keep paying somebody else.</p>
+      One of them tells you to keep paying somebody else, and another gives you permission
+      to read three Moves, do the arithmetic and stop.</p>
       <p class="bk-p">Every Move covers all three clouds: it names the real service on AWS,
       Google Cloud and Azure, and the one thing that is different on each.</p>
       <div class="bk-rule"></div>
       <div class="bk-list">
-        <div><b>{len(moves)}</b> Moves</div><div><b>5</b> Parts</div>
-        <div><b>{zero}</b> at zero downtime</div><div><b>{oneway}</b> you cannot undo</div>
+        <div><b>{len(moves)}</b> Moves</div><div><b>{len({m['layer'] for m in moves})}</b> Stages</div>
+        <div><b>{zero}</b> at zero downtime</div><div><b>{effort:.0f}</b> days of work</div>
         <div><b>3</b> clouds, every Move</div><div><b>1</b> closes the account</div>
       </div>
       <p class="bk-os"><b>The whole book is open source.</b> Every Move, and the software that

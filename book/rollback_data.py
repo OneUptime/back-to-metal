@@ -18,12 +18,17 @@ def intro(oneway):
     on the one page where being wrong costs data. Every output counts the Moves
     it is rendering and hands the answer in, the way mission.py takes the total.
     """
+    tail = ('and none of them is irreversible, which is a property of this edition '
+            'rather than of the work: every Move here was chosen so that it could be'
+            ' undone.'
+            if oneway == 0 else
+            f'and {oneway} are not reversible at all.')
     return (
         'Every Move in this book changes something that is running. Most are reversible '
-        'for a stated window, a few are reversible only until a particular step, and '
-        f'{oneway} are not reversible at all. The difference between a migration and an '
-        'incident is almost never the technique - it is whether somebody worked out the '
-        'way back before they started, and whether anybody had ever tested it.'
+        f'for a stated window, a few only until a particular step, {tail} The difference '
+        'between a migration and an incident is almost never the technique - it is '
+        'whether somebody worked out the way back before they started, and whether '
+        'anybody had ever tested it.'
     )
 
 POINTS = [
@@ -34,9 +39,9 @@ POINTS = [
      'that step today, and only then start at step one.'),
 
     ('A backup nobody restored is not a backup',
-     'It is a file. Before any Move in Part II, restore the backup you are relying on '
-     'into a scratch environment and count the rows against production. The number of '
-     'organisations that discover their backups were empty during the incident that '
+     'It is a file. Before Stage 4, restore the backup you are relying on into a '
+     'scratch environment and count the rows against production. The number of '
+     'companies that discover their backups were empty during the incident that '
      'needed them is not small, and every one of them had a green dashboard.'),
 
     ('Keep the old thing running, and keep paying for it',
@@ -52,11 +57,11 @@ POINTS = [
      'with one person and a laptop, every time.'),
 
     ('Write down the state you cannot recreate',
-     'Before Part II, list every store whose contents exist nowhere else: the primary '
+     'Before Stage 4, list every store whose contents exist nowhere else: the primary '
      'database, the uploads bucket, the secrets, the certificate private keys, the '
-     'TOTP seeds for the accounts that own the domain. Everything else is rebuildable '
-     'from a repository. That list is short, and it is the only part of the estate '
-     'where a mistake is permanent.'),
+     'recovery codes for the accounts that own the domain. Everything else is '
+     'rebuildable from a repository. That list is short, and it is the only part of '
+     'the estate where a mistake is permanent.'),
 
     ('Verify by counting, not by looking',
      'A migration is finished when the destination answers the same questions as the '
@@ -68,7 +73,8 @@ POINTS = [
      'Every High-risk Move in this book assumes a second person who is not typing, is '
      'reading the runbook aloud, and has the authority to stop. It is the cheapest '
      'safety control in infrastructure and the first one teams drop when they are '
-     'behind schedule.'),
+     'behind schedule. With two engineers on the whole programme, it is also the one '
+     'you are most tempted to skip.'),
 
     ('Stop when you are surprised',
      'Not when something breaks - when something is merely unexpected. A row count '

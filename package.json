@@ -1,8 +1,8 @@
 {
   "name": "back-to-metal",
-  "version": "1.3.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "A step-by-step roadmap off AWS, Google Cloud and Azure onto Kubernetes you run yourself, typeset into a printable book, an EPUB and a static site.",
+  "description": "Twenty moves that take a startup off AWS, Google Cloud or Azure and onto Kubernetes on hardware you own, typeset into a printable book, an EPUB and a static site.",
   "scripts": {
     "build": "python3 book/build.py && python3 book/render.py",
     "verify": "python3 book/verify.py"

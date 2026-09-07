@@ -11,8 +11,8 @@ the single source of truth; a Python toolchain in `book/` turns them into three 
 - `dist/Back-to-Metal.epub` — a reflowable EPUB3 for Kindle
 - `site/` — a static website with no build step and no external requests
 
-Every number that appears in any output — page numbers, contents, Part totals, cutover sums,
-the website filters, the planner, **and the count of Moves itself** — is derived from the Move
+Every number that appears in any output — page numbers, contents, stage totals, cutover sums,
+the website's figures, the checklist, **and the count of Moves itself** — is derived from the Move
 files. There are no hand-maintained totals anywhere, and no prose anywhere spells a total out:
 `mission.py` takes the count as a parameter and the cover reads `len(moves)`. Change a Move,
 rerun the build, and the rest follows.
@@ -73,26 +73,31 @@ agreement:
 | File | Owns |
 |---|---|
 | `book/deps.py` | which Moves must be finished before which |
-| `book/kit.py` | the reference build, the laptop kit, the ten rules |
+| `book/kit.py` | the reference build, the laptop kit, the seven rules |
 | `book/costs.py` | the cost model: AWS list prices, hardware, and the salary line |
 | `book/rollback_data.py` | the general rollback and safety page |
 | `book/equivalents.py` | AWS to GCP to Azure to what you run instead |
 | `book/symptoms.py` | the symptom index — "which Move do I need" |
 | `book/mission.py` | why the book exists |
-| `book/icons.py` | Part glyphs, the cutover dial, the risk bars, the page-anatomy diagram |
+| `book/icons.py` | stage glyphs, the cutover dial, the risk bars, the page-anatomy diagram |
 | `book/imprint.py` | title, author, ISBNs, and the economics of selling it |
 | `book/release.py` | the release gate, and the notes the GitHub release is made from |
 | `book/style.css` | print stylesheet |
 | `book/web/` | site stylesheet and scripts |
 
-The website is one page per question. `index.html` answers *what do I do next* and shows
-exactly one Move; `checklist.html` is all the Moves in order with a tick box each;
-`roadmap.html` answers *how long*; `plan.html` answers *what if we only do some of it*.
-A figure belongs on the page whose question it answers, and nowhere else — which is why
-the per-Move downtime, risk, effort and wait are on the Move page and inside the
-checklist's opt-in figures strip rather than printed on all 122 rows. On a list, print a
-fact only where it changes what the reader does: 110 of 122 Moves have no downtime, so
-the twelve that do are worth saying and the 110 are not.
+The website is **five pages** and one page per Move. `index.html` is the whole plan on one
+page — five stages, twenty Moves, and the numbers. `cost.html` answers *is it worth it*.
+`checklist.html` answers *where am I and what is next*. `start.html` is the safety page,
+the rules and the reference build. `about.html` is the book, the downloads and the licence.
+
+An earlier edition had nine top-level pages, seven stage pages and 244 Move pages, with a
+left rail, a sticky chrome, a spine, a jump box and a dependency planner. All of that was
+an instrument for somebody running a four-year programme. Do not put it back.
+
+A figure belongs on the page whose question it answers, and nowhere else. The one mechanic
+that spans every page is a single **next** link in the header: the lowest-numbered Move the
+reader has not ticked. The build renders Move 01 into it, which is correct for every reader
+on a first visit, and JavaScript only ever substitutes a later Move.
 
 ## Move file contract
 
@@ -149,14 +154,19 @@ and fails the build otherwise:
   the enum this used to be was too narrow for real content — "Until the order is signed" and "Per
   drive, at the cost of a Ceph rebuild" are better answers than a fixed vocabulary allows.
 
-## Parts are stages
+## The five stages
 
-Each Part carries a `stage` number, a `doing` verb and a `done` line in `parse.py`, and both
-outputs lead with them. The Part names are nouns from the system diagram — Iron, Site, Cluster —
-which is how an architect thinks about an estate and not how somebody halfway through the work
-thinks about their week. "Stage 4 · Make it fit to run production" answers *where am I*; "Part IV
-· Platform" does not. The website's checklist page is built on them, and its front
-page names the stage the Move it is recommending belongs to.
+`parse.LAYERS` carries five stages — **Decide, Buy, Build, Move, Run** — each with a number, a
+`doing` instruction and a `done` line, and every output leads with them.
+
+The names are verbs. An earlier edition named its seven Parts after the layers of the system —
+Iron, Site, Cluster, Platform, Data, Edge, Watch — which is how an architect thinks about an
+estate and not how somebody halfway through the work thinks about their week. "Stage 3 · Build"
+answers *where am I* without anybody holding a system diagram in their head.
+
+Four Moves a stage, twenty in total. The count is not sacred, but the shape is: a reader has to
+be able to hold the whole plan in their head, and that is what the previous edition's hundred
+and twenty-two could not do. If you are adding a Move, ask first which one it replaces.
 
 ## Three clouds, one runbook
 
@@ -213,8 +223,8 @@ be a lower-numbered Move.** That is what makes the book readable front to back �
 reached Move 40 has, by construction, met every prerequisite of Move 40 — and it makes a cycle
 impossible to express. `audit.py` fails the build on a forward or missing dependency.
 
-Because of it, book order is already a valid execution order, which is why the website's planner
-can "sort" a selection rather than topologically searching it.
+Because of it, book order is already a valid execution order, which is why the checklist can
+read top to bottom rather than topologically searching anything.
 
 Keep the map minimal and true. If Move B would work without Move A, they are not related, however
 much they rhyme.
@@ -230,10 +240,10 @@ editorial one. That is a decision with consequences you should not undo casually
   voice is built on the width axis, which the `wght` cut does not carry.
 - **Hairline rules, never boxes.** No rounded corners, no shadows, no tinted cards, no pills.
   A panel is a rule and some space.
-- **Colour is a signal.** One colour per Part, used in the fore-edge tab, a rule, and a
+- **Colour is a signal.** One colour per stage, used in the fore-edge tab, a rule, and a
   numeral. Never as a decorative fill.
-- **The fore-edge tab** steps down the page by Part index, so the closed book shows a band
-  per Part. It must not carry a CSS `transform`: a transform makes Chromium emit a
+- **The fore-edge tab** steps down the page by stage index, so the closed book shows a band
+  per stage. It must not carry a CSS `transform`: a transform makes Chromium emit a
   transparency group and `kdpcheck.py` will fail the build.
 - **The cutover is a gauge, not a dial**, and step numbers are mono ordinals in a ruled
   gutter, not discs.
@@ -257,7 +267,7 @@ insertions make the DOM index wrong.
 one, or the two-page spread the whole design rests on is split across a page turn. The build
 asserts this for every Move, that each Move's contents entry matches where its setup page lands,
 and that the total page count is even — KDP appends an uncontrolled blank otherwise. Front matter
-runs to 18 pages so the first Part divider opens on a recto.
+runs to 18 pages so the first stage divider opens on a recto.
 
 **Never write `rgba()`, `opacity`, or an eight-digit hex.** KDP requires a flattened interior.
 Every alpha in this book is one known colour over one known backdrop, so it is pre-composited at
@@ -276,7 +286,7 @@ justifier will do something to make it fit, and you want to confirm the somethin
 
 ## The recommendation the book has an interest in
 
-Part VII recommends OneUptime for alerting, on-call, incidents and status pages. The author
+Move 19 recommends OneUptime for alerting, on-call, incidents and status pages. The author
 founded it. CONTRIBUTING.md already requires a contributor who works on a project they are
 adding to say so, and that rule cannot apply to everybody except the author, so
 `imprint.DISCLOSURE` states the interest and is printed on the copyright page, in the
@@ -315,14 +325,15 @@ before writing one.
 
 1. Copy `docs/exemplar-move.md`, or an existing file in `moves/`, as the template — the
    contract above is unforgiving.
-2. Number it next in sequence; keep numbering contiguous, and keep the Parts in contiguous blocks.
+2. Number it next in sequence; keep numbering contiguous, and keep the stages in contiguous
+   blocks.
 3. Add its prerequisites to `book/deps.py`, all of them lower-numbered than the Move itself.
 4. `make verify && make audit` — both clean.
 5. `make` to regenerate, then eyeball the affected spread in `dist/Back-to-Metal.pdf`.
 6. Commit the sources **and** the regenerated `dist/` and `site/`.
 
 Renumbering existing Moves is expensive: it changes filenames, the dependency map, the symptom
-index and every cross-reference. Prefer appending within a Part.
+index and every cross-reference. Prefer replacing a Move within its stage.
 
 ## Versioning and releases
 

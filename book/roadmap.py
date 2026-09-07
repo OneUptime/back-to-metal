@@ -100,7 +100,7 @@ def critical_path(moves):
             'chain': list(reversed(chain))}
 
 
-def schedule(moves, workers=3):
+def schedule(moves, workers=2):
     """When each Move lands with `workers` people. Greedy list scheduling: at each
     moment take the lowest-numbered Move whose prerequisites are done and whose
     turn it is. Lowest-numbered rather than longest-first on purpose - the book's
@@ -132,8 +132,8 @@ def schedule(moves, workers=3):
 
 
 def stages(moves, sched):
-    """The roadmap grouped the way a reader will actually read it: one stage per
-    Part, with the window it occupies and what it delivers."""
+    """The roadmap grouped the way a reader will actually read it: one row per
+    Stage, with the window it occupies and what it delivers."""
     out = []
     for k in ORDER:
         rs = [m for m in moves if m['layer'] == k]
@@ -152,7 +152,7 @@ def stages(moves, sched):
     return out
 
 
-def payload(moves, workers=3):
+def payload(moves, workers=2):
     """Everything the website's roadmap needs, in one object."""
     sc = schedule(moves, workers)
     cp = critical_path(moves)
@@ -180,12 +180,12 @@ if __name__ == '__main__':
     print(f'critical path: {cp["days"] / WEEK:.0f} weeks over {len(cp["chain"])} Moves '
           f'({" -> ".join(cp["chain"][:6])}{" -> ..." if len(cp["chain"]) > 6 else ""})')
     print()
-    for w in (1, 2, 3, 6):
+    for w in (1, 2, 3):
         s = schedule(ms, w)
         print(f'  {w} engineer{"s" if w > 1 else " "}: {s["weeks"]:5.0f} weeks   '
               f'utilisation {s["utilisation"]:.0%}')
     print()
-    for st in stages(ms, schedule(ms, 3)):
+    for st in stages(ms, schedule(ms, 2)):
         print(f'  {st["roman"]:8s} {st["layer"]:9s} {st["first"]}-{st["last"]}  '
               f'weeks {st["start_week"]:3d}-{st["end_week"]:<3d} '
               f'{st["person_days"]:5.0f} person-days')
@@ -193,8 +193,8 @@ if __name__ == '__main__':
 
 # ---------------------------------------------------------------- the drawing
 def _lanes(items):
-    """Pack blocks into the fewest non-overlapping rows. A Part's Moves can run
-    alongside each other once there is more than one person, so a Part needs a
+    """Pack blocks into the fewest non-overlapping rows. A Stage's Moves can run
+    alongside each other once there is more than one person, so a Stage needs a
     band rather than a line."""
     lanes = []
     for it in items:
@@ -207,8 +207,8 @@ def _lanes(items):
     return lanes
 
 
-def svg(moves, workers=3, w=1180, week=WEEK, href=None):
-    """The roadmap as a schedule drawing: weeks across, Parts down.
+def svg(moves, workers=2, w=1180, week=WEEK, href=None):
+    """The roadmap as a schedule drawing: weeks across, Stages down.
 
     Rendered on the server rather than in the browser, so it is in the HTML, it
     prints, it needs no JavaScript, and there is no second implementation of the
@@ -224,7 +224,7 @@ def svg(moves, workers=3, w=1180, week=WEEK, href=None):
 
     total = max(sc['finish'].values(), default=1.0) or 1.0
     weeks = int(total // week) + 1
-    L, R, TOP = 104, 16, 30            # left gutter for Part labels, top for the ruler
+    L, R, TOP = 104, 16, 30            # left gutter for Stage labels, top for the ruler
     plot = w - L - R
     px = plot / total
     ROW, LANE, GAP = 13.0, 2.0, 11.0
@@ -245,10 +245,11 @@ def svg(moves, workers=3, w=1180, week=WEEK, href=None):
              f'stroke="var(--rule)" stroke-width="1"/>',
              f'<text x="{L - 12}" y="{TOP - 18}" class="rm-axis" '
              f'text-anchor="end">WEEK</text>']
-    # The ruler is spaced from the room it has, not from a guess. At three
-    # engineers the schedule runs to 242 weeks, and a fixed step of 4 put 61
+    # The ruler is spaced from the room it has, not from a guess. The previous
+    # edition ran to 242 weeks at three engineers, and a fixed step of 4 put 61
     # three-digit labels into 1,060 units of drawing - they overprinted into a
-    # grey smear and the axis stopped being readable at all.
+    # grey smear and the axis stopped being readable at all. Twenty Moves does
+    # not need the defence, but the drawing should not depend on that.
     LAB = 32.0
     step = next((c for c in (1, 2, 4, 5, 10, 20, 25, 50, 100)
                  if (weeks / c) * LAB <= plot), 100)
@@ -289,13 +290,13 @@ def svg(moves, workers=3, w=1180, week=WEEK, href=None):
                 else:
                     body.append(f'<g>{block}</g>')
         body.append('</g>')
-    # role="img" is children-presentational: on the web the bars are 122 real
+    # role="img" is children-presentational: on the web the bars are real
     # links, and declaring the drawing an image prunes every one of them from
     # the accessibility tree while leaving them in the tab order as silent
     # stops. The printed drawing has nothing to click, so there it is an image.
     role = 'img' if href is None else 'group'
     return (f'<svg class="rm" viewBox="0 0 {w} {height:.0f}" width="100%" '
             f'style="height:auto;display:block" role="{role}" '
-            f'aria-label="The roadmap: {len(moves)} Moves across {len(st)} Parts, '
+            f'aria-label="The roadmap: {len(moves)} Moves across {len(st)} Stages, '
             f'{sc["weeks"]:.0f} weeks with {workers} engineers">'
             + ''.join(ruler) + ''.join(body) + '</svg>')

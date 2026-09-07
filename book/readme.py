@@ -16,6 +16,7 @@ sys.path.insert(0, str(HERE))
 
 from parse import load_all, LAYERS, ORDER
 from deps import DEPS
+import roadmap as RM
 
 MARKER = '<!-- generated: everything below this line is written by book/readme.py -->'
 
@@ -47,6 +48,11 @@ def main():
         if rs:
             out.append(f'| {LAYERS[k]["roman"]} · {k} | {len(rs)}, '
                        f'{rs[0]["num"]}–{rs[-1]["num"]} |')
+    effort = sum(RM.effort_days(m) for m in moves)
+    sched = RM.schedule(moves, 2)
+    out.append(f'| Work | {effort:,.0f} person-days |')
+    out.append(f'| End to end, two engineers | {sched["weeks"]:.0f} weeks, '
+               f'most of it waiting for hardware |')
     out.append(f'| At zero downtime | {zero} of {len(moves)} |')
     out.append(f'| Whole book, end to end | {total_cut} minutes of user-visible outage |')
     out.append(f'| Cannot be undone | {oneway} |')
@@ -55,7 +61,11 @@ def main():
     out.append(f'| Dependencies | {sum(len(v) for v in DEPS.values())}, every one '
                f'pointing backwards |')
     if saved:
-        out.append(f'| Illustrative monthly saving | ${saved:,.0f} across every Move |')
+        # Net, not gross: Move 07 adds a cost line rather than removing one, and a
+        # figure that quietly drops it would be the first number in this repository
+        # that flattered the argument.
+        out.append(f'| Illustrative monthly saving | ${saved:,.0f}, net of what the '
+                   f'cage adds |')
     out.append('')
     out.append('Every Move names the real service on AWS, Google Cloud and Azure, and the one '
                'thing that differs on each.')

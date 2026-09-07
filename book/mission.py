@@ -19,26 +19,30 @@ PARAS = [
     'A generation of engineers has now been trained to believe that owning a server is a '
     'kind of professional failure. It is not. It is a trade, and like every trade it has '
     'terms: you take on hardware, capacity and a pager, and in exchange you stop paying a '
-    'margin on every byte you move and every hour you idle. For a great many companies '
-    'that trade is worth making, and the arithmetic is not close.',
+    'margin on every byte you move and every hour you idle. For a startup spending real '
+    'money on one cloud, that trade is usually worth making, and the arithmetic is not '
+    'close.',
 
-    'What has been missing is not the argument. It is the <b>method</b>. Repatriation is '
-    'written about as a decision and executed as a crisis, which is why so many attempts '
-    'stall six months in, with half the estate moved, two platforms to run and nobody able '
-    'to say whether it is going well. This book is the other thing: {count} Moves, each '
-    'one a single job with a stated cutover, a stated risk and a rollback that works.',
+    'What has been missing is not the argument. It is a plan short enough to finish. '
+    'Repatriation is written about as a decision and executed as a crisis, which is why '
+    'so many attempts stall halfway, with two platforms live and nobody able to say '
+    'whether it is going well. This is the other thing: {count} Moves, in five stages, '
+    'each one a single job with a stated cutover, a stated risk and a rollback that '
+    'works. An earlier edition of this book had a hundred and twenty-two of them and '
+    'took four years. Nobody has four years.',
 
-    'It is honest about the parts that do not pay. Several Moves here end by telling you to '
-    'keep paying somebody else, because a CDN, a DDoS scrubbing centre and outbound email '
-    'are three things you will not beat on your own, and a book that pretends otherwise is '
-    'selling something. The point was never to own everything. It was to own the parts where '
-    'ownership is cheaper, faster and yours.',
+    'It is honest about the parts that do not pay. One whole Move ends by telling you to '
+    'keep paying somebody else, because a content network, denial-of-service scrubbing '
+    'and outbound email are three things you will not beat on your own, and a book that '
+    'pretends otherwise is selling something. Another gives you permission to read three '
+    'Moves, do the arithmetic, and stop. The point was never to own everything. It was '
+    'to own the parts where ownership is cheaper, faster and yours.',
 
     'Which is why the whole thing is <b>open source</b>. Every Move, the typesetter that '
-    'turns them into this book, and the site that publishes them are yours: the text under '
-    'Creative Commons, the software under the MIT licence, all of it at {repo}. Correct it, '
-    'extend it, add the services your own estate actually runs. Infrastructure knowledge '
-    'this practical should not sit behind a consulting invoice.',
+    'turns them into this book, and the site that publishes them are yours: the text '
+    'under Creative Commons, the software under the MIT licence, all of it at {repo}. '
+    'Correct it, extend it, add the services your own estate actually runs. '
+    'Infrastructure knowledge this practical should not sit behind a consulting invoice.',
 ]
 
 

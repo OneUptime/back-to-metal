@@ -10,60 +10,53 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MOVES = ROOT / 'moves'
 
-# The five Parts. `key` is the CSS/HTML handle, `color` prints and `tint` is the
+# The five Stages. `key` is the CSS/HTML handle, `color` prints and `tint` is the
 # opaque panel behind it - opaque because a KDP interior carries no alpha, so a
 # tint is a colour rather than a colour at 12%. See flatten.py.
 #
 # `dark` is the same signal lifted off a near-black ground. It is not a
-# decoration: `color` is chosen to sit on paper, and every one of the seven
-# measures between 2.2:1 and 3.6:1 against the website's dark background, which
-# is below the 3:1 floor for a graphic and nowhere near the 4.5:1 a numeral set
-# in it needs. Both hexes are the Part; which one is correct depends on what is
-# behind it, so both live here rather than one of them living in a stylesheet.
-# Each Part is also a STAGE of the migration, and carries the plain-language
-# version of what you are doing while you are in it.
+# decoration: `color` is chosen to sit on paper, and each measure sits between
+# 2.2:1 and 3.6:1 against the website's dark background, which is below the 3:1
+# floor for a graphic and nowhere near the 4.5:1 a numeral set in it needs. Both
+# hexes are the Stage; which one is correct depends on what is behind it, so
+# both live here rather than one of them living in a stylesheet.
 #
-# The Part names are nouns from the system diagram - Iron, Site, Cluster - which
-# is how an architect thinks about the estate and not how somebody halfway
-# through the work thinks about their week. `doing` is the verb, `stage` is the
-# number, and between them a reader can answer "where am I" without holding the
-# whole book in their head. Both outputs lead with them.
+# The Stage names are verbs, not nouns. An earlier edition of this book named
+# its Parts after the layers of the system - Iron, Site, Cluster, Platform -
+# which is how an architect thinks about an estate and not how somebody halfway
+# through the work thinks about their week. "Stage 3 - Build" answers "where am
+# I" without anybody having to hold a system diagram in their head. `doing` is
+# the whole instruction, `stage` is the number, and `done` is how you know you
+# have finished it.
 LAYERS = {
-    'Iron':     dict(key='iron',     color='#474F57', dark='#A8B0B8', tint='#ECEEF0', label='Iron',
-                     part='I',    roman='Part I',    stage=1,
-                     doing='Work out what to buy',
-                     done='You know what to order, and why.'),
-    'Site':     dict(key='site',     color='#6B5344', dark='#C9B29E', tint='#F0ECE8', label='Site',
-                     part='II',   roman='Part II',   stage=2,
-                     doing='Find somewhere to put it',
-                     done='The machines are racked, powered and reachable.'),
-    'Cluster':  dict(key='cluster',  color='#1F4E79', dark='#8FB4D6', tint='#E6ECF3', label='Cluster',
-                     part='III',  roman='Part III',  stage=3,
-                     doing='Build the cluster',
-                     done='A cluster that can take production traffic, and has never seen any.'),
-    'Platform': dict(key='platform', color='#4B3F8F', dark='#A996D8', tint='#ECEAF4', label='Platform',
-                     part='IV',   roman='Part IV',   stage=4,
-                     doing='Make it fit to run production',
-                     done='Identity, secrets, images, policy and dashboards, before any data arrives.'),
-    'Data':     dict(key='data',     color='#A32E1F', dark='#E39A7B', tint='#F6E8E5', label='Data',
-                     part='V',    roman='Part V',    stage=5,
-                     doing='Move the data',
-                     done='Your state is on your disks, and the old copy is still warm.'),
-    'Edge':     dict(key='edge',     color='#14655A', dark='#7FC4B2', tint='#E3EFED', label='Edge',
-                     part='VI',   roman='Part VI',   stage=6,
-                     doing='Move the traffic',
-                     done='Users are reaching your addresses, not somebody else’s.'),
-    'Watch':    dict(key='watch',    color='#8A6112', dark='#DDB26A', tint='#F4EEE1', label='Watch',
-                     part='VII',  roman='Part VII',  stage=7,
-                     doing='Run it, and close the account',
-                     done='You can carry it at 03:00, and the cloud bill is zero.'),
+    'Decide':  dict(key='decide',  color='#474F57', dark='#A8B0B8', tint='#ECEEF0', label='Decide',
+                    part='I',    roman='Stage 1',  stage=1,
+                    doing='Work out whether to do it at all',
+                    done='You know what you spend, what you would spend instead, '
+                         'and whether it is worth it.'),
+    'Buy':     dict(key='buy',     color='#8A6112', dark='#DDB26A', tint='#F4EEE1', label='Buy',
+                    part='II',   roman='Stage 2',  stage=2,
+                    doing='Order the hardware and sign the space',
+                    done='The machines are on order and the cage is signed.'),
+    'Build':   dict(key='build',   color='#1F4E79', dark='#8FB4D6', tint='#E6ECF3', label='Build',
+                    part='III',  roman='Stage 3',  stage=3,
+                    doing='Turn the boxes into a cluster',
+                    done='A cluster that could take production traffic, and never has.'),
+    'Move':    dict(key='move',    color='#A32E1F', dark='#E39A7B', tint='#F6E8E5', label='Move',
+                    part='IV',   roman='Stage 4',  stage=4,
+                    doing='Move the app, then the data',
+                    done='Everything runs on your machines, and the cloud copy is still warm.'),
+    'Run':     dict(key='run',     color='#14655A', dark='#7FC4B2', tint='#E3EFED', label='Run',
+                    part='V',    roman='Stage 5',  stage=5,
+                    doing='Cut the traffic over, and keep it alive',
+                    done='Users reach your machines, you can carry it at 03:00, '
+                         'and the cloud bill is zero.'),
 }
-# The order the Parts appear in, and therefore the order the numbering runs in.
-# Iron before Site because what you are buying sets the power draw the facility
-# contract is written against. Platform before Data because production databases
-# need identity, secrets, a registry, network policy and dashboards before they
-# arrive, not after.
-ORDER = ['Iron', 'Site', 'Cluster', 'Platform', 'Data', 'Edge', 'Watch']
+# The order the Stages appear in, and therefore the order the numbering runs in.
+# It is the order the work actually happens in: you cannot buy against numbers
+# you have not measured, rack machines you have not ordered, or move a database
+# onto a cluster that does not exist yet.
+ORDER = ['Decide', 'Buy', 'Build', 'Move', 'Run']
 
 RISKS = ['Low', 'Medium', 'High']
 

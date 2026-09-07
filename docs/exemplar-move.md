@@ -1,11 +1,12 @@
 <!-- EXEMPLAR. Not part of the book: this file is the reference for voice, shape
      and density when writing a Move. The contract it satisfies is documented in
      AGENTS.md; verify.py and audit.py enforce it. Numbered 02 here only because
-     it was written that way; it is not in moves/. -->
+     it was written that way; it is not in moves/, and the book's real Move 02 is
+     a different job entirely. -->
 
 # 02 · Managed Postgres, brought home
 
-**Layer:** Data · **Leaving:** Managed PostgreSQL · **Risk:** High · **Cutover:** 12 min · **Reversible:** 30 days
+**Layer:** Move · **Leaving:** Managed PostgreSQL · **Risk:** High · **Cutover:** 12 min · **Reversible:** 30 days
 
 > Logical replication carries the data while both databases are live, so the downtime is only the seconds it takes to stop writing to one and start on the other.
 

@@ -1,7 +1,7 @@
 """Structure: the shape of every Move file, checked before anything is built.
 
 This is one of the two gates. It answers "is this a well-formed Move?" - the
-template, the meta line, the arithmetic in the numbers strip, the Parts
+template, the meta line, the arithmetic in the numbers strip, the stage
 invariant, and the house style rules that are a build failure rather than a
 preference. audit.py answers the harder question of whether the content is right.
 
@@ -93,9 +93,9 @@ def main():
                                 f'dial cap - split the Move or call it an outage')
         # `No` is reserved and load-bearing: it is what marks a Move irreversible
         # everywhere else in the build. Beyond that the field is a short phrase,
-        # because the manifest showed the enum was too narrow for real content -
-        # "Until the order is signed" and "Per drive, at the cost of a Ceph
-        # rebuild" are better answers than any fixed vocabulary allows.
+        # because the enum this used to be was too narrow for real content -
+        # "Until the order is signed" and "Until the contract is signed" are
+        # better answers than any fixed vocabulary allows.
         if not reversible or len(reversible) > 52:
             problems.append(f'{n}: reversible {reversible!r} is empty or over 52 characters')
         elif reversible.endswith('.'):
@@ -145,9 +145,11 @@ def main():
         if oneway and not ONEWAY_WORDS.search(rb):
             problems.append(f'{n}: Reversible is No but the rollback does not say so plainly')
         # The honey rule's analogue: state moved is state that has to come back.
+        # Stage 4 is the one that carries state, so every Move in it is held to
+        # the rule whether or not its runbook happens to name a datastore.
         touches_state = bool(STATEFUL.search(section(t, 'The runbook'))
                              or STATEFUL.search(section(t, 'Before you start'))
-                             or layer == 'Data')
+                             or layer == 'Move')
         if touches_state and not RESTORE.search(rb):
             problems.append(f'{n}: moves persistent state but the rollback never mentions '
                             f'restoring it')
@@ -230,20 +232,20 @@ def main():
             problems.append(f'moves {", ".join(nums)} all slug to "{sl}", so the '
                             f'website would write one page for all of them')
 
-    # The Parts must occupy contiguous, correctly-ordered ranges: the whole
+    # The stages must occupy contiguous, correctly-ordered ranges: the whole
     # front matter, every divider and the whole navigation assume it.
     seen, seq = [], [r[2] for r in rows]
     for lay in seq:
         if not seen or seen[-1] != lay:
             seen.append(lay)
     if seen != [l for l in ORDER if l in seen]:
-        problems.append(f'Parts are not contiguous and in order: {seen}')
+        problems.append(f'stages are not contiguous and in order: {seen}')
 
     print('\nPROBLEMS:' if problems else '\nNo problems found.')
     for p in problems:
         print('  -', p)
 
-    print('\nParts:')
+    print('\nStages:')
     for lay in ORDER:
         rs = [r for r in rows if r[2] == lay]
         if rs:

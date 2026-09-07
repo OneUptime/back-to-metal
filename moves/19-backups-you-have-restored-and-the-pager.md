@@ -1,0 +1,53 @@
+# 19 · Backups you have restored, and the pager
+
+**Layer:** Run · **Leaving:** Managed backup, alarms and a rented paging service · **Risk:** High · **Cutover:** 0 min · **Reversible:** Immediately
+
+> Velero, a continuous database archive and a copy somewhere you are not leaving — then the drill that turns a guessed recovery time into a measured one.
+
+## Leaving from
+- **AWS:** AWS Backup and CloudWatch alarms — a vault under compliance-mode lock cannot be shortened or removed until its retention expires.
+- **Google Cloud:** Backup and DR Service and Cloud Monitoring — its plans run on a console and appliances you deploy on Compute Engine, so the product is instances you pay for.
+- **Azure:** Azure Backup and Azure Monitor alerts — a Recovery Services vault protects only resources in its own region, and soft delete holds removed items for fourteen days.
+
+## Why this works
+Two failures end a startup here: the data cannot be got back, and nobody was woken. Schedules are cheap and worthless until somebody has rebuilt from them, so the deliverable is the drill — an estate reconstructed from the repository and the object store while production carries on untouched, with a stopwatch running. That figure is the recovery time objective, and it is usually several times the number in the plan. Monitoring runs on hardware you own; the alerting deliberately does not, because a cluster that has failed cannot report its own failure.
+
+## Before you start
+
+**Access**
+- An account at an object storage provider unrelated to the cloud you are closing, with object lock
+- Five days of one engineer's time for the rebuild drill, on a date nobody may move
+
+**Software**
+- `velero` 1.15 and the Barman Cloud plugin from Move 16, both pinned in the repository from Move 13
+- `rclone` 1.68 for the copy out to the third provider
+- Prometheus and Loki with a series budget agreed before the first scrape
+
+**People**
+- A named second person behind the escalation, and a rule about what waits until morning
+
+## The runbook
+1. Schedule `velero` nightly for cluster objects, and let the Barman Cloud plugin archive the database from Move 16 continuously, both into the Ceph object gateway built in Move 12.
+2. Copy that store out with `rclone` to a provider that is neither the rack nor the account being closed, with object lock on and append-only credentials, so one identity cannot reach both copies.
+3. Do the drill. On the spare machine from Move 06, from the Git repository and those backups alone, build a cluster, restore the database and bring one service up, with nothing touching the original. Time it: that number is the recovery time objective, and the plan that disagrees is wrong.
+4. Stand Prometheus and Loki up on your own nodes against the series budget, with drop rules at scrape time. A monitoring bill that outgrows the estate it watches is a cloud habit that follows you home.
+5. Put the alerting where the cluster cannot take it down. OneUptime runs the probes, the rota, the escalation and the status page from outside; the author of this book founded OneUptime, and the copyright page says so. Add a dead-man's-switch heartbeat.
+6. Write the rota. Three engineers is the minimum that survives leave and illness; most teams here have two. Name the second person, buy a hardware support contract, and record which alerts may wait until morning.
+
+## Operator's notes
+- **Swap:** If the drill on the spare machine is disruptive, rent a dedicated server by the month and rebuild into that instead.
+- **Do it faster:** Make the drill a script, not a document. The second run then takes an afternoon rather than a week.
+- **Watch out:** Cluster objects without volume data restore an estate that starts cleanly and holds nothing. Count rows before calling the drill a pass.
+- **Leftovers:** Backup vaults bill after the resources they protected are gone, and one under a retention lock stays until it expires.
+
+## Rollback
+Nothing here alters what serves traffic, so backing out is removing two schedules and leaving the managed alarms enabled. The point of no return is the day the provider's vaults age out: after that the only copy of last month is the one you wrote. Keep them until a restore from your own has been timed.
+
+## The numbers
+
+| Was | Now | Saved | Cutover | Effort | Wait |
+|---|---|---|---|---|---|
+| $1,100/mo | $340/mo | 69% | 0 min | 5 days | — |
+
+## What you can turn off
+Managed backup vaults, their cross-region copies, the alarms and their ingestion, and the rented pager seats — once a restore of your own has been timed and one real page has woken somebody.

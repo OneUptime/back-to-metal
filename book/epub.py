@@ -201,7 +201,7 @@ def build():
     files['OEBPS/style.css'] = CSS.encode()
 
     # ---- navigation ---------------------------------------------------------
-    # Two levels at most: Part, then Move. Deeper nesting is the single most
+    # Two levels at most: stage, then Move. Deeper nesting is the single most
     # common reason a Kindle table of contents renders badly.
     nav_items = ''
     for k in ORDER:

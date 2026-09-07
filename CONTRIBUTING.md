@@ -42,7 +42,7 @@ Read [AGENTS.md](AGENTS.md) first — it documents the file contract in full, an
 unforgiving about it. In short:
 
 - Copy an existing Move as the template.
-- Number it next in sequence, inside the right Part. Parts occupy contiguous number ranges.
+- Number it next in sequence, inside the right stage. Stages occupy contiguous number ranges.
 - Add its prerequisites to `book/deps.py`. **Every dependency must be a lower-numbered Move**;
   the build refuses a forward reference.
 - Fill `The numbers` honestly. The saving percentage is checked against the arithmetic, and the
@@ -51,7 +51,8 @@ unforgiving about it. In short:
   return, and if the Move touches persistent state it has to say how the state comes back.
 
 Renumbering existing Moves is expensive — it changes filenames, the dependency map, the symptom
-index and every cross-reference. Prefer appending within a Part.
+index and every cross-reference. Prefer replacing a Move within its stage: this edition is
+twenty Moves on purpose, and a twenty-first has to earn its place against one already there.
 
 ## What gets rejected
 

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>02 · What you actually run — Back to Metal</title>
+<meta name="description" content="The estate feels infinite because nobody has written it down. On one page it is forty rows, and every row has a name against it.">
+<meta name="theme-color" content="#FCFCFB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14181A" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="../assets/style.css?v=2.0.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+<script>document.documentElement.className='js'</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="bar"><div class="bar-in"><a class="wm" href="../index.html">Back to <em>Metal</em></a><nav class="nav" aria-label="Sections"><a href="../index.html">The guide</a><a href="../cost.html">What it costs</a><a href="../checklist.html">Your checklist</a><a href="../start.html">Before you start</a><a href="../about.html">About</a></nav><a class="next" id="next" href="../m/01-the-bill-and-the-three-lines-that-are-most-of-it.html"><span class="lbl">Next</span><b class="next-n">01</b><span class="next-t">The bill, and the three lines that are most of it</span></a></div></header>
+<main id="main" class="shell">
+<article class="move" data-part="decide">
+  <header class="mh">
+    <p class="lbl">Stage 1 &middot; Decide &middot; Move 02 of 20</p>
+    <h1 class="d page">What you actually run</h1>
+    <p class="hook">The estate feels infinite because nobody has written it down. On one page it is forty rows, and every row has a name against it.</p>
+    <dl class="facts"><div><dt class="lbl">Cutover</dt><dd>0 min</dd></div><div><dt class="lbl">Risk</dt><dd>Low <svg class="ico" viewBox="0 0 13.4 14" height="1em" width="1em" style="width:auto" aria-hidden="true"><rect x="0" y="4" width="3.4" height="6" fill="currentColor"/><rect x="5" y="2" width="3.4" height="10" fill="currentColor" fill-opacity="0.22"/><rect x="10" y="0" width="3.4" height="14" fill="currentColor" fill-opacity="0.22"/></svg></dd></div><div><dt class="lbl">Effort</dt><dd>3 days</dd></div><div><dt class="lbl">Then wait</dt><dd>—</dd></div><div><dt class="lbl">Back out</dt><dd>Immediately</dd></div><div><dt class="lbl">Leaving</dt><dd>—</dd></div></dl>
+    <p class="needs">Needs <a href="01-the-bill-and-the-three-lines-that-are-most-of-it.html" aria-label="Move 01 &middot; The bill, and the three lines that are most of it">01</a></p>
+  </header>
+
+  <section class="sec"><h2 class="d sect">The runbook</h2>
+    <ol class="steps" data-n="02"><li><span class="sn" data-step="1">1</span><div>Pull the machine-readable list, one account at a time: <code>aws resource-explorer-2 search</code>, <code>gcloud asset search-all-resources</code> or <code>az graph query</code>. Paste it into one document, a row per resource.</div></li><li><span class="sn" data-step="2">2</span><div>Add what those APIs never return: scheduled jobs, queues, third-party services with a webhook into production, and the DNS records pointing at any of it.</div></li><li><span class="sn" data-step="3">3</span><div>Reconcile against the billing export from Move 01 both ways. A bill line with no row is unowned; a row with no bill line is free, or in an account nobody has opened.</div></li><li><span class="sn" data-step="4">4</span><div>Hunt what hides: snapshots whose disk is gone, volumes attached to nothing, load balancers with no target, staging at full size overnight, the accounts opened for a proof of concept in 2022.</div></li><li><span class="sn" data-step="5">5</span><div>Sort every row into one of four piles — moves as-is, moves with work, stays rented, gets deleted. The fourth is the biggest; confirm each row with its owner and check thirty days of metrics first.</div></li></ol></section>
+
+  <section class="sec"><h2 class="d sect">Before you start</h2>
+    <div class="pre"><div class="pre-g"><h3 class="lbl">Access</h3><ul><li>Read-only access to every cloud account, project and subscription, including the forgotten ones</li><li>The billing export from Move 01, at resource granularity rather than by service</li></ul></div><div class="pre-g"><h3 class="lbl">Software</h3><ul><li>The provider's asset CLI — <code>aws</code>, <code>gcloud</code> or <code>az</code> — and one shared document with a row per resource</li></ul></div><div class="pre-g"><h3 class="lbl">People</h3><ul><li>The engineer who would notice each service stopping, named on every row</li></ul></div></div></section>
+
+  <section class="sec"><h2 class="d sect">What you are leaving</h2>
+    <ul class="clouds"><li data-cloud="aws"><b>AWS</b><span class="svc">Resource Explorer</span><span class="dif">indexes per Region behind one aggregator and searches one account until the organisation-wide view is on, so the second account stays invisible.</span></li><li data-cloud="gcp"><b>Google Cloud</b><span class="svc">Cloud Asset Inventory</span><span class="dif">the caller needs <code>cloudasset.assets.searchAllResources</code> at the organisation scope; a project-level grant says nothing about the siblings on the same invoice.</span></li><li data-cloud="azure"><b>Azure</b><span class="svc">Resource Graph</span><span class="dif">reads only subscriptions the caller can already see, and pages at 1,000 rows, so an unpaged query returns a truncated estate that looks complete.</span></li></ul></section>
+
+  <section class="sec"><h2 class="d sect">Why this works</h2>
+    <p>Leaving the cloud feels impossible because nobody can say what would have to move. The estate lives in three or four heads, so the total is always imagined larger than it is. A startup spending $24,000 a month usually runs a dozen services, one Postgres, one cache, two or three buckets and a handful of scheduled jobs. That fits on a page, and every later Move then has something finite to count against. Nothing changes here: this Move reads, and writes down what it read. The risk is being wrong about what runs, and the bill settles that.</p></section>
+
+  <section class="sec"><h2 class="d sect">Operator&rsquo;s notes</h2>
+    <dl class="notes"><div><dt>Swap</dt><dd>Where accounts are few and tags honest, the provider's tag report is a quicker first pass. Untagged resources still have to be found by hand.</dd></div><div><dt>Do it faster</dt><dd>Reconcile before assigning owners. The bill sorts rows by cost, which is the order worth arguing about.</dd></div><div><dt>Watch out</dt><dd>These inventories list what the provider created. What a third party stood up against your account — an agent, a contractor's sandbox — appears nowhere else.</dd></div><div><dt>Leftovers</dt><dd>A snapshot outlives the volume it came from and bills long after the rest of its account has gone. So does a retained log group.</dd></div></dl></section>
+
+  <section class="sec warn"><h2 class="d sect">Rollback</h2>
+    <p>Nothing here touches a running system, so backing out is discarding a document nobody acted on. The point of no return is the fourth pile: once a resource on it is deleted, getting it back means a restore from whatever snapshot survives, and for a log group there may be none. Keep the inventory in version control.</p></section>
+
+  <section class="sec"><h2 class="d sect">The numbers</h2>
+    <table class="nums"><thead><tr><th scope="col">Was</th><th scope="col">Now</th><th scope="col">Saved</th><th scope="col">Cutover</th><th scope="col">Effort</th><th scope="col">Wait</th></tr></thead><tbody><tr><td>—</td><td>—</td><td>—</td><td>0 min</td><td>3 days</td><td>—</td></tr></tbody></table>
+    <p class="turnoff"><span class="lbl">What you can turn off</span>
+      The fourth pile, once its owners confirm: orphaned volumes, snapshots of vanished disks, idle load balancers and the proof-of-concept accounts. The cheapest saving in the book.</p></section>
+
+  <footer class="mf">
+    <label class="ck big"><input type="checkbox" class="ck-box" data-n="02">
+      Mark Move 02 as done</label>
+    <nav class="pn" aria-label="Moves"><a class="prev" rel="prev" href="01-the-bill-and-the-three-lines-that-are-most-of-it.html">01 &middot; The bill, and the three lines that are most of it</a><a class="nxt" rel="next" href="03-the-number-that-decides-it.html">03 &middot; The number that decides it</a></nav>
+    <p class="unlocks">Unlocks <a href="03-the-number-that-decides-it.html" aria-label="Move 03 &middot; The number that decides it">03</a> <a href="04-the-three-things-you-keep-renting.html" aria-label="Move 04 &middot; The three things you keep renting">04</a> <a href="06-five-machines-and-the-one-on-the-shelf.html" aria-label="Move 06 &middot; Five machines, and the one on the shelf">06</a></p>
+  </footer>
+</article>
+</main>
+<footer class="foot"><div class="foot-in"><nav class="foot-nav" aria-label="Every page"><a href="../index.html">The guide</a><a href="../cost.html">What it costs</a><a href="../checklist.html">Your checklist</a><a href="../start.html">Before you start</a><a href="../about.html">About</a><a href="../Back-to-Metal.pdf" download>PDF</a><a href="../Back-to-Metal.epub" download>EPUB</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav><p class="foot-note">Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves&rsquo; own effort figures and the dependency graph rather than asserted, and every price is a public list rate observed while writing. <a href="../start.html">Read the safety page</a> before running anything.</p><p class="foot-note">By the makers of OneUptime &mdash; <a href="https://oneuptime.com">oneuptime.com</a>, an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Stage 5, and the interest is declared on the <a href="../about.html">about page</a>.</p><p class="foot-note">Open source: the Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> &mdash; software MIT, text CC BY 4.0. <span class="ver">v2.0.0</span></p></div></footer>
+<script src="../assets/moves-index.js?v=2.0.0" defer></script>
+<script src="../assets/app.js?v=2.0.0" defer></script>
+</body>
+</html>

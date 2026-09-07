@@ -1,7 +1,7 @@
 """Move files -> one self-contained build/book.html, ready for render.py.
 
 Every number in the finished book - page numbers, the contents, the indexes, the
-cover statistics, the Part totals - is derived here from the Move files. There
+cover statistics, the stage totals - is derived here from the Move files. There
 are no hand-maintained totals anywhere: change a Move, rerun the build, and the
 rest follows.
 
@@ -27,6 +27,7 @@ from flatten import mix
 import costs as COSTS
 import imprint as IMP
 import mission as MISSION
+import roadmap as RM
 
 ROOT = Path(__file__).resolve().parent.parent
 HERE = Path(__file__).resolve().parent
@@ -54,33 +55,29 @@ FONTS = f"""
 CSS = (HERE / 'style.css').read_text()
 
 PART_BLURB = {
-    'Iron': 'What to buy. Cores, memory, disks, network cards, switches, optics and '
-            'the topology they hang on \u2014 chosen against your own numbers rather than a '
-            'vendor configurator, and tested before anything depends on it.',
-    'Site': 'Where the machines live, who owns the room, and what you are signing. '
-            'Nothing here is software, and getting it wrong is the only mistake in this '
-            'book you cannot fix with a deploy.',
-    'Cluster': 'Everything between a racked machine and a cluster that can take production '
-               'traffic. Nothing here moves a workload; all of it decides how well the '
-               'rest of the book goes.',
-    'Data': 'The part that can lose a company its data, and therefore the part with the '
-            'longest overlap windows, the most rehearsal and the fewest one-way steps.',
-    'Edge': 'How traffic reaches you once the addresses are yours. Also the Part with the '
-            'most honest advice to keep paying somebody else.',
-    'Platform': 'What developers touch. Get this wrong and the migration succeeds while '
-                'everybody who has to use it quietly hates you.',
-    'Watch': 'Running it once it is yours. Every repatriation article stops before this '
-             'Part, and every repatriation that regrets itself failed inside it.',
+    'Decide': 'Whether to do this at all. Three Moves of arithmetic against your own '
+              'invoice, and a fourth that names what stays rented. The stage most likely '
+              'to end the programme, and that is a success rather than a failure.',
+    'Buy': 'What to order and where to put it. Nothing here is software, and getting it '
+           'wrong is the only mistake in this book you cannot fix with a deploy. Both '
+           'clocks start in this stage, and they run in parallel.',
+    'Build': 'Everything between a racked machine and a cluster that could take production '
+             'traffic. Nothing here moves a workload; all of it decides how well the rest '
+             'of the book goes.',
+    'Move': 'The application first, then the state. The stage that can lose a company its '
+            'data, and therefore the one with the longest overlap windows, the most '
+            'rehearsal and the fewest one-way steps.',
+    'Run': 'The traffic, the pager and the last account. Every article about leaving the '
+           'cloud stops before this stage, and every migration that regrets itself failed '
+           'inside it.',
 }
 
 PART_KICKER = {
-    'Iron': 'Servers, disks, network hardware, and what to test before you trust it',
-    'Site': 'Colocation, your own room, rented metal, power and the loading dock',
-    'Cluster': 'The OS, the control plane, the network and the disks',
-    'Data': 'Databases, object storage, queues, and the way back',
-    'Edge': 'Addresses, load balancers, DNS, certificates and the CDN you keep',
-    'Platform': 'Builds, registries, secrets, identity and the view of it all',
-    'Watch': 'Upgrades, on-call, capacity, compliance, and the last account',
+    'Decide': 'The bill, the inventory, the comparison, and what stays rented',
+    'Buy': 'Sizing, the machines, the cage, and everything with a lead time',
+    'Build': 'Racking, the network, the cluster and the disks',
+    'Move': 'Images, the first service, the buckets, and the database',
+    'Run': 'The edge, go-live, backups, the pager and the last account',
 }
 
 
@@ -89,13 +86,13 @@ def esc(s):
 
 
 def plural(n, one, many=None):
-    """'1 Move', '14 Moves'. Cheap, and it stops a Part that happens to hold a
+    """'1 Move', '14 Moves'. Cheap, and it stops a stage that happens to hold a
     single Move printing '1 Moves' on its contents page."""
     return f'{n} {one if n == 1 else (many or one + "s")}'
 
 
-# The fore-edge tab. Five Parts, five bands stepping down the page, so a closed
-# book can be opened at the right Part with a thumb. `slot` is the Part index;
+# The fore-edge tab. One band a stage, stepping down the page, so a closed book
+# can be opened at the right stage with a thumb. `slot` is the stage index;
 # None means no tab, which is every page of the front matter.
 TAB_TOP, TAB_H, TAB_GAP = 42.0, 24.0, 4.0
 
@@ -127,7 +124,7 @@ def cover_front_html(moves):
     by = {m['num']: m for m in moves}
     zero = sum(1 for m in moves if m['cutover'] == 0)
     # A dozen Moves for the jacket: the shortest titles that still fit the
-    # column, spread across the Parts so the list samples the book rather than
+    # column, spread across the stages so the list samples the book rather than
     # reprinting its opening. Chosen here rather than by hand so it cannot drift
     # out of step with the Moves themselves.
     FITS = 34
@@ -145,7 +142,7 @@ def cover_front_html(moves):
             picks.append(m); seen.add(m['num'])
     SHOWCASE = [m['num'] for m in sorted(picks, key=lambda x: int(x['num']))]
     # A jacket list wants at least six entries to read as a list. Scaled against
-    # the book so a small build - a smoke test, or a single Part rendered on its
+    # the book so a small build - a smoke test, or a single stage rendered on its
     # own - does not trip a check aimed at a finished one.
     assert len(SHOWCASE) >= min(6, len(moves)), (
         f'only {len(SHOWCASE)} Move titles fit the jacket column at {FITS} characters; '
@@ -155,8 +152,13 @@ def cover_front_html(moves):
         f'<span class="mdot"></span><span class="mmin">{by[k]["cutover"]}</span></div>'
         for k in SHOWCASE if k in by)
 
-    stats = [(str(len(moves)), 'Moves'), ('5', 'Parts'),
-             (str(zero), 'At zero downtime'), ('3', 'Say keep paying')]
+    # Nothing here is typed. A hardcoded '5' was right for five stages and would
+    # be quietly wrong the day somebody added a sixth.
+    cover_effort = sum(RM.effort_days(m) for m in moves)
+    stages_n = len({m['layer'] for m in moves})
+    keep = sum(1 for m in moves if 'keep paying' in (m['why'] + ' ' + m['hook']).lower())
+    stats = [(str(len(moves)), 'Moves'), (str(stages_n), 'Stages'),
+             (str(zero), 'At zero downtime'), (str(len(CLOUDS)), 'Clouds, every Move')]
     return f"""
     <div class="cover-rule"></div>
     <div style="margin-top:5mm" class="eyebrow">{len(moves)} Moves &nbsp;·&nbsp; AWS, Google Cloud and Azure out</div>
@@ -167,7 +169,7 @@ def cover_front_html(moves):
     <div class="promise d">
       <p>One Move, <em>one job, one stated cutover</em>.</p>
       <p>A rollback <em>that has been rehearsed</em>.</p>
-      <p>And three Moves that say <em>keep paying somebody else</em>.</p>
+      <p>And <em>{cover_effort:.0f} days of work</em>, not four years.</p>
     </div>
     <div style="flex:.5"></div>
     <div class="stats">{''.join(
@@ -193,32 +195,32 @@ def build(moves):
     SYM_PER_PAGE = 12
     sym_pages = max(1, -(-len(SYMPTOMS) // SYM_PER_PAGE))
 
-    # Front matter has to run to an EVEN count, so the first Part divider opens on
+    # Front matter has to run to an EVEN count, so the first stage divider opens on
     # a recto and every Move's setup page lands on a verso facing its runbook.
     #
     # Derived rather than written down, because it is not a constant: the front
-    # matter carries one contents page per Part that actually has Moves, so a
-    # book with four Parts has different front matter from one with five. It used
-    # to be the literal 18, which was right for five Parts and silently wrong for
+    # matter carries one contents page per stage that actually has Moves, so a
+    # book with four stages has different front matter from one with five. It used
+    # to be the literal 18, which was right for five stages and silently wrong for
     # any other number - the pagination assertion at the foot of this function
     # caught it, which is what that assertion is for.
     #
     # Twelve fixed pages: half title, why-this-exists, title, copyright,
     # foreword, the reference build, the on-ramp, the ten rules, the rollback
     # page, the cost page, and the two equivalence pages. Then a contents page
-    # per Part, then the symptom index, then a blank verso if the total is odd.
+    # per stage, then the symptom index, then a blank verso if the total is odd.
     FRONT_FIXED = 12 + len(parts) + sym_pages
     FRONT = FRONT_FIXED + (FRONT_FIXED % 2)
 
     pageno, _p = {}, FRONT
     keys = list(parts)
     for _i, k in enumerate(keys):
-        _p += 1                                    # the Part divider, always a recto
+        _p += 1                                    # the stage divider, always a recto
         for _j, m in enumerate(parts[k]):
             pageno[m['num']] = _p + 1 + 2 * _j
         _p += 2 * len(parts[k])
         if _i < len(keys) - 1:
-            _p += 1                                # blank verso closing the Part
+            _p += 1                                # blank verso closing the stage
 
     def texture(ms):
         return ' &nbsp;·&nbsp; '.join(esc(m['title']) for m in ms)
@@ -290,6 +292,8 @@ def build(moves):
         ('The rollback', 'On the facing page, at the foot, in colour. It names the point of '
                          'no return. Read it before step one, not after step five.'),
     ]
+    total_effort = sum(RM.effort_days(m) for m in moves)
+    total_weeks = RM.schedule(moves, 2)['weeks']
     keyhtml = ''.join(
         f'<div class="kitem"><div class="kn">{i + 1}</div><div><b>{t}</b>{b}</div></div>'
         for i, (t, b) in enumerate(KEY))
@@ -297,31 +301,35 @@ def build(moves):
     <div class="pkicker">A short note first</div>
     <h2 class="ptitle d">Many Moves,<br>Not One Migration</h2>
     <div class="fw">
-      <p class="lede">The reason cloud repatriations fail is almost never that the technology
-      did not work. It is that they were attempted as one decision, executed as one project,
-      and abandoned somewhere in the middle with two platforms running and nobody able to say
+      <p class="lede">The reason leaving the cloud fails is almost never that the technology
+      did not work. It is that it was attempted as one decision, executed as one project, and
+      abandoned somewhere in the middle with two platforms running and nobody able to say
       whether it was going well.</p>
-      <p>This book takes the opposite shape. It is {len(moves)} Moves. Each is one job with a
-      stated cutover, a stated risk and a rollback that has been thought about. Each can be
-      done on a Tuesday and undone on a Wednesday. You can stop after any of them and still
-      be in a coherent place, which is the only property that matters in a project measured
-      in quarters.</p>
+      <p>This book takes the opposite shape. It is {len(moves)} Moves, in five stages. Each is
+      one job with a stated cutover, a stated risk and a rollback that has been thought about.
+      Each can be done on a Tuesday and undone on a Wednesday. You can stop after any of them
+      and still be in a coherent place, which is the only property that matters in a project
+      measured in quarters.</p>
+
+      <p>It is deliberately small. The first edition had a hundred and twenty-two Moves and,
+      computed from its own files, 975 person-days and four and a half years. That was correct
+      and useless. This is {total_effort:.0f} person-days and about {total_weeks:.0f} weeks for
+      two people, most of it hardware lead time rather than work. Hiring does not shorten
+      it.</p>
       <p>They are ordered so that a reader who starts at Move 01 and works forward has, by
-      construction, met every prerequisite of the Move in front of them. The dependency at
-      the foot of each page always points backwards. That is not a stylistic choice; the
-      build refuses to compile a book where it does not hold.</p>
+      construction, met every prerequisite of the Move in front of them. That is not a
+      stylistic choice; the build refuses to compile a book where it does not hold.</p>
       <p>Every Move carries all three clouds. The job is the same whether you are leaving AWS,
       Google Cloud or Azure &mdash; what differs is the extraction, so each Move opens with three
-      lines naming the real service on each provider and the one thing that is different there.
-      Writing three whole variants of every runbook would have tripled the book to say the same
-      thing three times.</p>
-      <p>Three of the Moves conclude that you should keep paying somebody else. A global content
-      network, scrubbing capacity at the edge and outbound email are businesses other people run
-      better than you will, and each is cheap next to what it replaces. The aim was never to own
-      everything.</p>
-      <p class="sign">Work in any order the dependencies allow. Rehearse everything. And read
-      the Rollback section before the first step of every Move, including the ones that look
-      like nothing.</p>
+      lines naming the real service on each provider and the one thing that is different
+      there.</p>
+      <p>Move 04 concludes that you should keep paying somebody else for three things. A
+      content delivery network, scrubbing capacity at the edge and outbound email are businesses
+      other people run better than you will, and each is cheap next to what it replaces. The aim
+      was never to own everything. And Move 03 gives you permission to stop: if the arithmetic
+      does not clear a third, three Moves and a week is the whole cost of finding out.</p>
+      <p class="sign">Rehearse everything, and read the Rollback before the first step of every
+      Move &mdash; including the ones that look like nothing.</p>
     </div>
     <div class="anat">
       <div class="anat-fig">{anatomy()}<div class="anat-cap">Every Move, without exception</div></div>
@@ -336,15 +344,16 @@ def build(moves):
         '</div>' for name, items in list(SHELVES) + [('On the laptop', KIT)])
     n_items = sum(len(i) for _, i in SHELVES) + len(KIT)
     R = REFERENCE
-    n_nodes = R['sites'] * R['nodes_per_site']
+    n_nodes = R['nodes']
     pages.append(page('', '#6B5344', f"""
     <div class="pkicker">Before you start &nbsp;·&nbsp; {n_items} things</div>
     <h2 class="ptitle d">The Reference Build</h2>
     <p class="pintro">Every Move in this book is written against one cluster, so that a runbook
-    can name a real thing rather than a category: {R['sites']} sites, {R['nodes_per_site']} nodes
-    each, {R['cores_per_node']} cores and {R['ram_gb_per_node']} GB a node,
-    {R['uplink_gbps']} GbE to the top of the rack. Two sites because one site is not a platform,
-    and {R['nodes_per_site']} nodes because that is where losing one stops hurting. Scale the
+    can name a real thing rather than a category: one site, {R['nodes']} nodes and
+    {R['spares']} on the shelf, {R['cores_per_node']} cores and {R['ram_gb_per_node']} GB a node,
+    {R['uplink_gbps']} GbE to the switch. {R['nodes']} because three is the smallest control
+    plane with a quorum and losing one of three leaves two machines carrying a load nobody sized
+    them for; the spare because a dead board is a return authorisation and three weeks. Scale the
     numbers; do not scale away the redundancy.</p>
     <div class="hrule" style="margin:5mm 0"></div>
     <div class="shelves">{shelves_html}</div>
@@ -358,7 +367,7 @@ def build(moves):
     <p class="pintro">Almost nobody should sign a facility contract before they have run this
     stack once. A cluster of {HOMELAB['nodes']} refurbished machines with
     {HOMELAB['cores_per_node']} cores and {HOMELAB['ram_gb_per_node']} GB each, on a managed
-    switch under a desk, will run every Move in Parts II and III unchanged and most of Part IV
+    switch under a desk, will run every Move in Stage 3 unchanged and most of Stage 4
     besides. It costs about
     ${COSTS.homelab_capex():,.0f} once and about ${COSTS.homelab_month():.0f} a month in
     electricity, it saves nothing whatsoever, and it is the cheapest way to find out whether the
@@ -374,11 +383,11 @@ def build(moves):
       the control plane, Cilium with kube-proxy replaced, Rook and Ceph, the registry, secrets,
       the observability stack, and a Postgres cutover rehearsed end to end against a copy. If a Move works here it will work on the metal; the difference is scale,
       not shape.</p></div>
-      <div class="pcard"><h4>What it cannot teach you</h4><p>Every word of Part I. A homelab has
-      one power feed, one switch, no cross-connect, no remote hands, no second site and nobody
-      to escalate to at three in the morning. It cannot show you what a colocation contract is
-      for, or what happens when the A feed goes away and the B feed was never tested. The
-      building is a different discipline, which is why it has a Part of its own.</p></div>
+      <div class="pcard"><h4>What it cannot teach you</h4><p>Every word of Stage 2. A homelab
+      has one power feed, one switch, no cross-connect, no remote hands and nobody to escalate
+      to at three in the morning. It cannot show you what a colocation contract is for, or what
+      happens when the A feed goes away and the B feed was never tested. The building is a
+      different discipline, which is why it has a stage of its own.</p></div>
       <div class="pcard"><h4>When to stop using it</h4><p>Never. The on-ramp becomes the
       non-production cluster the rest of the book keeps asking for &mdash; the one you restore
       etcd onto, rehearse an upgrade on, and point a load generator at. Every estate needs a
@@ -402,16 +411,16 @@ def build(moves):
         for k in HOMELAB_KIT)}</div>
     </div>""", 'THE ON-RAMP'))
 
-    # ---------- the ten rules
+    # ---------- the rules
     pages.append(page('', '#1F4E79', f"""
     <div class="pkicker">And then</div>
-    <h2 class="ptitle d">Ten Rules for<br>Leaving the Cloud</h2>
+    <h2 class="ptitle d">The Rules for<br>Leaving the Cloud</h2>
     <div class="hrule" style="margin:6mm 0 7mm"></div>
     <div class="rules big">{''.join(
         f'<div class="rule-item"><div class="rn d">{i + 1}</div>'
         f'<div class="rt"><b>{esc(t)}</b> {esc(b)}</div></div>'
         for i, (t, b) in enumerate(RULES))}</div>
-    """, 'TEN RULES'))
+    """, 'THE RULES'))
 
     # ---------- the rollback page: the most important in the book
     oneway = sum(1 for m in moves if m['oneway'])
@@ -428,8 +437,10 @@ def build(moves):
     </div>""", 'BEFORE YOU TOUCH ANYTHING'))
 
     # ---------- what it actually costs
-    o = COSTS.owned_month(R['sites'], R['nodes_per_site'])
-    d = COSTS.dedicated_month(n_nodes)
+    o = COSTS.owned_month(R['nodes'], R['spares'])
+    d = COSTS.dedicated_month(n_nodes + R['spares'])
+    capex = ((n_nodes + R['spares']) * COSTS.HARDWARE['node_capex']
+             + COSTS.HARDWARE['switch_capex'])
     vcpu = n_nodes * R['cores_per_node'] * 2
     aws_compute = vcpu * COSTS.AWS['ec2_vcpu_hour'] * 730
     money = lambda v: f'${v:,.0f}'
@@ -447,26 +458,28 @@ def build(moves):
       gigabyte of storage, a load balancer or a byte of egress. Egress is the line that ends most
       arguments: 100 TB a month is {money(COSTS.egress_month(100))}, every month, for the privilege
       of your own traffic leaving.</p></div>
-      <div class="pcard"><h4>Owned, in two facilities</h4><p>{money(o['infrastructure'])} of
-      infrastructure - metal amortised over five years, power, racks, transit, cross-connects and
-      remote hands - plus {money(o['people'])} of additional salaried time. Total
-      <b>{money(o['total'])}</b> a month for the same {vcpu:,} vCPU, with the redundancy the cloud
-      figure does not include.</p></div>
-      <div class="pcard"><h4>Rented by the month</h4><p>The same class of machine from a dedicated-host
-      provider is {money(d['infrastructure'])}, and removes the racking, the spares and half a person:
-      <b>{money(d['total'])}</b> all in. Most of the saving, none of the loading dock, and a supplier
-      you can still leave in thirty days.</p></div>
-      <div class="pcard"><h4>What the difference buys</h4><p>Roughly
-      {money(aws_compute - o['total'])} a month, or {money((aws_compute - o['total']) * 12)} a year,
-      against a capital outlay of {money(n_nodes * COSTS.HARDWARE['node_capex'])} that pays for
-      itself in about {n_nodes * COSTS.HARDWARE['node_capex'] / max(aws_compute - o['total'], 1):.0f}
-      months. Every Move in this book states its own version of this table, and every one of them
-      is a fraction of this.</p></div>
+      <div class="pcard"><h4>Owned, in one quarter rack</h4><p>{money(o['infrastructure'])} of
+      infrastructure - metal amortised over five years, the spare, power, the space, transit, the
+      cross-connect and remote hands - plus {money(o['people'])} of additional salaried time. That
+      salary line is the largest number in this column, and a comparison without it is the reason
+      repatriations get approved and then regretted. Total <b>{money(o['total'])}</b> a
+      month.</p></div>
+      <div class="pcard"><h4>Rented by the month</h4><p>The same class of machine from a
+      dedicated-host provider is {money(d['infrastructure'])}, and removes the racking, the spares
+      and a quarter of a person: <b>{money(d['total'])}</b> all in. At this size that is close to
+      owning, because a quarter rack's fixed costs do not amortise over six machines. You own
+      hardware when the fleet is big enough to carry the room.</p></div>
+      <div class="pcard"><h4>What the difference buys</h4><p>Against a bill of
+      {money(COSTS.BILL_MONTH)} a month, roughly {money(COSTS.BILL_MONTH - o['total'])} a month or
+      {money((COSTS.BILL_MONTH - o['total']) * 12)} a year, for a capital outlay of
+      {money(capex)} &mdash; six machines and a pair of switches &mdash; which pays for itself in
+      about {capex / max(COSTS.BILL_MONTH - o['total'], 1):.0f}
+      months. Every Move states its own version of this table, and every one is a slice of
+      this.</p></div>
     </div>
     <div class="chartwrap">
-      <div class="pkicker" style="margin-bottom:4mm">The same {vcpu:,} vCPU, three ways,
-        per month</div>
-      {cost_chart([('On AWS', aws_compute, 0),
+      <div class="pkicker" style="margin-bottom:4mm">One estate, three ways, per month</div>
+      {cost_chart([('Cloud now', COSTS.BILL_MONTH, 0),
                    ('Owned', o['infrastructure'], o['people']),
                    ('Rented', d['infrastructure'], d['people'])], '100%', '#8A6112')}
     </div>
@@ -507,10 +520,10 @@ def build(moves):
     pages.append(eq_page(
         EQ_ROWS[half:], ' <span style="color:var(--ink4)">II</span>',
         'The edge, the platform, and the three you do not take back',
-        'Three rows here say keep paying, and they are set in red because they are the most '
-        'important lines in the table. A global content network, scrubbing capacity at the edge '
-        'and outbound mail deliverability are not technical problems you have not solved yet. '
-        'They are businesses, and you are not in them.',
+        'The rows that say keep paying are set in red because they are the most important '
+        'lines in the table. A content delivery network, scrubbing capacity at the edge and '
+        'outbound mail deliverability are not technical problems you have not solved yet. They '
+        'are businesses, and you are not in them.',
         'WHAT REPLACES WHAT &nbsp;·&nbsp; II'))
 
     # ---------- one checklist page per stage
@@ -527,20 +540,16 @@ def build(moves):
             f'<span class="pn">{pageno[m["num"]]}</span></div>' for m in ms)
 
     LEGEND = {
-        'Iron': 'Servers, disks, switches and optics, chosen against your numbers and '
-                'burned in before anything trusts them.',
-        'Site': 'The facility, the contract and the power. The Part where a mistake costs '
-                'a lorry rather than a deploy.',
-        'Cluster': 'The OS, the control plane, the network and the disks. Nothing here moves '
-                   'a workload, and everything here decides how the rest goes.',
-        'Data': 'State, and the way back from moving it. The longest overlaps and the most '
-                'rehearsal in the book.',
-        'Edge': 'Addresses, balancers, DNS and certificates - and the three things you keep '
-                'paying somebody else to do.',
-        'Platform': 'Builds, registries, secrets, identity and observability. What your own '
-                    'engineers actually touch.',
-        'Watch': 'Upgrades, on-call, capacity and compliance. The Part that decides whether '
-                 'this was a good idea.',
+        'Decide': 'The invoice, the inventory and the comparison with the salary line in '
+                  'it. Three Moves, about a week, and permission to stop.',
+        'Buy': 'The specification, the machines, the space and everything with a lead '
+               'time. The stage where a mistake costs a lorry rather than a deploy.',
+        'Build': 'Racking, the network, the cluster and the disks. Nothing here moves a '
+                 'workload, and everything here decides how the rest goes.',
+        'Move': 'Images and secrets, the first service, the buckets and the database. The '
+                'longest overlaps and the most rehearsal in the book.',
+        'Run': 'The edge, the cutover, the backups you have restored, the pager, and the '
+               'account you finally close.',
     }
     legend = ''.join(
         f'<div class="lg"><h5 style="color:{LAYERS[k]["color"]}">{icon(LAYERS[k]["key"], "4.2mm")}'
@@ -736,8 +745,8 @@ def build(moves):
 
     def derive_trio(ms):
         """Three Moves worth doing first: the safest start, the biggest saving,
-        and whatever the Part opens with. Used until part_trios.py names them by
-        hand, and de-duplicating because a Part can be short enough that the three
+        and whatever the stage opens with. De-duplicated, because a stage can be
+        short enough that the three
         rules pick the same Move twice."""
         order = []
         for cand in (sorted(ms, key=lambda m: (m['risk'] != 'Low', m['cutover'])),
@@ -815,7 +824,7 @@ def build(moves):
       That is rather the point.</p>
       <div class="hrule" style="margin:0 0 5mm"></div>
       <div class="colo-grid">
-        <div><h6>The book</h6><p>{len(moves)} Moves across five Parts.
+        <div><h6>The book</h6><p>{len(moves)} Moves across five stages.
         {zero} cost no downtime at all, {oneway} cannot be undone, and the whole book executed
         end to end costs {hours_saved(moves)} minutes of user-visible outage.</p></div>
         <div><h6>The type</h6><p>Set in Archivo, drawn by Omnibus-Type, and JetBrains Mono,
