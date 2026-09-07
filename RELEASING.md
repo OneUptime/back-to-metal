@@ -63,10 +63,13 @@ before it goes out.
 
 ### The deploy credentials
 
-The workflow needs one repository secret, **`FIREBASE_SERVICE_ACCOUNT`**, holding the whole JSON
-key of a service account in the `back-to-metal` project with the **Firebase Hosting Admin**
-role. Nothing else in the pipeline needs a secret — the GitHub release uses the token the
-workflow is already given.
+The workflow needs one repository secret to deploy, and takes either of two. Nothing else in
+the pipeline needs a secret — the GitHub release uses the token the workflow is already given.
+
+**`FIREBASE_SERVICE_ACCOUNT`** is the one to use. It holds the whole JSON key of a service
+account scoped to the `back-to-metal` project with the **Firebase Hosting Admin** role, so a
+leak costs you this project's hosting and nothing else. The Firebase CLI cannot mint one;
+`gcloud` does:
 
 ```bash
 gcloud iam service-accounts create back-to-metal-deploy \
@@ -84,9 +87,26 @@ rm key.json
 ```
 
 Delete the local copy the moment it is in the secret; it is a long-lived credential to a
-project that publishes under a company domain. `firebase init hosting:github` will mint the same
-thing through a browser if you would rather not use `gcloud`, but it names the secret after the
-project — rename it to `FIREBASE_SERVICE_ACCOUNT`, which is what this workflow reads.
+project that publishes under a company domain.
+
+`firebase init hosting:github` mints the same thing through a browser if you would rather not
+use `gcloud`, and sets the GitHub secret itself — but it names the secret after the project
+(`FIREBASE_SERVICE_ACCOUNT_BACK_TO_METAL`) and offers to write workflow files of its own.
+Rename the secret to `FIREBASE_SERVICE_ACCOUNT` and decline the workflows.
+
+**`FIREBASE_TOKEN`** is the fallback, and it is one command:
+
+```bash
+firebase login:ci
+```
+
+It prints a token; paste that into a repository secret called `FIREBASE_TOKEN`. Understand what
+you are pasting: it is a refresh token for **your whole Google account**, not for this project,
+and `--token` is marked deprecated in the CLI and will be removed in some future major version.
+Use it to get a release out, then move to the service account.
+
+The workflow prefers the service account when both are set, and says in the log which one it
+used.
 
 ## Publishing the website by hand
 

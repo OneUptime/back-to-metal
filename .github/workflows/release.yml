@@ -180,16 +180,25 @@ jobs:
           PY
           echo "version=$(python3 -c "import json;print(json.load(open('package.json'))['version'])")" >> "$GITHUB_OUTPUT"
 
+      # Two ways to authorise a deploy, because the two ways of getting one are
+      # very different amounts of work. A service account is scoped to this
+      # project and is what a pipeline should use; a CI token is one command and
+      # is what somebody reaches for at 03:00 when the pipeline is the thing
+      # that is broken.
       - name: Check the deploy credentials are present
         env:
           KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
-          if [ -z "$KEY" ]; then
-            echo "::error::The repository secret FIREBASE_SERVICE_ACCOUNT is not set, so"
+          if [ -n "$KEY" ]; then
+            echo "Deploying as the service account in FIREBASE_SERVICE_ACCOUNT."
+          elif [ -n "$TOKEN" ]; then
+            echo "Deploying with the CI token in FIREBASE_TOKEN."
+          else
+            echo "::error::Neither FIREBASE_SERVICE_ACCOUNT nor FIREBASE_TOKEN is set, so"
             echo "::error::this workflow cannot publish. See 'The deploy credentials' in RELEASING.md."
             exit 1
           fi
-          echo "Credentials present."
 
       - name: Publish the website
         id: deploy
@@ -198,6 +207,7 @@ jobs:
           # reproduced is not a deploy. Verified against 15.29.0 on 2026-09-07.
           FIREBASE_VERSION: 15.29.0
           FIREBASE_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-key.json
           PROJECT: ${{ steps.where.outputs.project }}
           SITE: ${{ steps.where.outputs.site }}
@@ -205,8 +215,16 @@ jobs:
           VERSION: ${{ steps.where.outputs.version }}
         run: |
           set -euo pipefail
-          printf '%s' "$FIREBASE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
-          trap 'rm -f "$GOOGLE_APPLICATION_CREDENTIALS"' EXIT
+          # Exactly one credential reaches the CLI. Leaving both set would make
+          # which one authorised the deploy a question nobody can answer from
+          # the log.
+          if [ -n "$FIREBASE_KEY" ]; then
+            printf '%s' "$FIREBASE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
+            trap 'rm -f "$GOOGLE_APPLICATION_CREDENTIALS"' EXIT
+            unset FIREBASE_TOKEN
+          else
+            unset GOOGLE_APPLICATION_CREDENTIALS
+          fi
 
           FB="npx --yes firebase-tools@${FIREBASE_VERSION}"
 
