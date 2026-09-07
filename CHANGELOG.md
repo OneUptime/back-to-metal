@@ -5,6 +5,16 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-09-07
+
+### Fixed
+- **The about page printed the PDF and EPUB file sizes,** which made `site/` fail
+  its own reproducibility check and turned the release build red on a commit that
+  had changed nothing. Both artefacts carry a build timestamp, so both are excluded
+  from that check by name — and a size read off their bytes and written into an
+  HTML page walked straight past the exclusion. The cards now carry the trim size
+  and the Move count, which are derived from the sources like everything else.
+
 ## [2.1.0] - 2026-09-07
 
 ### Changed

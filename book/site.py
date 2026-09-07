@@ -78,10 +78,6 @@ def pdf_pages():
     return max(counts) if counts else None
 
 
-def mb(path):
-    return path.stat().st_size / 1e6
-
-
 def fonts_css():
     """Archivo and JetBrains Mono, embedded. Two families: one carries every word,
     the other every number. The 'standard' cut of Archivo is the one with the
@@ -722,18 +718,24 @@ def build_about(moves, T):
     first = moves[0]
     pp = pdf_pages()
 
+    # The page count is derived from the PDF and is stable; the FILE SIZE is not,
+    # and it used to be printed here. Both artefacts carry a build timestamp, so
+    # they are excluded from the committed-site check in CI - and a size read off
+    # their bytes and written into this page walked straight past that exclusion,
+    # so the check failed on a rebuild that had changed nothing. A number nobody
+    # reads is not worth a red build.
     dls = []
     if PDF_SRC.exists():
         dls.append(
             f'<a class="dl" href="{PDF_NAME}" download><b class="dl-t">The print '
             f'interior</b><span class="dl-m">PDF'
             + (f' &middot; {pp} pages' if pp else '')
-            + f' &middot; {mb(PDF_SRC):.1f} MB</span></a>')
+            + ' &middot; 8.25 x 11 in</span></a>')
     if EPUB_SRC.exists():
         dls.append(
             f'<a class="dl" href="{EPUB_NAME}" download><b class="dl-t">The Kindle '
             f'edition</b><span class="dl-m">EPUB &middot; reflowable &middot; '
-            f'{mb(EPUB_SRC):.1f} MB</span></a>')
+            f'{T["n"]} Moves</span></a>')
 
     colophon = ''.join(f'<div><dt class="lbl">{esc(k)}</dt><dd>{v}</dd></div>'
                        for k, v in [
