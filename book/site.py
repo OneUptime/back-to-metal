@@ -138,6 +138,49 @@ def parts_css():
         + ':root{' + spectrum('color') + '}\n}\n')
 
 
+# ------------------------------------------------------------- the reveal list
+# THE ONE COPY. This list used to live twice - once as a selector list in
+# style.css and once as a string in app.js - and the two had to agree, because
+# a selector added to the stylesheet and not to the script leaves an element at
+# opacity 0 for ever. So the build owns it and writes both.
+#
+# WHAT IS AND IS NOT ON IT. Only structure arrives: headings, figure strips,
+# rows, tables, charts, controls. Running prose is not on this list and must
+# never be added to it. A paragraph that is invisible until it is scrolled to
+# is a paragraph withheld from somebody reading fast, and this is a book about
+# doing a thing rather than a page about a product - the reader is trying to
+# find out what a Move costs, not to be shown around.
+#
+# It is also a list of LEAVES: a reveal nested inside another reveal adds the
+# two offsets together and reads as a stumble, which is why `.stage-head` is
+# here and `.stage` is not.
+RISE = [
+    '.sect', '.figs', '.summary', '.twenty', '.prog', '.prog-bar',
+    '.cta', '.actions', '.cost-key',
+    '.stage-head', '.mv>li', '.ck', '.symp li', '.pt', '.rules>li',
+    '.shelf', '.dl', '.tablewrap', '.cost', '.rm', '.perm', '.cmp',
+    '.notes>div', '.pre-g', '.mf', '.colo',
+]
+
+
+def rise_css():
+    """The hidden state, and nothing else - the transition that undoes it and
+    the failsafe that guarantees it are both in style.css, where the rest of
+    the motion system is."""
+    sel = ',\n    '.join(RISE)
+    return (
+        '\n/* The reveal list, written by site.py out of RISE so the stylesheet\n'
+        '   and app.js cannot hold different opinions about what is hidden.\n'
+        '   `:where()` keeps this at the specificity of `html.rise` alone, so\n'
+        '   the `.in` rule in style.css outranks it. */\n'
+        '@media (prefers-reduced-motion:no-preference){\n'
+        f'  html.rise :where({sel}){{\n'
+        '    opacity:0;transform:translateY(14px);\n'
+        '    transition:opacity var(--t-rise) var(--e-out),\n'
+        '               transform var(--t-rise) var(--e-out)}\n'
+        '}\n')
+
+
 # ------------------------------------------------------------------ the shell
 # Five items, in the order somebody asks the questions. No rail, no spine, no
 # jump box: with twenty Moves in a fixed order the order IS the navigation, and
@@ -176,11 +219,11 @@ def shell(title, body, depth=0, desc=''):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(title)}</title>
 <meta name="description" content="{attr(desc)}">
-<meta name="theme-color" content="#14181A">
+<meta name="theme-color" content="#0C0F11">
 <link rel="stylesheet" href="{up}assets/style.css{v}">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
 <script>var d=document.documentElement;d.className='js rise';
-window.BTM_RISE=setTimeout(function(){{d.classList.remove('rise')}},2000)</script>
+window.BTM_RISE_T=setTimeout(function(){{d.classList.remove('rise')}},2000)</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to the content</a>
@@ -260,7 +303,8 @@ def moves_index_js(moves):
     # else on the bill, and the script has to be able to tell the difference.
     rows = [[m['num'], page(m)[:-5], m['title'], RM.effort_days(m),
              m['was'], m['now']] for m in moves]
-    return 'window.BTM_MOVES=' + json.dumps(rows, separators=(',', ':')) + ';\n'
+    return ('window.BTM_MOVES=' + json.dumps(rows, separators=(',', ':')) + ';\n'
+            + 'window.BTM_RISE_SEL=' + json.dumps(','.join(RISE)) + ';\n')
 
 
 # ---------------------------------------------------------------- the numbers
@@ -500,11 +544,20 @@ def cost_bars(rows):
         # rather than all at once. It is a number, not a duration: the
         # timing belongs in the CSS with the rest of the timing.
         out.append(f'<text class="cost-l" x="0" y="{y + 11}">{esc(label)}</text>')
-        out.append(f'<rect class="cost-i" style="--i:{k}" x="0" y="{y + 20}" '
+        # THE TWO SEGMENTS ARE ONE GROUP, and the group is what the
+        # stylesheet grows. Scaling each rect from its own left edge
+        # tears the bar: the salaried segment starts at x=wi, so while
+        # the metal segment is still short the two of them are drawing
+        # with a widening gap between them, for the whole of the
+        # animation. One group, one transform, and the segments keep
+        # their relationship at every frame of it.
+        out.append(f'<g class="cost-bar" style="--i:{k}">')
+        out.append(f'<rect class="cost-i" x="0" y="{y + 20}" '
                    f'width="{wi:.1f}" height="{BAR}"/>')
         if wp > 0:
-            out.append(f'<rect class="cost-p" style="--i:{k}" x="{wi:.1f}" '
+            out.append(f'<rect class="cost-p" x="{wi:.1f}" '
                        f'y="{y + 20}" width="{wp:.1f}" height="{BAR}"/>')
+        out.append('</g>')
         out.append(f'<text class="cost-v" style="--i:{k}" x="{end + 9:.1f}" '
                    f'y="{y + 36}">{mny(infra + people)}</text>')
         # The gap, and what it is worth. Only where there is room to set the
@@ -1066,7 +1119,8 @@ def main():
     ASSETS.mkdir(parents=True)
 
     (ASSETS / 'style.css').write_text(
-        fonts_css() + (HERE / 'web' / 'style.css').read_text() + parts_css(),
+        fonts_css() + (HERE / 'web' / 'style.css').read_text()
+        + parts_css() + rise_css(),
         encoding='utf-8')
     shutil.copy(HERE / 'web' / 'app.js', ASSETS / 'app.js')
     (ASSETS / 'moves-index.js').write_text(moves_index_js(moves), encoding='utf-8')

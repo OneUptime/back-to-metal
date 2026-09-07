@@ -251,32 +251,20 @@
      only thing that earns this module the right to hide anything.
      ================================================================== */
   const root = document.documentElement;
-  clearTimeout(window.BTM_RISE);
+  clearTimeout(window.BTM_RISE_T);
 
   /* Asked once, and asked again if the reader changes it mid-visit. A
      reader who has said they do not want motion gets the finished page
      immediately: nothing hidden, nothing counted up, nothing swept. */
   const still = matchMedia('(prefers-reduced-motion: reduce)');
 
-  /* THE SAME LIST style.css hides under `html.rise`, and the two copies
-     have to agree: a selector added there and not here leaves an element
-     invisible for ever. It is deliberately a list of LEAVES - a reveal
-     inside a reveal double-counts the offset and reads as a stumble - so
-     `.stage-head` is named and `.stage` is not, and the Moves under it
-     arrive as their own row each. */
-  const RISE = [
-    '.sect', '.hero>p', '.band>p', '.sec>p', '.callout', '.note', '.figs',
-    '.summary', '.cta', '.actions', '.twenty', '.prog', '.prog-bar',
-    '.stage-head', '.mv>li', '.ck', '.symp li', '.pt', '.rules>li', '.shelf',
-    '.dl', '.tablewrap', '.cost', '.rm', '.perm', '.cmp', '.clouds li',
-    /* The runbook is NOT on this list, and that is deliberate. Every
-       other page here is read; a Move page is worked, open beside a
-       terminal, and a step that fades in as you scroll to it is a step
-       arguing with the person running it. The runbook's motion is the
-       gutter rule filling as steps are ticked, and that is all. */
-    '.notes>div', '.pre-g', '.mh>*', '.mf', '.colo',
-    '.onramp li', '.tools li', '.cost-key', '.turnoff', '.needs', '.unlocks',
-  ].join(',');
+  /* THE LIST THE BUILD WROTE. It is the same string site.py used to
+     write the hiding rule into the stylesheet, so the two cannot
+     disagree - which they could, and did, while this file kept a copy.
+     If it is missing, the corpus script did not load, and the honest
+     thing is to reveal everything rather than to observe a list that
+     is not the one doing the hiding. */
+  const RISE = window.BTM_RISE_SEL || '';
 
   /* One shot, and then it stops watching. A reveal that re-ran on the
      way back up the page would be a page that never settles. */
@@ -286,7 +274,7 @@
   };
 
   const armRise = () => {
-    if (still.matches || !('IntersectionObserver' in window)) {
+    if (!RISE || still.matches || !('IntersectionObserver' in window)) {
       root.classList.remove('rise');
       return;
     }
