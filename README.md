@@ -31,7 +31,8 @@ undone on a Wednesday, and you can stop after any of them and still be somewhere
 The first edition of this book had 122 Moves. It was correct, and it was 975 person-days and
 four and a half years of elapsed time for three engineers, which is not a plan a startup can
 act on. This edition is the same argument at a size somebody can finish: the whole thing is
-around 70 person-days, and most of the calendar is waiting for hardware rather than working.
+around eighty person-days — the table at the foot of this file has the exact figure, computed
+from the Move files — and most of the calendar is waiting for hardware rather than working.
 
 The exact figures are in the table at the foot of this file, and they are computed from the
 Move files rather than typed.
@@ -159,7 +160,8 @@ give credit.
 | Cannot be undone | 0 |
 | Risk | 3 low, 7 medium, 10 high |
 | Dependencies | 31, every one pointing backwards |
-| Illustrative monthly saving | $20,123, net of what the cage adds |
+| Line savings across the Moves | $20,123 a month, before the salary and the cage |
+| Saving, with everything counted | $10,538 a month &mdash; $126,456 a year, 44 per cent of a $24,000 bill |
 
 Every Move names the real service on AWS, Google Cloud and Azure, and the one thing that differs on each.
 

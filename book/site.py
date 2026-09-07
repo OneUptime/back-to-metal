@@ -236,10 +236,13 @@ window.BTM_RISE_T=setTimeout(function(){{d.classList.remove('rise')}},2000)</scr
 def bar(depth, first, active=''):
     """The header: a wordmark, five links, and the next Move.
 
-    It is not sticky. Sticky chrome on a page somebody reads for twenty minutes
-    is the thing this edition removed, and the next link is worth more at the
-    top of the page you arrived on than pinned over the paragraph you are
-    reading."""
+    It IS sticky, and for two editions this docstring said it was not. Sticky
+    chrome on a page somebody reads for twenty minutes was the argument
+    against; the answer is that this is twenty-five pages in a fixed order, the
+    header carries the one thing that knows where the reader is in them, and
+    somebody four screens down a Move page had to go back to the top to use it.
+    It pays for the space by halving its padding once the masthead is behind
+    it, and on a phone it folds the nav row away entirely."""
     up = '../' * depth
     links = ''.join(
         f'<a href="{up}{h}"' + (' class="on" aria-current="page"' if h == active else '')
@@ -342,6 +345,23 @@ def totals(moves):
 
     owned = COSTS.owned_month(R['nodes'], R['spares'], retained)
     dedicated = COSTS.dedicated_month(R['nodes'] + R['spares'], retained)
+
+    # ROUND ONCE, HERE, AND MAKE EVERY TOTAL THE SUM OF THE ROUNDED PARTS.
+    # Every figure on this site is printed to the nearest dollar, and a column
+    # of rounded parts under a rounded total does not add up: $3,235 + $7,917 +
+    # $2,310 is $13,462 and the total printed $13,461. A reader doing exactly
+    # what costs.py's docstring invites - checking the arithmetic - found the
+    # first sum they tried was a dollar out, on a page whose whole argument is
+    # that other people's comparisons are sloppy. So the parts are the truth
+    # and the total is their sum, everywhere, including the year and the
+    # percentage.
+    def dollars(c):
+        i, pp, k = (round(c['infrastructure']), round(c['people']),
+                    round(c['retained']))
+        return {'infrastructure': i, 'people': pp, 'retained': k,
+                'total': i + pp + k}
+
+    owned, dedicated = dollars(owned), dollars(dedicated)
     save = COSTS.BILL_MONTH - owned['total']
     return {
         'n': len(moves),
@@ -355,6 +375,7 @@ def totals(moves):
         'dedicated': dedicated,
         'retained': retained,
         'save': save,
+        'year': save * 12,
         'pct': save / COSTS.BILL_MONTH * 100 if COSTS.BILL_MONTH else 0,
         'zero': sum(1 for m in moves if m['cutover'] == 0),
         'cutover': sum(m['cutover'] for m in moves),
@@ -639,9 +660,16 @@ def build_cost(moves, T):
         + '</tbody></table>')
 
     # Where the money goes: every Move, in book order, with the slice of the
-    # bill it takes off. The rows sum to less than the headline saving and
-    # should - some Moves buy safety rather than money, and they say so with
-    # an em dash rather than a zero.
+    # bill it takes off.
+    #
+    # The rows sum to MORE than the headline saving, and should. This comment
+    # said "less" for two editions and the prose eighty lines down said "more",
+    # which is how a comment starts lying to the next person: these are LINE
+    # savings, taken before the salaried time, before the whole cost of running
+    # your own site, and before the retained lines the comparison puts back.
+    # Some Moves buy safety rather than money and say so with an em dash; Move
+    # 04 is the one that states a real zero, because it trades $1,400 for the
+    # same $1,400 on purpose.
     perm_rows, tw, tn = [], 0.0, 0.0
     for m in moves:
         if m['was'] is not None and m['now'] is not None:
@@ -681,13 +709,13 @@ def build_cost(moves, T):
 <main id="main" class="shell">
 {hero('What it costs',
       f'{mny(bill)} a month becomes {mny(owned["total"])} with the salary counted. '
-      f'That is {mny(T["save"] * 12)} a year, or {T["pct"]:.0f} per cent of the bill.',
+      f'That is {mny(T["year"])} a year, or {T["pct"]:.0f} per cent of the bill.',
       f'The reference build is {REFERENCE["nodes"]} machines and a spare on the shelf, '
       f'in one cage. Every figure below is a public list price observed while writing, '
       f'against a bill this size. Substitute your own and the shape does not change.',
       'page',
       figs([(mny(bill), 'Cloud, a month'), (mny(owned['total']), 'Owned, a month'),
-            (mny(T['save'] * 12), 'Saved a year'), (f'{T["pct"]:.0f}%', 'Off the bill')]))}
+            (mny(T['year']), 'Saved a year'), (f'{T["pct"]:.0f}%', 'Off the bill')]))}
 
 {band('compare', 'The comparison, with the salary in it',
       cmp_html
@@ -740,7 +768,14 @@ def build_cost(moves, T):
       f'<p class="note">Every figure on this page is a dated list-price observation, '
       f'not a quotation. Cloud prices are on-demand and undiscounted on purpose; a '
       f'reader with a commitment discount should substitute their own effective rate, '
-      f'and a reader without one is genuinely paying this.</p>')}
+      f'and a reader without one is genuinely paying this.</p>'
+      f'<p class="callout"><span class="lbl">The rented column, with a warning</span> '
+      f'The monthly rent of one dedicated machine is the single figure in this book '
+      f'that a re-check could not settle: the cheapest European provider and a survey '
+      f'of three others disagree by a factor of two or three on the same specification, '
+      f'which is wide enough to decide the question on its own. The number above is the '
+      f'last one observed and it is not a quotation. Get a quote before you let this '
+      f'column decide anything &mdash; Move 07 step 6 is where to do it.</p>')}
 </main>
 {foot(0)}"""
     (SITE / 'cost.html').write_text(shell(

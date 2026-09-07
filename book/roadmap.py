@@ -295,8 +295,16 @@ def svg(moves, workers=2, w=1180, week=WEEK, href=None):
     # the accessibility tree while leaving them in the tab order as silent
     # stops. The printed drawing has nothing to click, so there it is an image.
     role = 'img' if href is None else 'group'
+    # EVERYTHING IS INSIDE ONE GROUP, and the group exists so the website can
+    # wipe the drawing in without clipping the <svg> itself. It matters more
+    # than it looks: an IntersectionObserver measures the target's box AFTER
+    # its own clip-path, so an element hidden by being clipped to zero width
+    # reports an intersection of nothing, is never seen to arrive, and is
+    # never revealed. That shipped once. The observer watches the <svg>; the
+    # clip belongs to the <g>.
     return (f'<svg class="rm" viewBox="0 0 {w} {height:.0f}" width="100%" '
             f'style="height:auto;display:block" role="{role}" '
             f'aria-label="The roadmap: {len(moves)} Moves across {len(st)} Stages, '
             f'{sc["weeks"]:.0f} weeks with {workers} engineers">'
-            + ''.join(ruler) + ''.join(body) + '</svg>')
+            f'<g class="rm-in">'
+            + ''.join(ruler) + ''.join(body) + '</g></svg>')

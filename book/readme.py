@@ -16,6 +16,8 @@ sys.path.insert(0, str(HERE))
 
 from parse import load_all, LAYERS, ORDER
 from deps import DEPS
+from kit import REFERENCE
+import costs as COSTS
 import roadmap as RM
 
 MARKER = '<!-- generated: everything below this line is written by book/readme.py -->'
@@ -35,7 +37,22 @@ def main():
     oneway = sum(1 for m in moves if m['oneway'])
     risks = Counter(m['risk'] for m in moves)
     total_cut = sum(m['cutover'] for m in moves)
-    saved = sum((m['was'] or 0) - (m['now'] or 0) for m in moves)
+    # LINE savings: what the Move files themselves state, Move 07's cage
+    # included as the cost it is. It is NOT the saving the book headlines, and
+    # this file printed it under the heading "Illustrative monthly saving" for
+    # two editions - which is the exact error the cost page calls the reason
+    # repatriations get approved and then regretted, committed by the same
+    # repository, on its own front page. Both numbers now appear, each under
+    # the name of what it actually is.
+    line_saved = sum((m['was'] or 0) - (m['now'] or 0) for m in moves)
+
+    # The real one, computed the way the site and the printed book compute it:
+    # the metal, the salaried time and the lines that never come home.
+    retained = sum(m['now'] for m in moves
+                   if m['was'] is not None and m['now'] is not None)
+    _o = COSTS.owned_month(REFERENCE['nodes'], REFERENCE['spares'], retained)
+    owned = round(_o['infrastructure']) + round(_o['people']) + round(_o['retained'])
+    saved = COSTS.BILL_MONTH - owned
 
     out = [MARKER, '']
     out.append('## The book at a glance')
@@ -60,12 +77,13 @@ def main():
                f'{risks["High"]} high |')
     out.append(f'| Dependencies | {sum(len(v) for v in DEPS.values())}, every one '
                f'pointing backwards |')
+    if line_saved:
+        out.append(f'| Line savings across the Moves | ${line_saved:,.0f} a month, '
+                   f'before the salary and the cage |')
     if saved:
-        # Net, not gross: Move 07 adds a cost line rather than removing one, and a
-        # figure that quietly drops it would be the first number in this repository
-        # that flattered the argument.
-        out.append(f'| Illustrative monthly saving | ${saved:,.0f}, net of what the '
-                   f'cage adds |')
+        out.append(f'| Saving, with everything counted | ${saved:,.0f} a month '
+                   f'&mdash; ${saved * 12:,.0f} a year, {saved / COSTS.BILL_MONTH * 100:.0f} '
+                   f'per cent of a ${COSTS.BILL_MONTH:,.0f} bill |')
     out.append('')
     out.append('Every Move names the real service on AWS, Google Cloud and Azure, and the one '
                'thing that differs on each.')

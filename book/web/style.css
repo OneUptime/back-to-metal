@@ -262,15 +262,30 @@ body::after{opacity:.032;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 
   /* Two drawings do not rise, because they have motion of their own
      and a translate on top of it reads as two things happening. They
-     stay on the reveal list because `.in` is what starts them. */
-  html.rise :where(.cost,.rm){transform:none}
+     stay on the reveal list because `.in` is what starts them.
+
+     NOT wrapped in :where(). The rule that hides them is written by
+     site.py out of RISE and appended AFTER this file, so at equal
+     specificity it would win on source order; at (0,2,1) against its
+     (0,1,1) this wins wherever it is written. */
+  html.rise .cost,html.rise .rm{transform:none}
+
   /* The roadmap wipes left to right in schedule order - which is the
      order it is read in, and the order the work actually happens in.
      A little past the right edge, so the last bar's end is not shaved
-     by a clip that stops exactly on it. */
-  html.rise .rm{clip-path:inset(0 100% 0 0)}
-  html.rise .rm.in{clip-path:inset(0 -2% 0 0);
-    transition:clip-path 1150ms var(--e-out),opacity var(--t-rise) var(--e-out)}
+     by a clip that stops exactly on it.
+
+     THE CLIP IS ON THE INNER GROUP, NEVER ON THE <svg>. This was on
+     the <svg> for one release and the chart was invisible for the
+     whole of it: an IntersectionObserver measures its target AFTER
+     the target's own clip-path, so an element clipped to zero width
+     reports an intersection rectangle of 0x0 and isIntersecting
+     false, wherever it actually is on the screen. It was never seen
+     to arrive, so it was never revealed, and the only readers who
+     saw the drawing were the ones whose scripting was broken. */
+  html.rise .rm .rm-in{clip-path:inset(0 100% 0 0)}
+  html.rise .rm.in .rm-in{clip-path:inset(0 -2% 0 0);
+    transition:clip-path 1150ms var(--e-out)}
 
   /* The cost bars draw themselves when the chart arrives, in the
      order the rows are read. */
@@ -819,17 +834,22 @@ html.scrolled .wm{font-size:16px}
    a tick that draws itself, it is the same object at both sizes, and
    it is still an <input type=checkbox> underneath: it focuses, it
    toggles from the keyboard, and a form reset resets it. */
+/* --ink4 rather than --rule for the resting border. A control's boundary
+   needs 3:1 and --rule measures 1.90:1 against the page, so an unticked
+   box was effectively invisible and the checklist read as a plain list
+   of titles. --ink4 is 5.53:1, and it leaves --ink3 for hover and the
+   Stage colour for checked as the two brighter steps above it. */
 .ck-box,.kt-box{appearance:none;-webkit-appearance:none;
   width:var(--tick);height:var(--tick);margin:0;flex:none;
   display:inline-grid;place-content:center;cursor:pointer;
-  border:1px solid var(--rule);background:transparent;
+  border:1px solid var(--ink4);background:transparent;
   transition:border-color var(--t-quick) linear,
              background-color var(--t-quick) linear}
 .ck-box::before,.kt-box::before{content:'';width:5px;height:10px;
   margin-top:-2px;border:solid var(--on-c);border-width:0 2px 2px 0;
   transform:rotate(45deg) scale(0);
   transition:transform var(--t-move) var(--e-out)}
-.ck:hover .ck-box,.kt:hover .kt-box{border-color:var(--ink3)}
+.ck:hover .ck-box,.kt:hover .kt-box{border-color:var(--ink)}
 /* A ticked box is lit, so it glows in its own colour rather than just
    filling. It is the only indicator on the site that a reader turns on
    themselves, and it should look like it went on. */
@@ -1082,7 +1102,11 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
   /* The runbook gutter rotates: 44px back into the measure, taking it
      from about thirty characters to about forty-four. */
   .steps>li{grid-template-columns:minmax(0,1fr)}
-  .steps::before{display:none}
+  /* Both rules of the gutter go, not just the track. Hiding the track and
+     leaving the fill drew a bright Stage-coloured line straight through the
+     body text of every ticked step, with nothing behind it to explain it.
+     At this width the done state is the border-top below. */
+  .steps::before,.steps::after{display:none}
   .steps>li>div{margin-left:0;padding:var(--s2) 0 0;border-left:0;
     border-top:3px solid transparent}
   .steps>li.done>div{border-left-color:transparent;border-top-color:var(--c)}
@@ -1093,6 +1117,10 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
      answer was not. */
   .cost-l{font-size:18px}
   .cost-v{font-size:20px}
+  /* The saving was left out of this bump and rendered at about 6px - the
+     two numbers that are the whole argument of the page, smaller than
+     anything else on it. */
+  .cost-s{font-size:19px}
   .cmp,.eq{min-width:0}
   .cmp,.cmp tbody,.cmp tr,.cmp th,.cmp td,
   .eq,.eq tbody,.eq tr,.eq td{display:block;width:auto}
@@ -1105,6 +1133,18 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
     text-transform:uppercase;color:var(--ink3)}
   .perm,.nums{font-size:var(--t-fine)}
   .tablewrap{overflow-x:visible}
+  /* THE TWENTY SCROLLS ON A PHONE INSTEAD OF DIVIDING. Twenty bars across
+     360px is an 11.8px target with a 3px gap - under half the 24px floor,
+     so tapping Move 12 landed on 11 or 13 - and the two-digit ordinals ran
+     together into five unbroken runs of eight digits. Fixed-width cells in
+     a scroller give every bar a real target and every number its own room;
+     the strip is a contents page, and a contents page is allowed to be
+     longer than the screen. */
+  .twenty{overflow-x:auto;gap:var(--s1);
+    scroll-snap-type:x proximity;overscroll-behavior-x:contain}
+  .twenty:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .tw{flex:0 0 30px;scroll-snap-align:start}
+  .tw.first{margin-left:var(--s3)}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;
@@ -1154,7 +1194,11 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
      stays - but flat, at a fixed height, and with the ink put back. */
   .twenty{break-inside:avoid}
   .tw{grid-template-rows:52px auto}
-  .tw i{opacity:1;background:var(--c);filter:none}
+  /* Backgrounds are dropped by default in print, so the bars came out as
+     twenty hairlines under a caption describing a chart. The outline
+     carries the height whether or not the printer is told to ink it. */
+  .tw i{opacity:1;background:var(--c);filter:none;border:1px solid var(--c);
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
   .tw b{color:#3A3A3A}
   .twenty-k{margin-top:var(--s4)}
   /* The masthead's metal is a gradient clipped to the glyphs, and on

@@ -444,8 +444,17 @@ def build(moves):
     # same reason as every other number in this book.
     retained = sum(m['now'] for m in moves
                    if m['was'] is not None and m['now'] is not None)
-    o = COSTS.owned_month(R['nodes'], R['spares'], retained)
-    d = COSTS.dedicated_month(n_nodes + R['spares'], retained)
+    # Rounded once, with every total the sum of its own rounded parts - the
+    # printed page quotes all four to the dollar, and a column that does not
+    # add up is the first thing a sceptic finds. See site.totals().
+    def dollars(c):
+        i, pp, k = (round(c['infrastructure']), round(c['people']),
+                    round(c['retained']))
+        return {'infrastructure': i, 'people': pp, 'retained': k,
+                'total': i + pp + k}
+
+    o = dollars(COSTS.owned_month(R['nodes'], R['spares'], retained))
+    d = dollars(COSTS.dedicated_month(n_nodes + R['spares'], retained))
     capex = ((n_nodes + R['spares']) * COSTS.HARDWARE['node_capex']
              + COSTS.HARDWARE['switch_capex'])
     vcpu = n_nodes * R['cores_per_node'] * 2

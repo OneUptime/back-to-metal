@@ -38,10 +38,13 @@ jobs:
       - name: Install Chromium
         run: python -m playwright install --with-deps chromium
 
-      # The two gates. verify.py checks the shape of every Move file; audit.py
-      # checks the content — undeclared tools, unguarded destructive steps,
-      # unpinned installs, drifted service names, the dependency graph and
-      # repeated prose. Both must be clean.
+      # The three gates. verify.py checks the shape of every Move file;
+      # audit.py checks the content — undeclared tools, unguarded destructive
+      # steps, unpinned installs, drifted service names, the dependency graph
+      # and repeated prose. webcheck.py, below, opens the built site in a real
+      # browser and asks the one question the other two cannot: after a reader
+      # has scrolled a page, is anything on it still invisible? All three must
+      # be clean.
       - name: Verify Move structure
         run: make verify
 
@@ -53,6 +56,9 @@ jobs:
 
       - name: Build the site
         run: make site
+
+      - name: Drive the site in a browser
+        run: make webcheck
 
       # moves/ is the source of truth and site/ is generated from it, so a commit
       # that changes one without regenerating the other has drifted. The PDF and

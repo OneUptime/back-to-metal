@@ -5,6 +5,96 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [3.0.1] - 2026-09-07
+
+3.0.0 shipped with the roadmap on the front page invisible, and twenty-one
+other defects an adversarial review found and reproduced. This fixes them, and
+adds the gate that would have caught the first one.
+
+### Fixed
+
+- **The roadmap was invisible for the whole of 3.0.0.** The one drawing of the
+  20 Moves across 34 weeks rendered as a blank 153px band under its own
+  heading, above a caption describing a chart that was not there, for every
+  reader whose scripting worked — and only appeared for readers whose scripting
+  was broken. Its hidden state was a `clip-path` on the `<svg>` itself, and an
+  IntersectionObserver measures its target **after** the target's own clip, so
+  the observer saw an intersection rectangle of 0×0 and `isIntersecting: false`
+  wherever the chart actually was on screen. It was never seen to arrive, so it
+  was never revealed. The wipe now lives on a `<g>` inside the SVG; the
+  observer watches the SVG, which is never clipped.
+- **A new gate, `book/webcheck.py`, and `make webcheck`.** It drives the built
+  site in a real browser, scrolls each of the seven page types the way a reader
+  would, and fails if anything the build hid is still invisible at the end —
+  plus the reduced-motion and app.js-blocked paths, and horizontal overflow at
+  390px. Every check that ran before 3.0.0 passed: the markup was right, the
+  CSS parsed, the links resolved, the contrast was fine, the element was in the
+  document at its final position. It simply was not on the screen. This is now
+  the third gate, in `make all`, in `make artefacts` and in CI. Confirmed
+  against the bug: reinstating the 3.0.0 clip makes it fail with
+  `index.html: svg.rm is still invisible after the whole page has been scrolled`.
+- **The owned column did not add up.** $3,235 + $7,917 + $2,310 was printed
+  under a total of $13,461. Every figure is rounded to the dollar, so the total
+  has to be the sum of the rounded parts and not the rounded sum — on a page
+  whose argument is that other people's comparisons are sloppy, the first sum a
+  sceptic tries was a dollar out. Rounded once now, in one place, with the year
+  and the percentage derived from it: $13,462 owned, $10,538 saved, 44 per cent.
+- **The README headlined a $20,123 monthly saving** where the book computes
+  $10,538 — the same repository committing the exact error its cost page calls
+  the reason repatriations get approved and then regretted. Both numbers appear
+  now, each under the name of what it is: line savings across the Moves, and
+  the saving with everything counted. Its prose said "around 70 person-days"
+  six lines above its own generated table saying 79.
+- **Keyboard focus landed on rows still at opacity 0.** The reveal holds back
+  anything in the bottom eight per cent of the window, which is right for
+  scrolling and wrong for the Tab key: a reader tabbing down the checklist
+  reached rows they could not see, with an invisible focus ring, and the next
+  Space ticked a Move that gave no visible feedback. Anything focus lands
+  inside is now shown at once, with a `:focus-within` backstop in CSS written
+  out of the same list that does the hiding, so the two cannot drift.
+- **Pressing Back showed a checklist that contradicted itself** — the row
+  struck through and counted, its tick box visibly empty. A restored page is
+  not re-executed; it repaints on `pageshow` now.
+- **Ticking a Move while the summary was on screen left the summary wrong.** A
+  count-up animation in flight kept writing an old number over the new one for
+  the rest of its run. Runs are cancellable now, and a frame that finds the
+  element has been written to by anything else stops.
+- **A missing corpus script painted "0 Moves left" and "$0 still on the
+  table"** above twenty unticked boxes — the opposite of the truth, and the
+  central claim of the book. `paintSummary` now has the guard `paintNext`
+  already had.
+- **Unticked tick boxes were drawn at 1.90:1** against the page — below the 3:1
+  floor for a control boundary, so the checklist read as a plain list of titles
+  and the one thing the page exists to do was invisible until hovered. They are
+  `--ink4` now, at 5.53:1.
+- **The printed cost chart's key overprinted itself.** Labels sat under the
+  start of the segments they named, which works at two segments and collided at
+  three into "INFRASTRUC☒RRIED TIME". It is a measured legend row now, so the
+  three colours are always named — dropping the colliding label would have
+  dropped the salary, which is the argument.
+- **On a phone:** the twenty-Move strip gave each link an 11.8px target with
+  3px between them, under half the 24px floor, and its ordinals ran together
+  into unbroken runs of digits — it scrolls now, with real targets and room for
+  each number; a ticked runbook step drew a bright Stage-coloured line straight
+  through its own body text, because the fill was hidden with the track left
+  behind; and the cost chart's saving figure was left out of the font bump and
+  rendered at about 6px — the two numbers that are the whole argument of the
+  page.
+- **The twenty printed as twenty hairlines**, backgrounds being dropped in
+  print by default, under a caption describing a chart of bars.
+- **The website printed the rented column with no caveat** while the printed
+  interior of the same edition warned about it — the free, linked, most-read
+  artefact was the one stating an unsourceable figure as fact.
+- **Move 07's Swap note compared a whole rented column against an
+  infrastructure-only line**, so a reader with a real quote at the top of the
+  book's own range saw double the cost where the note promised level. It
+  compares like with like now.
+- Smaller: `site.py`'s comment about the Move table still said its rows sum to
+  less than the headline while the prose below said more; `bar()`'s docstring
+  still said the header is not sticky, two editions after it became sticky; and
+  the override keeping the two charts from double-animating was wrapped in
+  `:where()`, so it lost on source order to the rule `site.py` appends.
+
 ## [3.0.0] - 2026-09-07
 
 A fact-check and a redesign. The fact-check moved a headline the book prints on

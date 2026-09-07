@@ -217,23 +217,28 @@ def cost_chart(rows, w='100%', color='#1F4E79', bg='#FBFAF7', line='#DEDCD4'):
             f'<text x="{pad_l + wi + wp + wk + 10:.1f}" y="{y + bar_h * 0.7}" font-size="14" '
             f'fill="{color}" font-family="Inter" font-weight="700">'
             f'${(infra + people + kept) / 1000:,.1f}k</text>')
-    # The key, on the widest bar rather than in a legend of its own. It goes on
-    # the bar with the most SEGMENTS, not the longest one: the cloud bar is the
-    # longest and it is one undivided block, so a key hung under it would name
-    # three colours that are not there to see.
-    wide = max(range(len(rows)),
-               key=lambda k: (sum(1 for v in rows[k][1:] if v),
-                              rows[k][1] + rows[k][2] + kept_of(rows[k])))
-    yk = top + wide * (bar_h + gap) + bar_h + 13
-    out.append(f'<text x="{pad_l}" y="{yk}" font-size="11" fill="{ink4}" font-family="Inter" '
-               f'letter-spacing="1.4">INFRASTRUCTURE</text>')
-    if rows[wide][2]:
-        xk = pad_l + rows[wide][1] * scale + 6
-        out.append(f'<text x="{xk:.1f}" y="{yk}" font-size="11" fill="{ink4}" '
-                   f'font-family="Inter" letter-spacing="1.4">SALARIED TIME</text>')
-    if kept_of(rows[wide]):
-        xk = pad_l + (rows[wide][1] + rows[wide][2]) * scale + 6
-        out.append(f'<text x="{xk:.1f}" y="{yk}" font-size="11" fill="{ink4}" '
-                   f'font-family="Inter" letter-spacing="1.4">STILL RENTED</text>')
+    # The legend goes under the last bar, where there is room for it.
+    yk = top + (len(rows) - 1) * (bar_h + gap) + bar_h + 15
+    # A LEGEND ROW, NOT LABELS ON THE BAR. The labels used to sit under the
+    # start of the segments they named, which reads beautifully at two
+    # segments and broke at three: "INFRASTRUCTURE" is 122px of Inter and the
+    # salaried segment starts 78px along, so the first two overprinted into
+    # "INFRASTRUC(X)RRIED TIME" and the key under the only chart in the cost
+    # argument became unreadable. Dropping the colliding label is worse than
+    # the collision - the one it drops is the salary, which is the argument.
+    # So: a swatch and a word each, laid out left to right on a line of their
+    # own, measured (Inter at 11px with 1.4 of tracking runs about 8.7px a
+    # character) so they cannot touch whatever the segment widths do.
+    keys = [(color, 'INFRASTRUCTURE'), (light, 'SALARIED TIME')]
+    if any(kept_of(r) for r in rows):
+        keys.append((ink4, 'STILL RENTED'))
+    xk = pad_l
+    for swatch, label in keys:
+        out.append(f'<rect x="{xk:.1f}" y="{yk - 8}" width="12" height="8" '
+                   f'fill="{swatch}" rx="1"/>')
+        out.append(f'<text x="{xk + 17:.1f}" y="{yk}" font-size="11" '
+                   f'fill="{ink4}" font-family="Inter" letter-spacing="1.4">'
+                   f'{label}</text>')
+        xk += 17 + len(label) * 8.7 + 26
     return (f'<svg viewBox="0 0 {width} {height + 22}" width="{w}" '
             f'style="height:auto;display:block" aria-hidden="true">{"".join(out)}</svg>')

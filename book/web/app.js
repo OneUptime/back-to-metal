@@ -80,6 +80,19 @@
     $('.next-t', nextLink).textContent = row[2];
   };
 
+  /* Every count-up in flight, by element. A figure that is repainted while
+     its own animation is running - tick a Move with the summary panel on
+     screen and this happens - would otherwise have the next frame of a
+     nine-hundred-millisecond run to an old number written over the top of
+     the new one, and the panel would sit there contradicting the rest of
+     the page until something else repainted it. */
+  const counting = new Map();
+
+  const stopCount = el => {
+    const id = counting.get(el);
+    if (id) { cancelAnimationFrame(id); counting.delete(el); }
+  };
+
   /* ---- the checklist ---------------------------------------------------- */
   const said = $('#ck-said');
   const say = t => { if (said) said.textContent = t; };
@@ -97,7 +110,11 @@
      The build renders the same arithmetic for zero ticks and says so in the
      label, so this only ever continues a sum that is already on the page. */
   const paintSummary = d => {
-    if (!$('#s-left')) return;
+    /* The same guard paintNext has. Without a corpus there is nothing to
+       subtract, and subtracting nothing from nothing printed "0 Moves left"
+       and "$0 still on the table" over twenty unticked boxes - the opposite
+       of the truth, and the central claim of the book. */
+    if (!$('#s-left') || !MOVES.length) return;
     const left = MOVES.filter(r => !d.has(r[0]));
     const days = left.reduce((a, r) => a + r[3], 0);
     /* A Move with an em dash in either half of its trade states no saving, and
@@ -105,10 +122,14 @@
        Moves totals() counts in the build, and reaches $0 at twenty ticks. */
     const save = left.reduce(
       (a, r) => a + (r[4] === null || r[5] === null ? 0 : r[4] - r[5]), 0);
-    $('#s-left').textContent = left.length;
-    $('#s-days').textContent = Math.round(days);
-    $('#s-weeks').textContent = Math.round(days / crew / WEEK);
-    $('#s-save').textContent = money(save);
+    for (const [el, v] of [[$('#s-left'), left.length],
+                           [$('#s-days'), Math.round(days)],
+                           [$('#s-weeks'), Math.round(days / crew / WEEK)],
+                           [$('#s-save'), money(save)]]) {
+      if (!el) continue;
+      stopCount(el);
+      el.textContent = v;
+    }
   };
 
   const bar = $('#prog-bar');
@@ -124,7 +145,7 @@
     if (bar) for (const seg of $$('i[data-n]', bar)) {
       seg.classList.toggle('on', d.has(seg.dataset.n));
     }
-    if (pDone) pDone.textContent = d.size;
+    if (pDone) { stopCount(pDone); pDone.textContent = d.size; }
     paintSummary(d);
     paintNext(d);
   };
@@ -181,6 +202,7 @@
   });
 
   /* ---- the runbook, on a Move page -------------------------------------- */
+  let repaintSteps = null;
   const steps = $('ol.steps[data-n]');
   if (steps) {
     const n = steps.dataset.n;
@@ -227,6 +249,7 @@
       if (sn && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggle(sn); }
     });
     paintSteps();
+    repaintSteps = paintSteps;
   }
 
   /* ---- the kit, on the safety page -------------------------------------- */
@@ -278,6 +301,20 @@
       root.classList.remove('rise');
       return;
     }
+    /* FOCUS OUTRUNS THE OBSERVER. The reveal deliberately holds back
+       anything in the bottom eight per cent of the window, which is right
+       for scrolling and wrong for the Tab key: a keyboard reader moving down
+       the checklist reaches a row that is still at opacity 0, the focus ring
+       is invisible, and the next Space ticks a Move they cannot see. Anything
+       focus lands inside is shown at once and without a delay - it is not
+       arriving, it has been asked for. */
+    document.addEventListener('focusin', e => {
+      const el = e.target && e.target.closest && e.target.closest(RISE);
+      if (el && !el.classList.contains('in')) {
+        el.style.transitionDelay = '0s';
+        show(el);
+      }
+    });
     const io = new IntersectionObserver((entries, obs) => {
       /* ALREADY PAST. An observer only ever reports what is on screen,
          and a browser restoring a scroll position - or a link with a
@@ -331,15 +368,22 @@
     const grouped = digits.includes(',');
     const t0 = performance.now();
     const DUR = 900;
+    let wrote = el.textContent;
     const frame = now => {
+      /* If anything else has written to this element since the last frame,
+         the animation has been overtaken and must not write again. */
+      if (el.textContent !== wrote) { counting.delete(el); return; }
       const t = Math.min(1, (now - t0) / DUR);
       /* Fast, then a long settle: the shape of a mechanical counter
          coming to rest, not a linear sweep. */
       const v = Math.round(end * (1 - Math.pow(1 - t, 4)));
-      el.textContent = pre + (grouped ? v.toLocaleString('en-GB') : v) + post;
-      if (t < 1) requestAnimationFrame(frame);
+      wrote = pre + (grouped ? v.toLocaleString('en-GB') : v) + post;
+      el.textContent = wrote;
+      if (t < 1) counting.set(el, requestAnimationFrame(frame));
+      else counting.delete(el);
     };
-    requestAnimationFrame(frame);
+    stopCount(el);
+    counting.set(el, requestAnimationFrame(frame));
   };
 
   const armCounts = () => {
@@ -388,6 +432,16 @@
   arm();
   addEventListener('scroll', onScroll, { passive: true });
   onScroll();
+
+  /* BACK IS THE COMMONEST JOURNEY ON THIS SITE: open the checklist, follow a
+     Move, tick it at the foot of its page, press Back. A restored page - from
+     the back/forward cache or not - is not re-executed, so the checklist came
+     back with the row struck through and counted, and its tick box empty.
+     Repainting on pageshow re-reads storage and makes the two agree. */
+  addEventListener('pageshow', () => {
+    paint();
+    if (typeof repaintSteps === 'function') repaintSteps();
+  });
 
   /* A reader who turns motion off mid-visit gets the settled page, and
      one who turns it on does not get a page that suddenly hides itself. */
