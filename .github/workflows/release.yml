@@ -1,0 +1,291 @@
+name: Release
+
+# Pushing to `release` publishes the book.
+#
+# It runs the same two gates and the same build as CI, adds the release gate
+# that CI cannot run (a bumped version, a written changelog entry, a tag that is
+# free, an EPUB identifier that has not moved), then publishes the website and
+# cuts a GitHub release with the interior, the Kindle edition, the paperback
+# wrap and the Kindle cover attached.
+#
+# Nothing here does anything a person could not do from a laptop with the
+# commands in RELEASING.md. It does them in one order, every time, from a commit
+# that has been checked.
+
+on:
+  push:
+    branches: [release]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: >-
+          preview publishes the website to an expiring channel URL and cuts no
+          release; live publishes to the real site and cuts the release.
+        type: choice
+        options: [preview, live]
+        default: preview
+
+# One release at a time, and never cancel one that has started: a cancelled
+# deploy leaves the site half-written.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The release gate reads the previous release tag to check the EPUB
+          # identifier has not moved, so it needs the history and the tags.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install fonts
+        run: npm ci
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Chromium
+        run: python -m playwright install --with-deps chromium
+
+      # The same two gates CI runs. A release is not the place to find out that
+      # a Move is malformed.
+      - name: Verify Move structure
+        run: make verify
+
+      - name: Audit Move content
+        run: make audit
+
+      # The gate CI cannot run. CI has to stay green while work is in progress,
+      # which means it cannot demand a bumped version or a written changelog
+      # entry. Here both are exactly the right demand.
+      - name: Check this commit is releasable
+        run: make releasable
+
+      # One invocation, so the book is built once rather than once per goal that
+      # depends on it, and in the order the Makefile says: the site is generated
+      # last because it copies the Kindle edition into itself.
+      - name: Build the book, the covers, the Kindle edition and the site
+        run: make artefacts
+
+      # moves/ is the source of truth and site/ is generated from it, so a
+      # commit that changes one without regenerating the other has drifted.
+      # Releasing from a drifted commit would publish a site nobody reviewed.
+      - name: Check the committed site is up to date
+        run: |
+          CHANGED=$(git status --porcelain -- site/ ':(exclude)site/*.pdf' ':(exclude)site/*.epub')
+          if [ -n "$CHANGED" ]; then
+            echo "::error::site/ is out of date with moves/. Run 'make' and commit the result."
+            echo "$CHANGED"
+            exit 1
+          fi
+          echo "site/ matches the sources."
+
+      - name: Bundle what gets published
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-bundle
+          path: |
+            site/
+            dist/Back-to-Metal.pdf
+            dist/Back-to-Metal.epub
+            dist/cover-paperback.pdf
+            dist/cover-kindle.jpg
+            build/release-notes.md
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    name: Publish
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # Recorded as a deployment, so GitHub shows what is live and where it came
+    # from. Add a protection rule to this environment if a release should need
+    # somebody to approve it first.
+    environment:
+      name: ${{ (github.event_name == 'push' || inputs.publish == 'live') && 'production' || 'preview' }}
+      url: ${{ steps.deploy.outputs.url }}
+
+    permissions:
+      contents: write   # to cut the release and attach the editions
+
+    steps:
+      # Only for firebase.json, .firebaserc and package.json — everything that
+      # gets published comes from the build job's artefact. The token is not
+      # persisted into .git/config: nothing here runs git, and this job runs
+      # third-party npm code with a writable token in scope otherwise.
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      # site/ and dist/ come from the build job rather than being rebuilt, so
+      # what is published is the bytes that were checked. They land beside the
+      # checkout and then replace it outright, rather than being unpacked over
+      # it, so there is no question about which copy is being deployed.
+      - name: Take the bundle from the build
+        uses: actions/download-artifact@v4
+        with:
+          name: release-bundle
+          path: ${{ runner.temp }}/bundle
+
+      - name: Put the built bytes in place of the committed ones
+        run: |
+          set -euo pipefail
+          rm -rf site dist build
+          mv "${{ runner.temp }}/bundle/site" site
+          mv "${{ runner.temp }}/bundle/dist" dist
+          mv "${{ runner.temp }}/bundle/build" build
+          ls -la site/index.html dist/ build/release-notes.md
+
+      - name: Decide where this goes
+        id: where
+        env:
+          EVENT: ${{ github.event_name }}
+          CHOICE: ${{ inputs.publish }}
+        run: |
+          if [ "$EVENT" = "push" ] || [ "$CHOICE" = "live" ]; then
+            echo "live=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "live=false" >> "$GITHUB_OUTPUT"
+          fi
+          # Both the project and the site name are read from .firebaserc rather
+          # than written here twice.
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          rc = json.load(open('.firebaserc'))
+          project = rc['projects']['default']
+          site = rc['targets'][project]['hosting']['book'][0]
+          print(f'project={project}')
+          print(f'site={site}')
+          PY
+          echo "version=$(python3 -c "import json;print(json.load(open('package.json'))['version'])")" >> "$GITHUB_OUTPUT"
+
+      - name: Check the deploy credentials are present
+        env:
+          KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$KEY" ]; then
+            echo "::error::The repository secret FIREBASE_SERVICE_ACCOUNT is not set, so"
+            echo "::error::this workflow cannot publish. See 'The deploy credentials' in RELEASING.md."
+            exit 1
+          fi
+          echo "Credentials present."
+
+      - name: Publish the website
+        id: deploy
+        env:
+          # firebase-tools is pinned rather than floated: a deploy that cannot be
+          # reproduced is not a deploy. Verified against 15.29.0 on 2026-09-07.
+          FIREBASE_VERSION: 15.29.0
+          FIREBASE_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-key.json
+          PROJECT: ${{ steps.where.outputs.project }}
+          SITE: ${{ steps.where.outputs.site }}
+          LIVE: ${{ steps.where.outputs.live }}
+          VERSION: ${{ steps.where.outputs.version }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$FIREBASE_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
+          trap 'rm -f "$GOOGLE_APPLICATION_CREDENTIALS"' EXIT
+
+          FB="npx --yes firebase-tools@${FIREBASE_VERSION}"
+
+          if [ "$LIVE" = "true" ]; then
+            $FB deploy --only hosting:book --project "$PROJECT" --non-interactive \
+                       --message "v${VERSION} from ${GITHUB_SHA}"
+            echo "url=https://${SITE}.web.app" >> "$GITHUB_OUTPUT"
+          else
+            # An expiring channel on a URL that is not the custom domain and is
+            # not indexed — the "preview first" step in RELEASING.md.
+            $FB hosting:channel:deploy "preview-${GITHUB_RUN_ID}" --only book \
+                --project "$PROJECT" --expires 30d --non-interactive --json > channel.json
+            URL=$(python3 -c "import json;d=json.load(open('channel.json'));print(next(iter(d['result'].values()))['url'])")
+            echo "url=$URL" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Proof, rather than a green tick: fetch the page that was just published
+      # and check it is the version this run built.
+      - name: Check what is actually being served
+        env:
+          URL: ${{ steps.deploy.outputs.url }}
+          VERSION: ${{ steps.where.outputs.version }}
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5; do
+            # -w is the only source of the code, so no fallback is appended to
+            # it; -f is dropped because the code is checked on the next line and
+            # a failing curl would otherwise print nothing to compare.
+            CODE=$(curl -sS -o served.html -w '%{http_code}' "$URL/" || true)
+            if [ "$CODE" = "200" ] && grep -q "v${VERSION}" served.html 2>/dev/null; then
+              echo "$URL serves v${VERSION}."
+              exit 0
+            fi
+            echo "attempt ${attempt}: HTTP ${CODE}, version not found yet; waiting."
+            sleep 10
+          done
+          echo "::error::${URL} did not serve v${VERSION} after five attempts."
+          exit 1
+
+      - name: Cut the release
+        if: steps.where.outputs.live == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.where.outputs.version }}
+        run: |
+          set -euo pipefail
+          TAG="v${VERSION}"
+          FILES="dist/Back-to-Metal.pdf dist/Back-to-Metal.epub dist/cover-paperback.pdf dist/cover-kindle.jpg"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            # Re-running a release should correct it rather than fail on it.
+            gh release edit "$TAG" --notes-file build/release-notes.md
+            gh release upload "$TAG" $FILES --clobber
+            echo "Updated the existing $TAG release."
+          else
+            gh release create "$TAG" $FILES \
+              --title "$TAG" \
+              --notes-file build/release-notes.md \
+              --target "$GITHUB_SHA"
+            echo "Created the $TAG release."
+          fi
+
+      - name: Say what happened
+        if: always() && steps.deploy.outputs.url != ''
+        env:
+          URL: ${{ steps.deploy.outputs.url }}
+          VERSION: ${{ steps.where.outputs.version }}
+          LIVE: ${{ steps.where.outputs.live }}
+        run: |
+          {
+            echo "## Back to Metal v${VERSION}"
+            echo
+            if [ "$LIVE" = "true" ]; then
+              echo "Published to the live site: <${URL}>"
+              echo
+              echo "The custom domain <https://backtometal.oneuptime.com> serves the same site."
+              echo "The GitHub release carries the interior, the Kindle edition, the paperback wrap and the Kindle cover."
+            else
+              echo "Published to a preview channel that expires in 30 days: <${URL}>"
+              echo
+              echo "It is not the custom domain and it is not indexed. No release was cut."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

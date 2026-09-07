@@ -4,19 +4,99 @@
 
 1. Bump `version` in `package.json`. Nothing else holds a version — `book/version.py` reads it,
    and it surfaces on the cover foot, in the colophon and in the website footer.
-2. Add a `CHANGELOG.md` entry.
-3. `make` — verify, audit, book, site. All clean.
-4. Commit the regenerated `dist/` and `site/` along with the sources.
-5. Merge to the `release` branch.
+2. Add a `CHANGELOG.md` entry, and move anything sitting under `[Unreleased]` into it.
+3. `make verify audit artefacts` — the gates, then the interior, the covers, the Kindle
+   edition and the site, in that order. `artefacts` exists because the order matters:
+   `site.py` copies the Kindle edition into `site/`, so the EPUB has to be built first or
+   the website ships whichever one was committed last.
+4. `make releasable` — the release gate. It is not part of `make`, because CI has to stay green
+   while work is in progress and this is the one check that must not pass until it should.
+5. Commit the regenerated `dist/` and `site/` along with the sources.
+6. Merge to the `release` branch and push. **That is the release**: pushing to `release` runs
+   `.github/workflows/release.yml`, which does everything below on its own.
 
 `EPUB_ID` in `book/imprint.py` must **not** change. It names the work, not the build: retailers
-and libraries key on it, and a new string presents the next version as a different book.
+and libraries key on it, and a new string presents the next version as a different book. The
+release gate compares it against the previous tag and fails the release if it has moved.
 
-## Publishing the website
+### What `make releasable` checks
+
+`book/release.py`, and every check is read out of a file in the repository:
+
+- the version is a semantic version and is not `0.0.0` (which is what `version.py` returns when
+  it cannot read `package.json` at all);
+- `CHANGELOG.md` has a section for that version, and it is not empty;
+- nothing is still filed under `[Unreleased]` — anything left there ships without being written
+  down as part of anything, which is how a changelog starts lying;
+- `EPUB_ID` has not moved since the previous release tag;
+- the tag `vX.Y.Z` either does not exist or already points at this commit.
+
+It also writes `build/release-notes.md` from the changelog entry, which is what the GitHub
+release is made from. The notes are never typed twice.
+
+## The pipeline
+
+`.github/workflows/release.yml`. Two jobs, and nothing in either that a person could not do
+from a laptop with the commands in this file.
+
+**Build and check** runs `make verify`, `make audit`, `make releasable`, then
+`make artefacts` in one invocation, then the same committed-site comparison CI
+runs — releasing from a drifted commit would publish a site nobody reviewed. What it built is
+handed to the second job as an artefact, so the bytes that get published are the bytes that
+were checked.
+
+**Publish** deploys `site/` to Firebase, fetches the page it has just published and fails
+unless it is serving this version, and then cuts the GitHub release with the interior, the
+Kindle edition, the paperback wrap and the Kindle cover attached. The hardback case is not
+among them: `cover.py` will not guess its dimensions, so until `HC` is measured there is
+nothing to attach. Re-running a release corrects it rather than failing on it.
+
+Two ways to start it:
+
+- **push to `release`** — publishes to the live site and cuts the release;
+- **Actions → Release → Run workflow** — pick `preview` for an expiring channel URL that is not
+  the custom domain and is not indexed, or `live` for the real thing.
+
+The publish job runs in the `production` environment (or `preview`). Add a protection rule to
+that environment in the repository settings if a release should need somebody to approve it
+before it goes out.
+
+### The deploy credentials
+
+The workflow needs one repository secret, **`FIREBASE_SERVICE_ACCOUNT`**, holding the whole JSON
+key of a service account in the `hackerbay-press` project with the **Firebase Hosting Admin**
+role. Nothing else in the pipeline needs a secret — the GitHub release uses the token the
+workflow is already given.
+
+```bash
+gcloud iam service-accounts create back-to-metal-deploy \
+  --project hackerbay-press --display-name "Back to Metal release pipeline"
+
+gcloud projects add-iam-policy-binding hackerbay-press \
+  --member "serviceAccount:back-to-metal-deploy@hackerbay-press.iam.gserviceaccount.com" \
+  --role roles/firebasehosting.admin
+
+gcloud iam service-accounts keys create key.json \
+  --iam-account back-to-metal-deploy@hackerbay-press.iam.gserviceaccount.com
+
+gh secret set FIREBASE_SERVICE_ACCOUNT --repo OneUptime/back-to-metal < key.json
+rm key.json
+```
+
+Delete the local copy the moment it is in the secret; it is a long-lived credential to a
+project that publishes under a company domain. `firebase init hosting:github` will mint the same
+thing through a browser if you would rather not use `gcloud`, but it names the secret after the
+project — rename it to `FIREBASE_SERVICE_ACCOUNT`, which is what this workflow reads.
+
+## Publishing the website by hand
+
+The pipeline above is the ordinary way. These are the same commands, for when you are deploying
+something that is not a release — or when the pipeline itself is what is broken.
 
 The site lives in the **hackerbay-press** Firebase project, on a hosting site of its own
 (`back-to-metal`), so it does not share a release history with anything else in that project.
-`.firebaserc` maps the deploy target `book` to it.
+`.firebaserc` maps the deploy target `book` to it, and both the project and the site name are
+read out of that file by the workflow rather than written down a second time.
 
 **Preview first.** A channel deploy publishes to a temporary URL that expires, is not the
 custom domain, and is not indexed. Use it for anything you would not want a stranger to read:

@@ -35,13 +35,23 @@ make audit      # content — must be clean
 make book       # markdown -> HTML -> PDF -> KDP check
 make site       # markdown -> static site
 make            # verify, audit, book, site
+make artefacts  # book, covers, epub, site — in the order a release needs
+make releasable # the release gate — see RELEASING.md
 ```
+
+`make artefacts` is not `make book site covers epub`. `site.py` copies the interior and the
+Kindle edition out of `dist/` into `site/`, so the EPUB has to exist before the site is
+generated; make walks goals left to right, so the order in that target is load-bearing.
 
 Requires Python 3.9 or newer with `playwright` and a Chromium build available to it. The
 Makefile prefers `.venv/bin/python3` when it exists, so a project virtualenv works without
 activating it. `make clean` removes `build/` and `site/`.
 
 `make verify` and `make audit` are the gate. Both must report zero problems before you commit.
+
+`make releasable` is a third gate, and deliberately not part of `make`: it demands a bumped
+version, a written changelog entry and nothing left under `[Unreleased]`, none of which can be
+true while work is in progress. It runs once, on the commit that is about to be released.
 
 ## Pipeline
 
@@ -71,6 +81,7 @@ agreement:
 | `book/mission.py` | why the book exists |
 | `book/icons.py` | Part glyphs, the cutover dial, the risk bars, the page-anatomy diagram |
 | `book/imprint.py` | title, author, ISBNs, and the economics of selling it |
+| `book/release.py` | the release gate, and the notes the GitHub release is made from |
 | `book/style.css` | print stylesheet |
 | `book/web/` | site stylesheet and scripts |
 
@@ -327,3 +338,19 @@ every push and pull request. It also fails if the committed `site/` does not mat
 sources generate — that check is what stops a Move change landing without its regenerated output.
 The PDF is excluded from that comparison because Chromium stamps a creation date into it, so it
 is not byte-reproducible. The HTML is.
+
+`.github/workflows/release.yml` is the release. Pushing to the `release` branch runs the same
+gates and the same build, adds `make releasable`, publishes `site/` to Firebase Hosting, checks
+the live page is serving that version, and cuts a GitHub release with the interior, the Kindle
+edition, the paperback wrap and the Kindle cover attached. Running it by hand from the Actions tab offers a `preview`
+option that deploys to an expiring channel and cuts nothing.
+
+Two consequences for anything you change here:
+
+- **The release job publishes to a company domain.** It needs one secret,
+  `FIREBASE_SERVICE_ACCOUNT`, and it deploys the artefact the build job checked rather than
+  rebuilding — so what goes out is the bytes that passed the gates. Do not add a step that
+  regenerates output after the check.
+- **Everything the release states is derived.** The version comes from `package.json`, the notes
+  from `CHANGELOG.md`, the Firebase project and site name from `.firebaserc`. If you find
+  yourself typing one of those into the workflow, read it instead.

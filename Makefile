@@ -2,7 +2,12 @@
 # was installed globally or into .venv (see README).
 PY := $(shell [ -x .venv/bin/python3 ] && echo .venv/bin/python3 || echo python3)
 
-.PHONY: all deps verify audit book covers epub pricing amazon site kdp readme clean
+.PHONY: all deps verify audit releasable book covers epub pricing amazon artefacts site kdp readme clean
+
+# The build is a chain of renders, none of which parallelises, and one of the
+# links is an ordering nobody would guess from the dependency graph alone - see
+# `artefacts` below. Serial is what this Makefile means, so it says so.
+.NOTPARALLEL:
 
 all: verify audit book site readme
 
@@ -16,6 +21,13 @@ verify:
 
 audit:
 	$(PY) book/audit.py
+
+# The release gate: a bumped version, a written changelog entry, nothing left
+# under [Unreleased], a tag that is free, and an EPUB identifier that has not
+# moved. Deliberately not part of `all` — CI has to stay green while work is in
+# progress, and this is the one check that must not be true until it is.
+releasable:
+	$(PY) book/release.py --notes build/release-notes.md
 
 book:
 	$(PY) book/build.py
@@ -39,6 +51,15 @@ pricing:
 amazon: verify audit book covers epub
 	$(PY) book/cover.py --require-hardback
 	$(PY) book/pricing.py
+
+# Everything a release publishes, in the order it has to be built.
+#
+# site.py copies the interior and the Kindle edition out of dist/ into site/,
+# because the website offers both as downloads. So the EPUB has to exist before
+# the site is generated, or site/ ships whichever one happened to be committed.
+# `make book site covers epub` looks equivalent and is not: make walks goals
+# left to right, and site.py would run first.
+artefacts: book covers epub site
 
 site: book
 	$(PY) book/site.py
