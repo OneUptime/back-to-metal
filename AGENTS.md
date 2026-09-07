@@ -74,6 +74,15 @@ agreement:
 | `book/style.css` | print stylesheet |
 | `book/web/` | site stylesheet and scripts |
 
+The website is one page per question. `index.html` answers *what do I do next* and shows
+exactly one Move; `checklist.html` is all the Moves in order with a tick box each;
+`roadmap.html` answers *how long*; `plan.html` answers *what if we only do some of it*.
+A figure belongs on the page whose question it answers, and nowhere else — which is why
+the per-Move downtime, risk, effort and wait are on the Move page and inside the
+checklist's opt-in figures strip rather than printed on all 122 rows. On a list, print a
+fact only where it changes what the reader does: 110 of 122 Moves have no downtime, so
+the twelve that do are worth saying and the 110 are not.
+
 ## Move file contract
 
 `moves/NN-slug.md`, numbered contiguously from `01`. `verify.py` enforces all of the following
@@ -135,7 +144,8 @@ Each Part carries a `stage` number, a `doing` verb and a `done` line in `parse.p
 outputs lead with them. The Part names are nouns from the system diagram — Iron, Site, Cluster —
 which is how an architect thinks about an estate and not how somebody halfway through the work
 thinks about their week. "Stage 4 · Make it fit to run production" answers *where am I*; "Part IV
-· Platform" does not. The website's front page is a checklist built on them.
+· Platform" does not. The website's checklist page is built on them, and its front
+page names the stage the Move it is recommending belongs to.
 
 ## Three clouds, one runbook
 

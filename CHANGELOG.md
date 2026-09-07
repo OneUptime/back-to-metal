@@ -5,6 +5,45 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-07
+
+The website, laid out so it can be used rather than read. No Move changed; the book,
+the PDF and the EPUB are the same 122 Moves. This is all presentation.
+
+### Changed
+- **The front page answers one question.** It used to be the whole checklist — seven
+  stages, every Move, and five or six figures on every row, all of it on screen before
+  the reader had decided anything. It now shows the single Move to do next: its number,
+  its title, its hook, the five figures that decide whether it can start today, and a
+  button to open it or tick it off. The build renders that answer, so it is correct with
+  no JavaScript; script only substitutes a later Move once there is a tick to substitute
+  it from.
+- **The 122 rows moved to `checklist.html`,** which is the page you work down. A row is a
+  tick box, a number and a title, and the title is the link. The six figures that used to
+  sit on every row are still rendered on every row and hidden until asked for, because a
+  column that reads `0 min` on 110 rows out of 122 is not information.
+- **A row carries one flag, and only where the fact changes what you do:** `no way back`
+  on the 13 Moves that cannot be undone, `NN min down` on the 12 that take the site off
+  the air. The other 109 rows say nothing.
+- **Each stage names the Moves with a lead time**, because nobody is working during a
+  wait and a Move ordered late holds up everything behind it.
+- **The symptom index moved to the front page,** which is where somebody who arrived with
+  a problem rather than a programme will look. It was below the schedule drawing.
+- **The masthead carries five figures instead of eight** and the navigation five links
+  instead of ten. Person-days and weeks-at-three now live only on the roadmap page, which
+  is the page that question belongs to; the reference pages and the downloads moved to
+  the footer.
+- **The rail appears only where the reader is inside the sequence** — the checklist and a
+  Move — and its links point at the checklist.
+- The "how to use this" box is gone, along with the only bordered tinted panel on the
+  site. The page does the three things it described instead of describing them.
+
+### Fixed
+- The planner did nothing at all: `plan.html` never emitted the `.picker` root that
+  `plan.js` requires, so every click was ignored.
+- An author `display` rule outranked the user agent's `[hidden]`, so the planner's summary
+  showed while it was still empty.
+
 ## [1.0.0] - 2026-09-06
 
 The book itself. All **122 Moves** are written, across seven Parts, each one a complete

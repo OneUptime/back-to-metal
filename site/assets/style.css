@@ -18,12 +18,12 @@
 :root{
   --ink:#0B0E10; --ink2:#333A3F; --ink3:#666E74; --ink4:#98A0A6;
   --bg:#FCFCFB; --fill:#F1F2F2; --rule:#C2C7CA; --rule2:#E3E6E7;
-  --accent:#1F4E79; --rail:196px; --gut:34px;
+  --accent:#1F4E79; --warn:#A32E1F; --rail:196px; --gut:34px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --ink:#E9EBEC; --ink2:#B2B8BC; --ink3:#828A8F; --ink4:#5F686D;
   --bg:#0A0C0D; --fill:#14171A; --rule:#2A3033; --rule2:#1B1F22;
-  --accent:#8FB4D6;
+  --accent:#8FB4D6; --warn:#E39A7B;
 }}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);
@@ -36,6 +36,10 @@ body{margin:0;background:var(--bg);color:var(--ink);
 code{font-size:.87em}
 a{color:inherit}
 img,svg{max-width:100%}
+/* Author display rules outrank the user agent's [hidden], which is why the
+   planner's summary used to show while it was still empty. Say it once here
+   and every hidden element in the site behaves. */
+[hidden]{display:none!important}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.19em;
   text-transform:uppercase;color:var(--ink4)}
@@ -65,12 +69,14 @@ img,svg{max-width:100%}
   border-bottom:2px solid transparent}
 .nav a:hover{color:var(--ink)}
 .nav a.on{color:var(--ink);border-bottom-color:var(--ink)}
-.nav .sp{margin-left:auto}
 
 /* ---------- shell ------------------------------------------------------- */
 .shell{display:grid;grid-template-columns:var(--rail) minmax(0,1fr);
   gap:0 var(--gut);padding:0 var(--gut) 0 var(--gut);align-items:start}
 @media (max-width:940px){.shell{grid-template-columns:1fr}.rail{display:none}}
+/* Only the checklist and a Move carry the rail: on a page you read rather than
+   work through, a second navigation is furniture. */
+.shell.solo{grid-template-columns:minmax(0,1fr)}
 .rail{position:sticky;top:41px;padding:26px 0 40px}
 /* The Part rail is the printed book's fore-edge tab, stood on its side. */
 .rail a{display:block;text-decoration:none;padding:9px 0 9px 12px;
@@ -91,6 +97,7 @@ img,svg{max-width:100%}
   flex-wrap:wrap;padding-bottom:10px;border-bottom:2px solid var(--ink)}
 .rm-head h2{margin:0;font-size:clamp(26px,3.4vw,40px)}
 .rm-lede{margin:16px 0 22px;font-size:16px;line-height:1.6;color:var(--ink2);max-width:74ch}
+.rm-note{margin:26px 0 0;font-size:14.5px;line-height:1.55;color:var(--ink3);max-width:76ch}
 /* Four pre-rendered charts, toggled with radios: the scheduling runs once, on the
    server, so the drawing and the printed book cannot disagree, and it all works
    with JavaScript off. */
@@ -321,7 +328,7 @@ table.eq td:first-child{font-weight:700;color:var(--ink);white-space:nowrap}
 table.eq td.yours{color:var(--ink)}
 table.eq tr.keep td.yours{font-weight:700;color:#A32E1F}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) table.eq tr.keep td.yours{color:#E39A7B}}
-.syms{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:0 38px;
+.syms{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(400px,100%),1fr));gap:0 38px;
   border-top:2px solid var(--ink);margin-top:20px}
 .sym{padding:15px 0;border-bottom:1px solid var(--rule2)}
 .sym .sq{font-size:16px;line-height:1.34;margin-bottom:7px;
@@ -375,51 +382,144 @@ table.eq tr.keep td.yours{font-weight:700;color:#A32E1F}
 
 /* ---------- footer ------------------------------------------------------ */
 .foot{border-top:5px solid var(--ink);margin-top:56px;padding:26px var(--gut) 54px}
+/* The reference pages and the downloads, out of the sticky bar and into the
+   one place a reader looks when they have finished reading. */
+.foot-links{display:flex;flex-wrap:wrap;gap:8px 24px;padding-bottom:16px;margin-bottom:18px;
+  border-bottom:1px solid var(--rule2);font-family:'JetBrains Mono',monospace;
+  font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+.foot .foot-links a{color:var(--ink3);text-decoration:none}
+.foot .foot-links a:hover{color:var(--ink)}
 .foot p{margin:0 0 11px;font-size:13.5px;line-height:1.6;color:var(--ink3);max-width:84ch}
 .foot .ft{font-variation-settings:'wdth' 79;font-weight:800;text-transform:uppercase;
   font-size:17px;color:var(--ink)}
 .foot a{color:var(--accent)}
 .ver{font-family:'JetBrains Mono',monospace}
 @media print{
-  .nav,.filters,.rail,.mvnav,.rm-pick,.foot{display:none}
+  .nav,.filters,.rail,.mvnav,.rm-pick,.foot,.ck-tools,.nums-l,.ans-act{display:none}
   body{background:#fff;color:#000}
   .shell{grid-template-columns:1fr}.planout,.two>aside{position:static}
   .rm-views>figure{display:block!important}
+  /* app.js opens every stage before the dialog appears; this is the belt to
+     that pair of braces, for a reader printing with no script at all. */
+  details.stg::details-content{content-visibility:visible!important;block-size:auto!important}
+  .ck-r{display:flex!important}
 }
 
 /* =====================================================================
-   THE CHECKLIST
-   The front page is a thing you work through, not a thing you read. Seven
-   stages, each a tick list, each remembering what you have done. The Gantt
-   moved to its own page: it answers "how long", which is a different
-   question from "what now".
+   THE FRONT PAGE
+   One question, one answer. The page used to be the whole checklist - seven
+   stages and a hundred and twenty-two rows carrying six figures each, all of
+   it on screen before the reader had decided anything. The checklist has its
+   own page now and this one answers the question the reader arrived with.
    ===================================================================== */
-.now{border-bottom:2px solid var(--ink);padding:22px 0 20px}
-.now-h{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
-.now-h h2{margin:0;font-size:clamp(22px,2.8vw,32px)}
-.now-k{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--ink4)}
-.now-next{margin:14px 0 0;font-size:16.5px;line-height:1.5;color:var(--ink2);max-width:74ch}
-.now-next a{font-weight:700;font-variation-settings:'wdth' 90}
-.now-next b{font-family:'JetBrains Mono',monospace;font-weight:400;color:var(--c,var(--accent))}
-.now-bar{display:flex;align-items:center;gap:14px;margin-top:18px}
-.now-bar .track{flex:1;height:8px;background:var(--fill);position:relative;overflow:hidden}
-.now-bar .track i{position:absolute;inset:0 auto 0 0;background:var(--ink);width:0}
-.now-bar .pct{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink3);
-  white-space:nowrap}
-.entry{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:0;
-  border-top:1px solid var(--rule);margin-top:20px}
-.entry a{display:block;padding:15px 18px 16px 0;text-decoration:none;
-  border-right:1px solid var(--rule2)}
-.entry a:last-child{border-right:0}
-.entry a:hover{background:var(--fill)}
-.entry .e-k{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.15em;
-  text-transform:uppercase;color:var(--c);margin-bottom:6px}
-.entry .e-t{font-size:14.5px;line-height:1.4;color:var(--ink2)}
+.q-head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+  flex-wrap:wrap;padding-bottom:10px;border-bottom:2px solid var(--ink)}
+.q-head h1{margin:0;font-size:clamp(26px,3.4vw,40px)}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+  flex-wrap:wrap;margin-top:52px;padding-bottom:9px;border-bottom:2px solid var(--ink)}
+.sec-h h2{margin:0;font-size:clamp(19px,2.3vw,26px)}
+.sec-b{margin:14px 0 0;font-size:14.5px;line-height:1.55;color:var(--ink3);max-width:76ch}
 
-.stg{padding:40px 0 0;scroll-margin-top:56px}
-.stg-h{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding-bottom:9px;
-  border-bottom:3px solid var(--c)}
+/* A panel is a rule and some space. Colour appears twice on this block: the
+   numeral, and the rule that closes it. */
+.answer{padding:26px 0 24px;border-bottom:3px solid var(--c);outline:none;
+  scroll-margin-top:60px}
+.sec-h{scroll-margin-top:60px}
+.ans-k{margin:0;font-family:'JetBrains Mono',monospace;font-size:11px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--c)}
+.ans-note{margin:12px 0 0;font-size:14px;line-height:1.5;color:var(--ink3);max-width:72ch}
+.ans-hd{display:flex;align-items:baseline;gap:18px;margin-top:12px;flex-wrap:wrap}
+.ans-n{font-family:'JetBrains Mono',monospace;font-feature-settings:'tnum' 1;
+  font-size:clamp(32px,5vw,52px);line-height:1;color:var(--c)}
+.ans-t{margin:0;font-size:clamp(24px,3.6vw,42px);line-height:1.06;font-weight:600;
+  font-variation-settings:'wdth' 88;flex:1 1 300px;min-width:0}
+.ans-t a{text-decoration:none}
+.ans-t a:hover,.ans-t a:focus-visible{text-decoration:underline;text-underline-offset:4px}
+.ans-hook{margin:16px 0 0;font-size:17px;line-height:1.52;color:var(--ink2);max-width:70ch}
+/* Label then value, lower case, no tracking: the figures recede by typography
+   rather than by a grey nobody can read. */
+.ans-facts{display:flex;flex-wrap:wrap;gap:5px 26px;margin:18px 0 0;
+  font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--ink2)}
+.ans-facts i{font-style:normal;color:var(--ink4);margin-right:7px}
+.ans-then{margin:12px 0 0;font-family:'JetBrains Mono',monospace;font-size:11px;
+  letter-spacing:.06em;color:var(--ink4)}
+.ans-act{display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin:22px 0 0}
+.ans-all{font-size:13.5px;color:var(--ink3);text-decoration:none;
+  border-bottom:1px solid var(--rule)}
+.ans-all:hover{color:var(--ink);border-color:var(--ink)}
+.ans-nojs{margin:14px 0 0;font-size:12.5px;color:var(--ink4)}
+html.js .ans-nojs{display:none}
+.lnk{border:0;background:none;padding:0;font:inherit;color:var(--accent);cursor:pointer;
+  border-bottom:1px solid currentColor}
+
+.prog{display:flex;align-items:center;gap:14px;margin-top:20px}
+.prog .track{flex:1;height:2px;background:var(--rule2);position:relative}
+.prog .track i{position:absolute;inset:0 auto 0 0;background:var(--ink);width:0}
+.prog .pct{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink3);
+  white-space:nowrap}
+.prog-note{margin:8px 0 0;font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--ink4)}
+
+/* The fore-edge tab again, moved to where it is doing work. */
+.routes{margin-top:4px}
+.route{display:block;padding:13px 0 13px 15px;text-decoration:none;
+  border-left:4px solid var(--c);border-bottom:1px solid var(--rule2)}
+.route:hover{background:var(--fill)}
+.rt-s{display:block;font-size:16px;line-height:1.3;font-variation-settings:'wdth' 94;
+  font-weight:500}
+.rt-m{display:block;margin-top:4px;font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.11em;text-transform:uppercase;color:var(--ink4)}
+
+.tail{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  margin-top:52px;border-top:2px solid var(--ink)}
+.tail a{display:block;padding:18px 20px 20px 0;text-decoration:none;
+  border-right:1px solid var(--rule2)}
+.tail a:last-child{border-right:0}
+.tail a:hover{background:var(--fill)}
+.tl-t{display:block;font-size:16px;font-weight:600;font-variation-settings:'wdth' 92}
+.tl-s{display:block;margin-top:5px;font-size:13px;line-height:1.45;color:var(--ink3)}
+@media (max-width:760px){
+  .tail{grid-template-columns:1fr}
+  .tail a{border-right:0;border-bottom:1px solid var(--rule2)}}
+
+/* =====================================================================
+   THE CHECKLIST
+   Every Move in order, with a tick box each. A row is a tick box, a number,
+   a title and - only where the fact changes what the reader does - one flag.
+   The six figures that used to sit on every row are still built; they are
+   hidden until asked for, because a column reading `0 min` on a hundred and
+   ten rows out of a hundred and twenty-two is not information.
+   ===================================================================== */
+.ck-lede{margin:16px 0 0;font-size:16.5px;line-height:1.5;color:var(--ink2);max-width:74ch}
+.ck-lede a{font-weight:700;font-variation-settings:'wdth' 90}
+.ck-lede b{font-family:'JetBrains Mono',monospace;font-weight:400;color:var(--accent)}
+
+.nums-l{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:26px 0 0;
+  padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.nums-l label{padding:6px 12px;border:1px solid var(--rule);cursor:pointer;
+  font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--ink3)}
+.nums-l label:hover{color:var(--ink);background:var(--fill)}
+#nums:checked+.nums-l label{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.nums-l span{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--ink4)}
+/* The input sits beside the stages rather than inside the label, because the
+   sibling combinator that reveals the figures needs them to share a parent.
+   Same technique as the roadmap's four pre-rendered charts. */
+#nums{position:absolute;width:1px;height:1px;margin:-1px;opacity:0;
+  clip-path:inset(50%);pointer-events:none}
+#nums:focus-visible+.nums-l label{outline:2px solid var(--accent);outline-offset:2px}
+
+details.stg{padding:44px 0 0;scroll-margin-top:60px}
+/* display:flex also removes the disclosure triangle in Chrome and Safari; the
+   affordance is the mono +/- in the gutter instead, because a chevron is not
+   one of the two families this book sets. */
+details.stg>summary.stg-h{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  padding-bottom:9px;border-bottom:3px solid var(--c);list-style:none;cursor:pointer}
+details.stg>summary::-webkit-details-marker{display:none}
+.stg-mk{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink4);width:11px}
+.stg-mk::after{content:'+'}
+details[open]>summary .stg-mk::after{content:'\2212'}
 .stg-n{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;
   text-transform:uppercase;color:var(--c)}
 .stg-h h2{margin:0;font-size:clamp(21px,2.6vw,30px)}
@@ -431,44 +531,54 @@ table.eq tr.keep td.yours{font-weight:700;color:#A32E1F}
 .stg-prog .track i{position:absolute;inset:0 auto 0 0;background:var(--c);width:0}
 .stg-prog .cnt{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink3)}
 .stg-done{margin:12px 0 4px;font-size:14.5px;line-height:1.5;color:var(--ink3);max-width:78ch}
-.stg-done b{font-family:'JetBrains Mono',monospace;font-weight:400;font-size:10px;
+.stg-done b,.stg-lead b{font-family:'JetBrains Mono',monospace;font-weight:400;font-size:10px;
   letter-spacing:.15em;text-transform:uppercase;color:var(--c);
   display:inline-block;margin-right:8px}
+/* Lead time is the one figure worth promoting out of the hidden strip: nobody
+   is working during a wait, so a Move ordered late holds up everything behind
+   it, and that is the mistake this book exists to stop somebody making. */
+.stg-lead{margin:4px 0 0;font-family:'JetBrains Mono',monospace;font-size:11px;
+  line-height:1.7;color:var(--ink3)}
 .stg.done .stg-h{border-bottom-color:var(--ink4)}
 
 ol.ck{list-style:none;margin:14px 0 0;padding:0}
-ol.ck>li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;
-  align-items:baseline;padding:10px 0;border-bottom:1px solid var(--rule2)}
+ol.ck>li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:0 14px;
+  align-items:baseline;border-bottom:1px solid var(--rule2);scroll-margin-top:60px}
 ol.ck>li:hover{background:var(--fill)}
-ol.ck label{display:grid;grid-template-columns:18px 40px minmax(0,1fr);gap:11px;
-  align-items:baseline;cursor:pointer;min-width:0}
+.ck-b{display:inline-flex;align-items:baseline;gap:11px;cursor:pointer;
+  padding:11px 8px 11px 0}
 ol.ck input{width:15px;height:15px;accent-color:var(--c);margin:0}
 .ck-n{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--c)}
-.ck-t{font-size:15.5px;line-height:1.35;font-variation-settings:'wdth' 92;font-weight:600}
+.ck-t{font-size:16px;line-height:1.35;font-variation-settings:'wdth' 92;font-weight:500;
+  padding:11px 0;text-decoration:none}
+.ck-t:hover,.ck-t:focus-visible{text-decoration:underline;text-underline-offset:3px}
 ol.ck li.done .ck-t{color:var(--ink4);text-decoration:line-through}
 ol.ck li.done .ck-n{color:var(--ink4)}
-.ck-r{display:flex;gap:12px;align-items:baseline;font-family:'JetBrains Mono',monospace;
-  font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4);
+/* One row on the page says which one you are on. */
+li.ck-next .ck-t::after{content:' \00b7 next';font-family:'JetBrains Mono',monospace;
+  font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);
   white-space:nowrap}
-.ck-r a{color:var(--ink3);text-decoration:none;border-bottom:1px solid var(--rule)}
-.ck-r a:hover{color:var(--ink);border-color:var(--ink)}
-.ck-blocked{color:#A32E1F}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ck-blocked{color:#E39A7B}}
+/* One flag, and only on the rows where the fact changes what you do: thirteen
+   Moves cannot be undone, twelve take the site down, and the other hundred and
+   nine say nothing, which is the correct rendering of nothing happening. */
+.ck-f{padding:11px 0;font-family:'JetBrains Mono',monospace;font-size:11px;
+  color:var(--ink3);white-space:nowrap}
+.ck-warn{color:var(--warn)}
+.ck-r{display:none;grid-column:2/-1;padding:0 0 11px;gap:12px;align-items:baseline;
+  font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink4);flex-wrap:wrap}
+#nums:checked~.stg .ck-r{display:flex}
+/* A prerequisite that is not ticked yet is marked where it is being read - in
+   the figures strip, which the reader opened on purpose - and only once
+   something has been ticked. On a fresh checklist a hundred and nineteen of a
+   hundred and twenty-two rows are waiting on something, and a hundred and
+   nineteen marks is wallpaper rather than a warning. Nothing is ever disabled:
+   the reader may well know better than the graph does. */
+.ck-blocked{color:var(--warn)}
 @media (max-width:760px){
-  ol.ck>li{grid-template-columns:1fr;gap:5px}
-  .ck-r{padding-left:69px}
-  ol.ck label{grid-template-columns:18px 34px minmax(0,1fr);gap:9px}
+  ol.ck>li{grid-template-columns:auto minmax(0,1fr);gap:0 10px}
+  .ck-f{grid-column:2;padding:0 0 11px}
+  .ck-r{grid-column:1/-1}
 }
 .ck-tools{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:16px 0 0;
-  border-top:1px solid var(--rule);margin-top:26px}
-
-/* ---- how to use this: the three lines that make the checklist legible to
-   somebody who has never seen the book. Deliberately plain and near the top. */
-.howto { border: 1px solid var(--rule); background: var(--fill);
-         padding: 18px 20px 14px; margin: 0 0 22px; }
-.howto h2 { margin: 0 0 10px; font-size: 15px; letter-spacing: .06em;
-            text-transform: uppercase; }
-.howto-l { margin: 0; padding-left: 20px; }
-.howto-l li { margin: 0 0 7px; line-height: 1.5; max-width: 70ch; }
-.howto-l li:last-child { margin-bottom: 0; }
-.howto-l b { font-weight: 650; }
+  border-top:1px solid var(--rule);margin-top:34px}
