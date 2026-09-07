@@ -59,6 +59,9 @@ AWS = {
 # outright from a tier-two vendor. Amortised straight-line over five years,
 # which is conservative: servers of this class are routinely run for seven.
 HARDWARE = {
+    # ALSO NOT RE-PRICED THIS EDITION. It sits on the same memory and NVMe
+    # market that moved the on-ramp node from $420 to $950, so it is the most
+    # likely stale figure here, and it drives both the $3,235 and the $87,000.
     'node_capex': 13000,
     'node_life_years': 5,
     'switch_capex': 9000,             # per pair, 25 GbE
@@ -102,6 +105,17 @@ PEOPLE = {
 # do not amortise over a fleet this small. Move 07 says so rather than hiding
 # it: you own hardware when the fleet is big enough to carry the room, and
 # before that you rent it.
+#
+# NOT RE-VERIFIED THIS EDITION, AND THE ONLY NUMBER IN THIS FILE THAT CHANGES A
+# CONCLUSION. The fact-check could not settle it: the cheapest European provider
+# lists a 48-core / 128 GB / 2 x 3.84 TB machine around $371, and the reference
+# spec is double that RAM and double that disk; a survey of three providers put
+# the class nearer $1,100, but its cheapest citation was a desktop part with a
+# server's name. At $420 renting is well under owning. Near $1,100 it is level.
+# The book will not pick between those on a number nobody could source, so the
+# figure stands as last observed, it is labelled here, and the prose around it
+# no longer draws a conclusion that needs it to be exact. Price it against a
+# real quote before you decide anything; that is what Move 07 step 6 is for.
 DEDICATED = {
     'node_month': 420,                # 32 core / 256 GB / 4 x 3.84 TB NVMe class
     'traffic_included_tb': 20,

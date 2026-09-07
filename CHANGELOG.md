@@ -5,6 +5,156 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-09-07
+
+A fact-check and a redesign. The fact-check moved a headline the book prints on
+its cover, so this is a major version rather than a minor one: the saving is
+44 per cent, not 54, and the programme is 79 person-days across 34 weeks, not
+74 across 29. Nothing about the argument changed. What changed is that the
+arithmetic behind it is now right, and the two figures that could not be
+verified say so out loud instead of being quoted as though they had been.
+
+### Fixed
+
+- **The saving was overstated by $2,310 a month, and this is the important
+  one.** Move 04 concludes that three things never come home — the content
+  delivery network, outbound mail deliverability and volumetric scrubbing at
+  the edge — and tells the reader in as many words to write them into the
+  comparison as a permanent line. The comparison had no row for them. Nor for
+  the residue five later Moves leave behind: archived object storage, a
+  registry, a queue, an off-site backup copy. All of it is inside the $24,000
+  on the left and all of it is still there on the right, so the model counted
+  it once and paid it twice. Owning is **$13,461** a month, not $11,151; the
+  saving is **$10,539 and 44 per cent**, not $12,849 and 54. The figure is
+  derived rather than typed — it is the Now column of the Move files, which
+  the cost page already printed in a table footer three sections below the
+  comparison that omitted it. Move 03 gains a runbook step for it, because
+  Move 03 is where the owned column gets built and it listed hardware, space,
+  transit, cross-connect, hands and salary with no slot for the one line
+  Move 04 tells you to add.
+- **Three AWS list prices were wrong**, each re-checked against
+  `pricing.us-east-1.amazonaws.com` offer files rather than a pricing page.
+  RDS PostgreSQL `db.r7g.2xlarge` was $1.0368 an hour and labelled Multi-AZ;
+  Multi-AZ is **$1.913** and Single-AZ is $0.956, so the figure was a Multi-AZ
+  label on something under the Single-AZ price — a 46 per cent understatement
+  on the line this book leans on hardest. ElastiCache `cache.r7g.large` was
+  $0.2016 and is **$0.219** (Valkey is $0.1752 for the same machine, which is
+  now in the comment because a fifth off is worth knowing). Egress was a flat
+  $0.09 a gigabyte, which is the first tier only: it is tiered at 0.09, 0.085,
+  0.07 and 0.05, so the flat sum overstated 100 TB by **$1,229 and 15 per
+  cent**. The function walks the bands now and applies the 100 GB free
+  allowance, which changes nothing at this size and is the same class of error
+  in the other direction.
+- **A managed Kubernetes control plane is $73 a month, not $220.** Ten cents
+  an hour at all three providers, times 730. `costs.py` had held that ten cents
+  in a constant nothing had referenced since it was written, while Move 11 said
+  $220 in its prose and in its numbers strip. There is a function now, so the
+  two cannot disagree again.
+- **Move 14 was under-booked, and it is the only estimate here that went up.**
+  Its runbook says to repeat across the stateless estate at two services a
+  week; its strip booked five days and one week, for one service, while
+  claiming the whole $6,800 of managed container compute. Ten days and five
+  weeks is what the Move as written actually costs. Its "what you can turn
+  off" no longer invites somebody to kill the managed runtime after the first
+  service's soak.
+- **Six claims about the three clouds were stale**, each replaced after the
+  vendor's current documentation was fetched and read. The Google calculator
+  does not silently apply sustained-use discounts (Move 03). Azure boot
+  diagnostics has not needed a storage account of yours for years (Move 09). A
+  GKE maintenance exclusion caps at 90 days, not 180 (Move 11).
+  `azure.extensions` is dynamic, and the restart belongs to
+  `shared_preload_libraries` (Move 16). Backup and DR's appliance requirement
+  no longer holds for the console-native path, and a backup vault's enforced
+  retention is the better gotcha anyway (Move 19). Azure DDoS Protection is
+  layer 3 and 4 only, so the row claiming to replace AWS Shield *and* WAF has
+  to name the WAF (the equivalence table).
+- **The on-ramp is $3,430, not $1,840.** A 64 GB kit now costs more than the
+  refurbished machine it goes into. It was three weekends and the price of a
+  laptop; it is three weekends and the price of two.
+- Smaller, all verified in the repository: `deps.py` said twenty-eight edges
+  while its own `__main__` printed thirty-one; a comment said Move 07 would
+  read as minus $1,250 where the file says $1,400; the comment above the Move
+  table said its rows sum to less than the headline when they sum to more, and
+  the sentence explaining the gap named half of it; Move 07 said the $1,400
+  buys "the space, the power" when power is charged per node on draw and the
+  fourth line is transit; the rack comment said a 3 kW commitment while Move
+  07 said 4, and Move 07 is right; `DEDICATED`'s comment said "at five
+  machines" where every caller passes six.
+
+### Changed
+
+- **Two numbers are now labelled as not re-priced, rather than quoted as
+  though they had been.** The monthly rent of a dedicated machine could not be
+  settled: the cheapest European provider lists a 48-core / 128 GB / 7.68 TB
+  box near $371 and the reference spec is double that memory and double that
+  disk, while a three-provider survey put the class near $1,100 on a citation
+  whose cheapest entry was a desktop part wearing a server's name. At $420
+  renting is well under owning; near $1,100 it is level. The book will not
+  pick between those on a number nobody could source, so the figure stands as
+  last observed, `costs.py` says so at the constant, and the prose around it
+  no longer draws a conclusion that needs it to be exact — Move 07 now tells
+  the reader to get a quote, and says the spread between providers is a factor
+  of two or three and wide enough to decide the question on its own. The
+  hardware capital cost carries the same note for the same reason: it sits on
+  the memory and NVMe market that moved the on-ramp node from $420 to $950.
+- **What the fact-check did NOT change, having tried to.** The hypothesis put
+  to the researchers was that colocation was priced too high and the saving
+  therefore understated. A quarter rack at $650, transit at $450, a
+  cross-connect at $150 and hands at $150 all came back inside the published
+  bands, and the finding that argued otherwise was refuted on verification. So
+  were the challenges to the $190 per kW power rate, the five-year
+  amortisation, the $190,000 loaded engineer and the half an engineer of
+  ongoing time. Those numbers stand exactly as written. Of sixty-five verdicts
+  returned, forty-four findings did not survive being argued with.
+
+### Changed — the website
+
+- **It has depth, colour and motion, and it had none of the three.** The ground
+  drops to `#0C0F11` so raised surfaces have somewhere to be raised from;
+  anything that lifts wears one inset hairline of white at 5.5 per cent, which
+  is a machined edge rather than a drop shadow used as decoration. Two fixed
+  layers sit behind the page: a bloom above the masthead with a hairline grid
+  masked away below the first screenful, and three octaves of noise at three
+  per cent, which is the only thing that stops a near-black gradient banding.
+- **Colour does two jobs now instead of one.** It still marks a Stage. It also
+  marks money — the saved column, the salaried-time bar, the delta on the
+  chart — because the argument of this book is arithmetic and the arithmetic
+  should be findable on the page.
+- **New on the front page: the twenty.** One bar a Move, as tall as that Move's
+  own effort figure, in its Stage's colour, every one of them a link. It is the
+  contents page and the shape of the work in one object, and the shape is the
+  argument — the heavy days are in the middle, not at the start.
+- **New on the cost page: the datum.** Today's bill drawn as a dashed rule the
+  height of the chart, with every row below it carrying a measured gap to that
+  rule, labelled with what the gap is worth. Three bars of different lengths
+  ask the reader to do the subtraction; a bar, a gap and a figure in the gap
+  have already done it. The bars carry three segments now, the third being the
+  line that never comes home.
+- **The header is sticky, and it was deliberately not.** Twenty-five pages in a
+  fixed order, and the header carries the one thing that knows where you are in
+  them; a reader four screens down a Move page had to go back to the top to use
+  it. It halves its padding once the masthead is behind it, and on a phone it
+  folds the nav row away entirely — 36px of chrome instead of 96.
+- **Prose never moves and is never hidden.** Only structure arrives: headings,
+  figure strips, rows, tables, charts, controls. A Move page does not arrive at
+  all, because it is worked rather than read, and a runbook step that fades in
+  as somebody scrolls to it is a step arguing with the person running it.
+- **The reveal has a dead man's handle.** The head of every page sets the class
+  that allows anything to be hidden and immediately arms a two-second timer to
+  remove it; `app.js` clears that timer as its first act. With the script
+  blocked, missing, or throwing, the timer fires and the reader gets the whole
+  page. Verified four ways, including a reload halfway down a document — which
+  had left every element above the fold at opacity 0, because an observer only
+  ever reports what is on screen and those had already gone past it.
+- **The reveal list lives in one place.** It used to be a selector list in
+  `style.css` and a string in `app.js`, and a selector added to one and not the
+  other left an element invisible for the life of the edition. `site.py` owns it
+  and writes both.
+- Contrast was audited on every page type at 1440 and 390: **no pair below
+  4.5:1**, including against the hover fill, which is the pair that actually
+  occurs and the one the old palette never checked. The money colour had no
+  paper value and printed at 1.84:1 on white; it has one now, at 5.5:1.
+
 ## [2.1.1] - 2026-09-07
 
 ### Fixed

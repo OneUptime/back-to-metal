@@ -475,10 +475,13 @@ def build(moves):
       regretted. Total <b>{money(o['total'])}</b> a month.</p></div>
       <div class="pcard"><h4>Rented by the month</h4><p>The same class of machine from a
       dedicated-host provider is {money(d['infrastructure'])}, and removes the racking, the spares
-      and a quarter of a person: <b>{money(d['total'])}</b> all in. At this size that BEATS
-      owning, by {money(o['total'] - d['total'])} a month, because a quarter rack's fixed costs do
-      not amortise over six machines. You own hardware when the fleet is big enough to carry the
-      room, and this fleet is not.</p></div>
+      and a quarter of a person: <b>{money(d['total'])}</b> all in. Read that one with a
+      raised eyebrow: the rent per machine is the one figure in this book that a re-check could
+      not settle, and the answer moves between comfortably under owning and level with it
+      depending on which provider you quote. What is not in doubt is the shape - a quarter rack's
+      fixed costs do not amortise over six machines, so at this size renting is at worst
+      competitive and it keeps the {money(capex)}. You own hardware when the fleet is big enough
+      to carry the room.</p></div>
       <div class="pcard"><h4>What the difference buys</h4><p>Against a bill of
       {money(COSTS.BILL_MONTH)} a month, roughly {money(COSTS.BILL_MONTH - o['total'])} a month or
       {money((COSTS.BILL_MONTH - o['total']) * 12)} a year, for a capital outlay of
