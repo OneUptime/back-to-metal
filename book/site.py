@@ -298,7 +298,7 @@ def moves_index_js(moves):
     # `was` and `now` stay null when the Move does not state them. Flattening a
     # missing half to zero would make Move 07 - which states a Now and no Was,
     # because the cage adds a cost rather than removing one - read as a saving
-    # of minus $1,250, and any future Move that stated a Was and no Now would
+    # of minus $1,400, and any future Move that stated a Was and no Now would
     # read as saving the whole of it. A null is a Move whose trade is somewhere
     # else on the bill, and the script has to be able to tell the difference.
     rows = [[m['num'], page(m)[:-5], m['title'], RM.effort_days(m),
@@ -316,14 +316,33 @@ def totals(moves):
     mentions a total, in the same way mission.py takes the count as an
     argument rather than spelling it out."""
     R = REFERENCE
-    owned = COSTS.owned_month(R['nodes'], R['spares'])
-    dedicated = COSTS.dedicated_month(R['nodes'] + R['spares'])
-    save = COSTS.BILL_MONTH - owned['total']
     sched = RM.schedule(moves, DEFAULT_CREW)
     # Only the Moves that state both halves of the trade can contribute to a
     # saving. A Move with an em dash in either cell is not a zero, it is a Move
     # whose saving is somewhere else on the bill.
     priced = [m for m in moves if m['was'] is not None and m['now'] is not None]
+
+    # WHAT YOU GO ON PAYING. The Now column of those same Moves, summed, and
+    # the single line the comparison used to leave out: Move 04's content
+    # network, outbound mail and edge scrubbing, which it explicitly tells the
+    # reader to write in as permanent, plus the residue five other Moves keep -
+    # archived object storage, a registry, a queue, off-site backup. Every
+    # dollar of it is inside the $24,000 before-state, so leaving it out of the
+    # after-state overstated the saving by exactly this much.
+    #
+    # It comes off the priced Moves rather than off every Move, and that is
+    # load-bearing rather than incidental. A Move whose Now is part of the
+    # OWNED SITE - Move 07's cage, at $1,400 - states no Was, because there was
+    # nothing there before to state, and site_month() already carries it. So
+    # the rule is: a Move that states both halves is trading one bill for a
+    # smaller bill, and the smaller bill is retained; a Move that states only a
+    # Now is buying something the model already counts. Anything added later
+    # that breaks that rule has to be counted by hand here.
+    retained = sum(m['now'] for m in priced)
+
+    owned = COSTS.owned_month(R['nodes'], R['spares'], retained)
+    dedicated = COSTS.dedicated_month(R['nodes'] + R['spares'], retained)
+    save = COSTS.BILL_MONTH - owned['total']
     return {
         'n': len(moves),
         'stages': RM.stages(moves, sched),
@@ -334,6 +353,7 @@ def totals(moves):
         'bill': COSTS.BILL_MONTH,
         'owned': owned,
         'dedicated': dedicated,
+        'retained': retained,
         'save': save,
         'pct': save / COSTS.BILL_MONTH * 100 if COSTS.BILL_MONTH else 0,
         'zero': sum(1 for m in moves if m['cutover'] == 0),
@@ -510,6 +530,10 @@ def cost_bars(rows):
     whole argument and hiding it inside a total is what makes a repatriation
     look better on a slide than it turns out to be.
 
+    THREE SEGMENTS, not two: the metal, the salaried time, and what stays on
+    somebody else's invoice whatever you do. The third one is the one this
+    chart used to omit, and omitting it is how a comparison flatters itself.
+
     THE DATUM is the first row, and it is what this chart is for. A dashed rule
     stands at today's bill and runs the height of the drawing, and every row
     below it carries a measured gap from where its bar stops to where that rule
@@ -524,9 +548,9 @@ def cost_bars(rows):
     if not rows:
         return ''
     W, PAD, ROW, BAR = 700, 120, 62, 22
-    top = max(i + p for _, i, p in rows) or 1
+    top = max(sum(r[1:]) for r in rows) or 1
     scale = (W - PAD) / top
-    datum = rows[0][1] + rows[0][2]          # the first row IS the comparison
+    datum = sum(rows[0][1:])                 # the first row IS the comparison
     dx = datum * scale
     H = len(rows) * ROW
     out = []
@@ -534,10 +558,12 @@ def cost_bars(rows):
     # The datum rule first, so every bar and every figure sits on top of it.
     out.append(f'<line class="cost-d" x1="{dx:.1f}" y1="6" x2="{dx:.1f}" y2="{H - 10}"/>')
 
-    for k, (label, infra, people) in enumerate(rows):
+    for k, row in enumerate(rows):
+        label, infra, people = row[0], row[1], row[2]
+        kept = row[3] if len(row) > 3 else 0
         y = k * ROW
-        wi, wp = infra * scale, people * scale
-        end = wi + wp
+        wi, wp, wk = infra * scale, people * scale, kept * scale
+        end = wi + wp + wk
         gap = dx - end
         # `--i` is the row's place in the chart, and the only thing the
         # stylesheet needs in order to draw the bars in reading order
@@ -557,20 +583,23 @@ def cost_bars(rows):
         if wp > 0:
             out.append(f'<rect class="cost-p" x="{wi:.1f}" '
                        f'y="{y + 20}" width="{wp:.1f}" height="{BAR}"/>')
+        if wk > 0:
+            out.append(f'<rect class="cost-k" x="{wi + wp:.1f}" '
+                       f'y="{y + 20}" width="{wk:.1f}" height="{BAR}"/>')
         out.append('</g>')
         out.append(f'<text class="cost-v" style="--i:{k}" x="{end + 9:.1f}" '
-                   f'y="{y + 36}">{mny(infra + people)}</text>')
+                   f'y="{y + 36}">{mny(infra + people + kept)}</text>')
         # The gap, and what it is worth. Only where there is room to set the
         # figure without it colliding with the total it is measured from:
         # a label that overlaps the number it explains explains nothing.
         if gap > 150:
-            saved = datum - (infra + people)
+            saved = datum - (infra + people + kept)
             out.append(f'<rect class="cost-g" style="--i:{k}" x="{end:.1f}" '
                        f'y="{y + 20}" width="{gap:.1f}" height="{BAR}"/>')
             out.append(f'<text class="cost-s" style="--i:{k}" x="{dx - 9:.1f}" '
                        f'y="{y + 36}">&#8722;{mny(saved)} a month</text>')
 
-    lab = '; '.join(f'{l}, {mny(i + p)}' for l, i, p in rows)
+    lab = '; '.join(f'{r[0]}, {mny(sum(r[1:]))}' for r in rows)
     return (f'<svg class="cost" viewBox="0 0 {W} {H}" width="100%" '
             f'style="height:auto;display:block" role="img" aria-label="Monthly cost '
             f'compared against today&rsquo;s bill of {mny(datum)}: {lab}">'
@@ -588,6 +617,11 @@ def build_cost(moves, T):
                                 mny(ded['infrastructure'])]),
         ('People', 'people', ['Already in the bill', mny(owned['people']),
                               mny(ded['people'])]),
+        # A row label goes through esc(), so it is written with a real
+        # apostrophe rather than an entity - an entity here arrives on the
+        # page spelled out, which is how it shipped for exactly one build.
+        ("Still on somebody else's invoice", 'kept',
+         ['Already in the bill', mny(owned['retained']), mny(ded['retained'])]),
         ('Total a month', 'tot', [mny(bill), mny(owned['total']), mny(ded['total'])]),
         ('Saved a month', 'save', ['&mdash;', mny(bill - owned['total']),
                                    mny(bill - ded['total'])]),
@@ -664,18 +698,31 @@ def build_cost(moves, T):
         f'costs {COSTS.PEOPLE["engineers_after"]}, so the difference is what appears '
         f'here. If your answer changes when that line goes in, you want to know in week '
         f'one rather than month ten.</p>'
-      + f'<p class="cost-key"><i class="k-i"></i>Infrastructure '
-        f'<i class="k-p"></i>Salaried time</p>'
-      + cost_bars([('Cloud now', bill, 0),
-                   ('Own the machines', owned['infrastructure'], owned['people']),
-                   ('Rent by the month', ded['infrastructure'], ded['people'])]))}
+      + f'<p class="callout"><span class="lbl">The row under it</span> '
+        f'{mny(T["retained"])} a month never comes home and was missing from this table '
+        f'until it was checked: the content network, outbound mail and edge scrubbing '
+        f'that Move 04 tells you to keep renting, plus the residue five later Moves '
+        f'leave behind &mdash; archived object storage, a registry, a queue, an off-site '
+        f'backup copy. All of it is inside the {mny(bill)} on the left, so a comparison '
+        f'that drops it from the right invents {mny(T["retained"])} a month of saving. '
+        f'It is the same error as leaving out the salary, in a smaller coat.</p>'
+      + f'<p class="cost-key"><span><i class="k-i"></i>Infrastructure</span> '
+        f'<span><i class="k-p"></i>Salaried time</span> '
+        f'<span><i class="k-k"></i>Still rented</span></p>'
+      + cost_bars([('Cloud now', bill, 0, 0),
+                   ('Own the machines', owned['infrastructure'], owned['people'],
+                    owned['retained']),
+                   ('Rent by the month', ded['infrastructure'], ded['people'],
+                    ded['retained'])]))}
 
 {band('where-money', 'Where the money goes',
       f'<p>One row per Move, in the order you run them. Some Moves buy safety rather '
       f'than money and say so with a dash. The rows that state both halves come to '
       f'{mny(tw - tn)} a month, which is more than the {mny(T["save"])} at the top of '
-      f'this page: these are line savings, taken before the salaried time and the fixed '
-      f'cost of the cage that the comparison above puts back in.</p>' + perm)}
+      f'this page: these are line savings, taken before the salaried time and before '
+      f'the whole cost of running your own site, both of which the comparison above '
+      f'puts back in. The Now column of this table is the {mny(tn)} that stays on '
+      f'somebody else&rsquo;s invoice, and it is the third row up there.</p>' + perm)}
 
 {band('replaces', 'What replaces what',
       f'<p>Find the row you are paying for, then read the Move. Where the last column '

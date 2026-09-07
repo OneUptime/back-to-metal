@@ -152,14 +152,14 @@ give credit.
 | Stage 3 · Build | 4, 09–12 |
 | Stage 4 · Move | 4, 13–16 |
 | Stage 5 · Run | 4, 17–20 |
-| Work | 74 person-days |
-| End to end, two engineers | 29 weeks, most of it waiting for hardware |
+| Work | 79 person-days |
+| End to end, two engineers | 34 weeks, most of it waiting for hardware |
 | At zero downtime | 18 of 20 |
 | Whole book, end to end | 25 minutes of user-visible outage |
 | Cannot be undone | 0 |
 | Risk | 3 low, 7 medium, 10 high |
 | Dependencies | 31, every one pointing backwards |
-| Illustrative monthly saving | $20,270, net of what the cage adds |
+| Illustrative monthly saving | $20,123, net of what the cage adds |
 
 Every Move names the real service on AWS, Google Cloud and Azure, and the one thing that differs on each.
 

@@ -6,11 +6,11 @@
 
 ## Leaving from
 - **AWS:** EKS — tearing a cluster down leaves its IAM OIDC provider behind, still trusting an issuer URL nothing resolves.
-- **Google Cloud:** GKE — the control plane upgrades on its release channel regardless; a maintenance exclusion defers a minor version 180 days at most.
+- **Google Cloud:** GKE — the control plane upgrades on its release channel regardless; a full-freeze exclusion cannot exceed 90 days, and holding a minor version only lasts until that version leaves support.
 - **Azure:** AKS — the Free tier carries no API server uptime guarantee at all, so what is given up is a paid Standard tier or nothing at all.
 
 ## Why this works
-A control plane is three machines that agree with each other, and the agreement is etcd. Talos Linux removes the reason hand-built clusters rot: no shell, no package manager, no login, so changing a machine means changing the YAML in Git and applying it. Drift stops being a category. Doing this while nothing runs is what makes the risk survivable — every mistake costs a rebuild, and an empty cluster rebuilds in twenty minutes. Be plain about the money: a managed control plane is about $220 a month, so this is not the Move that pays for the migration.
+A control plane is three machines that agree with each other, and the agreement is etcd. Talos Linux removes the reason hand-built clusters rot: no shell, no package manager, no login, so changing a machine means changing the YAML in Git and applying it. Drift stops being a category. Doing this while nothing runs is what makes the risk survivable — every mistake costs a rebuild, and an empty cluster rebuilds in twenty minutes. Be plain about the money: a managed control plane is about $73 a month — the same ten cents an hour on all three — so this is not the Move that pays for the migration.
 
 ## Before you start
 
@@ -47,7 +47,7 @@ While the cluster is empty nothing here is hard to undo. Reverting the kube-prox
 
 | Was | Now | Saved | Cutover | Effort | Wait |
 |---|---|---|---|---|---|
-| $220/mo | $0/mo | 100% | 0 min | 4 days | — |
+| $73/mo | $0/mo | 100% | 0 min | 4 days | — |
 
 ## What you can turn off
 Nothing yet — the managed cluster still carries production and stays until Move 20. Its per-hour control-plane charge is the first bill line to reach zero.

@@ -6,7 +6,7 @@
 
 ## Leaving from
 - **AWS:** AWS Backup and CloudWatch alarms — a vault under compliance-mode lock cannot be shortened or removed until its retention expires.
-- **Google Cloud:** Backup and DR Service and Cloud Monitoring — its plans run on a console and appliances you deploy on Compute Engine, so the product is instances you pay for.
+- **Google Cloud:** Backup and DR Service and Cloud Monitoring — a backup vault's enforced retention makes a backup indelible until it expires, by you or by Google, so the copy outlives the decision to leave.
 - **Azure:** Azure Backup and Azure Monitor alerts — a Recovery Services vault protects only resources in its own region, and soft delete holds removed items for fourteen days.
 
 ## Why this works

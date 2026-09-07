@@ -10,7 +10,7 @@
 - **Azure:** regions, availability zones and zone-redundant tiers — zone support varies by region and by machine series, and a resource created without a zone cannot be moved into one later.
 
 ## Why this works
-A region and a zone were labels on an invoice. Underneath sat a building, a power feed, a loading dock and somebody's hands, and this Move buys the smallest version of all four: a quarter rack in a carrier-neutral facility, near enough that somebody can be at the cabinet within a couple of hours. Nothing binds until a signature, and every term that hurts later is negotiable before it. It also costs more rather than less — about $1,400 a month for the space, the power, the cross-connect and the hands, paid from handover, before a machine is racked. One site, not two.
+A region and a zone were labels on an invoice. Underneath sat a building, a power feed, a loading dock and somebody's hands, and this Move buys the smallest version of all four: a quarter rack in a carrier-neutral facility, near enough that somebody can be at the cabinet within a couple of hours. Nothing binds until a signature, and every term that hurts later is negotiable before it. It also costs more rather than less — about $1,400 a month for the space, the transit, the cross-connect and the hands, paid from handover, before a machine is racked. One site, not two.
 
 ## Before you start
 
@@ -34,7 +34,7 @@ A region and a zone were labels on an invoice. Underneath sat a building, a powe
 6. Before anyone signs, price the alternative in the next column of the comparison sheet: the same six machines rented by the month, near $420 each, racked and powered by somebody else. At this fleet size that column wins, and Move 03's rule applies to it too.
 
 ## Operator's notes
-- **Swap:** Rented dedicated servers skip this Move and Move 08's lead times — three months off the programme, and at six machines about $2,520 a month against $3,235 of owned infrastructure, so cheaper as well as faster. What you give up is the network, your own addresses and the price you can hold; owning wins once the fleet is large enough to carry the room. On short runway, rent.
+- **Swap:** Rented dedicated servers skip this Move and Move 08's lead times — about a month off the programme, and at six machines about $2,520 a month against $3,235 of owned infrastructure, so cheaper as well as faster. What you give up is the network, your own addresses and the price you can hold; owning wins once the fleet is large enough to carry the room. On short runway, rent.
 - **Do it faster:** Ask for the standard agreement and the cross-connect list before price is discussed; a day of reading decides which clauses are worth arguing.
 - **Watch out:** A second building doubles the hardware, the spares and the change surface, and is the commonest reason a repatriation stalls. One site with backups held elsewhere beats two nobody has exercised.
 - **Leftovers:** The cage invoices from handover while the cloud bill stays where it was; both run in parallel for about four months.

@@ -12,7 +12,7 @@ Two rules the build enforces:
   * a dependency must be a real prerequisite, not a thematic neighbour. If Move B
     would work without Move A, they are not related, however much they rhyme.
 
-Keep it minimal: most Moves need one or two. Twenty Moves and twenty-eight
+Keep it minimal: most Moves need one or two. Twenty Moves and thirty-one
 edges is a graph somebody can hold in their head, which is the point.
 """
 

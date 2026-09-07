@@ -7,7 +7,7 @@
 ## Leaving from
 - **AWS:** RDS for PostgreSQL — the default parameter group cannot be edited, so `rds.logical_replication` needs a custom group and a reboot.
 - **Google Cloud:** Cloud SQL for PostgreSQL — storage auto-grows to hold retained write-ahead log and never shrinks, so it bills at the high-water mark.
-- **Azure:** Database for PostgreSQL flexible server — `CREATE EXTENSION` fails until the name is in the static `azure.extensions` parameter, which needs a restart.
+- **Azure:** Database for PostgreSQL flexible server — `CREATE EXTENSION` fails until the name is in the `azure.extensions` allowlist, and anything wanting shared memory needs `shared_preload_libraries` too, which does need a restart.
 
 ## Why this works
 Nothing here is new except the data. The local NVMe and the object gateway the backups go to both came up in Move 12, that gateway has carried the application's own buckets since Move 15, and the application has run on the cluster since Move 14. CloudNativePG supplies the part nobody wants to write: a primary, two standbys, and an operator that promotes one without a human awake at three in the morning. The copy is a stream, not a dump, so the new cluster is caught up and dull for days before anyone books a window. The rehearsed restore is what makes the fifteen minutes safe.

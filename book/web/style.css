@@ -691,7 +691,8 @@ html.scrolled .wm{font-size:16px}
   text-transform:none;color:var(--ink);border-bottom:1px solid var(--rule2)}
 .cmp .tot th,.cmp .tot td{border-top:2px solid var(--ink)}
 .cmp .save th,.cmp .save td{font-weight:700;color:var(--ink)}
-.cmp .people th,.cmp .people td{border-bottom:1px solid var(--rule)}
+.cmp .people th,.cmp .people td{border-bottom:1px solid var(--rule2)}
+.cmp .kept th,.cmp .kept td{border-bottom:1px solid var(--rule)}
 
 /* The chart used to take its two tones from the ink scale, on the rule
    that colour meant a Stage and nothing else. That rule now has a
@@ -716,6 +717,11 @@ html.scrolled .wm{font-size:16px}
 .cost-bar rect{vector-effect:non-scaling-stroke}
 .cost-i{fill:var(--accent)}
 .cost-p{fill:var(--hot)}
+/* The third segment: what stays on somebody else's invoice however this
+   goes. It is neither metal nor salary, so it is neither of their
+   colours - it is the ink scale, which is what this site uses for a
+   quantity that is simply there. */
+.cost-k{fill:var(--ink3);stroke:var(--bg);stroke-width:1.5}
 /* The datum: today's bill, standing as a dashed rule the height of the
    drawing. Dashed rather than solid because it is a reference and not
    a quantity - nothing is that long, it is just where the line is. */
@@ -728,11 +734,18 @@ html.scrolled .wm{font-size:16px}
   transform-box:fill-box;transform-origin:100% 50%}
 .cost-s{font-size:12px;fill:var(--hot);text-anchor:end;
   font-variant-numeric:tabular-nums;letter-spacing:.02em}
-.cost-key{margin:var(--s6) 0 0;font:400 var(--m-lab)/1.6 var(--mono);
+/* Three keys on one line, or three keys on three lines - never two and
+   a half, which is what inline margins gave when the third key was
+   added and the swatch wrapped away from its own word. */
+.cost-key{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);
+  margin:var(--s6) 0 0;font:400 var(--m-lab)/1.6 var(--mono);
   letter-spacing:var(--tr-lab);text-transform:uppercase;color:var(--ink3)}
-.k-i,.k-p{display:inline-block;width:var(--s4);height:var(--s2);vertical-align:0}
-.k-i{background:var(--accent);margin-right:var(--s2)}
-.k-p{background:var(--hot);margin:0 var(--s2) 0 var(--s5)}
+.cost-key span{display:inline-flex;align-items:center;gap:var(--s2);
+  white-space:nowrap}
+.k-i,.k-p,.k-k{flex:none;display:inline-block;width:var(--s4);height:var(--s2)}
+.k-i{background:var(--accent)}
+.k-p{background:var(--hot)}
+.k-k{background:var(--ink3)}
 
 .perm-n{width:var(--num)}
 .perm-n a{font-family:var(--mono);color:var(--c);text-decoration:none;

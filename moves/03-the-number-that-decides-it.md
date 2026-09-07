@@ -6,7 +6,7 @@
 
 ## Leaving from
 - **AWS:** AWS Pricing Calculator — two tools now carry that name, and only the one inside the billing console can see the Savings Plans your account already holds.
-- **Google Cloud:** Google Cloud Pricing Calculator — sustained-use discounts are applied to the estimate automatically, so a Compute Engine line reads lower here than the same machine does on a fresh invoice.
+- **Google Cloud:** Google Cloud Pricing Calculator — the only discount it models is a committed-use one you pick from a dropdown, and its default machine series earns no sustained-use discount at all.
 - **Azure:** Azure Pricing Calculator — signing in and selecting the Enterprise Agreement licensing programme rewrites every price on the page, so an anonymous quote is retail and not yours.
 
 ## Why this works
@@ -29,8 +29,9 @@ Moves 01 and 02 produced a grouped bill and an inventory that accounts for it. T
 2. Fill the rented column from the three invoices at the rate you actually paid, discounts in and tax out on both sides. One monthly number, checkable against Move 01.
 3. Fill the owned column from the hardware quote and the facility quote: five machines and a spare over sixty months, the quarter rack, committed power, transit, the cross-connect, remote hands.
 4. Add the salary line. Five machines in one cage need about half an engineer, ongoing, beside whoever already carries the pager: near $7,900 a month loaded, and more than twice the whole of the hardware, the space and the link put together. Anybody who will not write that down is not ready.
-5. Total both columns and apply the rule. If owned is not a third under rented, stop and keep the spreadsheet. Stopping costs three Moves and a week, against a programme abandoned in month five with two estates billing.
-6. If it clears, put the capital question to the founder who signs. About $87,000 leaves the bank before anything serves a request — six machines and a pair of switches, and on eighteen months of runway that is a fair refusal; renting dedicated machines by the month is the way round it, in Move 07.
+5. Add the line that does not come home. Move 04 settles which capabilities you keep renting — the edge, outbound mail, scrubbing — and there is a residue besides: archived object storage nobody will pay the egress to extract, a registry, a queue, an off-site backup copy. It is inside the rented column already, so it has to be inside the owned column too. Leaving it out is the same error as leaving out the salary, and it is worth about a tenth of the bill.
+6. Total both columns and apply the rule. If owned is not a third under rented, stop and keep the spreadsheet. Stopping costs three Moves and a week, against a programme abandoned in month five with two estates billing.
+7. If it clears, put the capital question to the founder who signs. About $87,000 leaves the bank before anything serves a request — six machines and a pair of switches, and on eighteen months of runway that is a fair refusal; renting dedicated machines by the month is the way round it, in Move 07.
 
 ## Operator's notes
 - **Swap:** Price the three largest lines only; that lands within about ten per cent in an afternoon.

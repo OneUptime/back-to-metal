@@ -57,7 +57,7 @@ ROWS = [
      'Node addresses, and one translation hop for the few that need it', '18'),
     ('CloudFront',           'Cloud CDN',             'Azure Front Door',
      'Keep paying - change vendor, not model', '04'),
-    ('AWS Shield and WAF',   'Cloud Armor',           'Azure DDoS Protection',
+    ('AWS Shield and WAF',   'Cloud Armor',           'Azure DDoS Protection and WAF',
      'Keep paying for scrubbing - the capacity is upstream of you', '04'),
     ('SES',                  'No first-party equivalent', 'Communication Services',
      'Keep paying for outbound - inbound can come home', '04'),

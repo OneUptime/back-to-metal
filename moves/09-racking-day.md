@@ -7,7 +7,7 @@
 ## Leaving from
 - **AWS:** EC2 Serial Console — granted per account, Nitro types only, and no virtual media, so your own image never boots.
 - **Google Cloud:** Compute Engine serial console — switched on by the `serial-port-enable` metadata key, and an organisation policy can forbid it estate-wide.
-- **Azure:** Boot diagnostics and Serial Console — needs a diagnostics storage account on the machine, and reaches the guest only, never wedged firmware.
+- **Azure:** Boot diagnostics and Serial Console — on by default against a managed storage account you cannot open, gated behind a role and killable subscription-wide, and reaches the guest only, never wedged firmware.
 
 ## Why this works
 The physical work is ordered so nothing has to be undone: rails across all six positions before a chassis is lifted, weight low, power split so one distribution unit cannot take the estate. None of that is the point. The Move exists for the baseboard management controller in each node — a small computer with its own processor, port and firmware, and the whole of the console the cloud gave you. Proved from outside the building, it turns two years of faults into an afternoon at a keyboard rather than a drive to the facility.

@@ -170,28 +170,38 @@ def anatomy(c='#1F4E79', tint='#E6ECF3', w='64mm', bg='#FBFAF7'):
 
 
 def cost_chart(rows, w='100%', color='#1F4E79', bg='#FBFAF7', line='#DEDCD4'):
-    """A stacked bar per option: infrastructure, then the salaried time.
+    """A stacked bar per option: infrastructure, the salaried time, and what
+    stays on somebody else's invoice however it goes.
 
     Drawn rather than charted, because the point is a comparison a reader can
-    check in their head, not a dashboard. Two segments, one scale, no gridlines
-    and no legend beyond the labels already on the bars.
+    check in their head, not a dashboard. Three segments, one scale, no
+    gridlines and no legend beyond the labels already on the bars.
 
-    `rows` is a list of (label, infrastructure, people). Colours are pre-composited
-    against the paper with flatten.mix - the printed interior carries no alpha, so
-    a lighter segment has to be a lighter colour rather than a faded one.
+    `rows` is a list of (label, infrastructure, people) or, with the third
+    segment, (label, infrastructure, people, retained). The four-cell form is
+    the honest one: the content network, the outbound mail and the edge
+    scrubbing that Move 04 tells you to keep renting are inside the bill on the
+    left and inside the bar on the right, and a chart that drops them from the
+    second draws a saving nobody gets.
+
+    Colours are pre-composited against the paper with flatten.mix - the printed
+    interior carries no alpha, so a lighter segment has to be a lighter colour
+    rather than a faded one.
     """
     pad_l, top, bar_h, gap, right = 116, 20, 26, 20, 74
     width, height = 700, top + len(rows) * (bar_h + gap)
-    total = max(i + p for _, i, p in rows)
+    kept_of = lambda r: r[3] if len(r) > 3 else 0
+    total = max(r[1] + r[2] + kept_of(r) for r in rows)
     scale = (width - pad_l - right) / total if total else 0
     light = mix(color, bg, .34)
     ink3, ink4 = '#767E8A', '#A2A9B3'
 
     out = [f'<line x1="{pad_l}" y1="{top - 8}" x2="{width - right + 8}" y2="{top - 8}" '
            f'stroke="{line}" stroke-width="1"/>']
-    for k, (label, infra, people) in enumerate(rows):
+    for k, row in enumerate(rows):
+        label, infra, people, kept = row[0], row[1], row[2], kept_of(row)
         y = top + k * (bar_h + gap)
-        wi, wp = infra * scale, people * scale
+        wi, wp, wk = infra * scale, people * scale, kept * scale
         out.append(
             f'<text x="{pad_l - 12}" y="{y + bar_h * 0.68}" font-size="13" fill="{ink3}" '
             f'text-anchor="end" font-family="Inter" font-weight="600">{label}</text>')
@@ -200,12 +210,20 @@ def cost_chart(rows, w='100%', color='#1F4E79', bg='#FBFAF7', line='#DEDCD4'):
         if wp > 0:
             out.append(f'<rect x="{pad_l + wi:.1f}" y="{y}" width="{wp:.1f}" height="{bar_h}" '
                        f'fill="{light}" rx="2"/>')
+        if wk > 0:
+            out.append(f'<rect x="{pad_l + wi + wp:.1f}" y="{y}" width="{wk:.1f}" '
+                       f'height="{bar_h}" fill="{ink4}" rx="2"/>')
         out.append(
-            f'<text x="{pad_l + wi + wp + 10:.1f}" y="{y + bar_h * 0.7}" font-size="14" '
+            f'<text x="{pad_l + wi + wp + wk + 10:.1f}" y="{y + bar_h * 0.7}" font-size="14" '
             f'fill="{color}" font-family="Inter" font-weight="700">'
-            f'${(infra + people) / 1000:,.1f}k</text>')
-    # The key, on the widest bar rather than in a legend of its own.
-    wide = max(range(len(rows)), key=lambda k: rows[k][1] + rows[k][2])
+            f'${(infra + people + kept) / 1000:,.1f}k</text>')
+    # The key, on the widest bar rather than in a legend of its own. It goes on
+    # the bar with the most SEGMENTS, not the longest one: the cloud bar is the
+    # longest and it is one undivided block, so a key hung under it would name
+    # three colours that are not there to see.
+    wide = max(range(len(rows)),
+               key=lambda k: (sum(1 for v in rows[k][1:] if v),
+                              rows[k][1] + rows[k][2] + kept_of(rows[k])))
     yk = top + wide * (bar_h + gap) + bar_h + 13
     out.append(f'<text x="{pad_l}" y="{yk}" font-size="11" fill="{ink4}" font-family="Inter" '
                f'letter-spacing="1.4">INFRASTRUCTURE</text>')
@@ -213,5 +231,9 @@ def cost_chart(rows, w='100%', color='#1F4E79', bg='#FBFAF7', line='#DEDCD4'):
         xk = pad_l + rows[wide][1] * scale + 6
         out.append(f'<text x="{xk:.1f}" y="{yk}" font-size="11" fill="{ink4}" '
                    f'font-family="Inter" letter-spacing="1.4">SALARIED TIME</text>')
+    if kept_of(rows[wide]):
+        xk = pad_l + (rows[wide][1] + rows[wide][2]) * scale + 6
+        out.append(f'<text x="{xk:.1f}" y="{yk}" font-size="11" fill="{ink4}" '
+                   f'font-family="Inter" letter-spacing="1.4">STILL RENTED</text>')
     return (f'<svg viewBox="0 0 {width} {height + 22}" width="{w}" '
             f'style="height:auto;display:block" aria-hidden="true">{"".join(out)}</svg>')

@@ -29,13 +29,26 @@ AWS = {
     's3_standard_gb_month': 0.023,
     's3_glacier_ir_gb_month': 0.004,
     'egress_gb': 0.09,                # first 10 TB; the number that ends arguments
+    # Egress is TIERED, and quoting the first tier as though it were a flat
+    # rate overstates any volume big enough to be worth arguing about. The
+    # bands below are us-east-1 internet egress, read off the published offer
+    # file (AWSDataTransfer, us-east-1, DataTransfer-Out-Bytes) rather than
+    # off a pricing page: (up-to GB, USD per GB).
+    'egress_tiers': ((10 * 1024, 0.09), (50 * 1024, 0.085),
+                     (150 * 1024, 0.07), (float('inf'), 0.05)),
+    'egress_free_gb': 100,            # every month, every region, since 2021
     'nat_gateway_hour': 0.045,
     'nat_gateway_gb': 0.045,
     'alb_hour': 0.0225,
     'alb_lcu_hour': 0.008,
-    'rds_pg_r7g_2xl_hour': 1.0368,    # 8 vCPU, 64 GB, Multi-AZ
+    # WAS 1.0368 AND LABELLED MULTI-AZ, which was neither: Multi-AZ is 1.913
+    # and Single-AZ is 0.956, so the old figure was a Multi-AZ label on
+    # something under the Single-AZ price - it understated the managed
+    # database by 46 per cent, on the line the book leans on hardest.
+    'rds_pg_r7g_2xl_hour': 1.913,     # 8 vCPU, 64 GB, PostgreSQL, Multi-AZ
+    'rds_pg_r7g_2xl_hour_single_az': 0.956,
     'rds_storage_gb_month': 0.115,
-    'elasticache_r7g_large_hour': 0.2016,
+    'elasticache_r7g_large_hour': 0.219,   # Redis or Memcached; Valkey is 0.1752
     'cloudwatch_ingest_gb': 0.50,
     'cloudwatch_store_gb_month': 0.03,
     'eks_cluster_hour': 0.10,
@@ -50,10 +63,13 @@ HARDWARE = {
     'node_life_years': 5,
     'switch_capex': 9000,             # per pair, 25 GbE
     'switch_life_years': 7,
-    'rack_month': 650,                # a quarter rack, 3 kW committed, A+B power
-    # 3 kW because five racked nodes and two switches draw near 2.5 kW, and a
-    # facility lets you take eighty per cent of a commitment continuously. The
-    # sixth machine is on the shelf and unplugged, so it is capital and not power.
+    'rack_month': 650,                # a quarter rack, 4 kW committed, A+B power
+    # 4 kW, not 3, which is what this comment used to say while Move 07 said 4:
+    # five racked nodes and two switches draw near 2.5 kW, a facility lets you
+    # take only eighty per cent of a commitment continuously, and 2.5 / 0.8 is
+    # 3.1 - so the next size up is 4. The commitment sizes the breaker; the bill
+    # is on draw, which is power_kw_month below. The sixth machine is on the
+    # shelf and unplugged, so it is capital and not power.
     'transit_month': 450,             # facility blended transit, 1 Gbps commit
     'crossconnect_month': 150,
     'remote_hands_month': 150,
@@ -80,10 +96,12 @@ PEOPLE = {
 # Dedicated hosts by the month, for the reader who wants the saving without the
 # cage. Roughly a comparable machine at a European provider, list, ex-VAT.
 #
-# At five machines this comes out close to owning, because a quarter rack's
-# fixed costs - space, transit, cross-connect, hands - do not amortise over a
-# small fleet. Move 07 says so rather than hiding it: you own hardware when the
-# fleet is big enough to carry the room, and before that you rent it.
+# At six machines - which is what every caller passes, the five racked and the
+# one on the shelf - this comes out BELOW owning rather than close to it,
+# because a quarter rack's fixed costs (space, transit, cross-connect, hands)
+# do not amortise over a fleet this small. Move 07 says so rather than hiding
+# it: you own hardware when the fleet is big enough to carry the room, and
+# before that you rent it.
 DEDICATED = {
     'node_month': 420,                # 32 core / 256 GB / 4 x 3.84 TB NVMe class
     'traffic_included_tb': 20,
@@ -94,9 +112,15 @@ DEDICATED = {
 # Second-hand small-form-factor machines and a managed switch. The point of this
 # figure is not the saving - there is none, because it replaces nothing - but
 # the size of the bet you have to place before you know whether any of the rest
-# of the book will work for you. It is three weekends and the price of a laptop.
+# of the book will work for you. It used to be three weekends and the price of a
+# laptop; since memory doubled it is three weekends and the price of two.
 HOMELAB = {
-    'node_capex': 420,          # refurbished, 12 core / 64 GB / 2 x 1 TB NVMe
+    # WAS 420, WHICH HAS NOT BEEN BUYABLE SINCE THE 2026 MEMORY SQUEEZE. At list
+    # today the chassis with a 12-core part is $200-300, the 64 GB kit is
+    # $340-450 - more than the machine it goes in - and two 1 TB NVMe is
+    # $200-315. Memory is most of this now, which is worth knowing before you
+    # price a homelab off a two-year-old blog post.
+    'node_capex': 950,          # refurbished, 12 core / 64 GB / 2 x 1 TB NVMe
     'nodes': 3,
     'switch_capex': 260,        # managed, VLANs, 2.5 GbE
     'ups_capex': 180,
@@ -144,24 +168,76 @@ def people_month(p=PEOPLE):
     return delta * p['platform_engineer_year'] / 12
 
 
-def owned_month(nodes, spares=1):
+# --- what you go on paying, USD -------------------------------------------
+# THE LINE THE FIRST EDITION OF THIS MODEL LEFT OUT, and the reason its headline
+# was wrong by $2,310 a month.
+#
+# Move 04 concludes that three things do not come home - the content delivery
+# network, outbound mail deliverability and volumetric scrubbing at the edge -
+# and tells the reader to write them into the comparison as a PERMANENT line.
+# Five more Moves retire most of a service and keep a residue: object storage
+# that stays archived, a registry, a queue, a certificate authority, off-site
+# backup. All of that is inside the $24,000 before-state and all of it is still
+# there afterwards, and a model that counts it on the left and not on the right
+# is the exact error this book was written to argue against.
+#
+# It is not a constant here, because it is not a judgement: it is the sum of
+# the Now column of the Move files, and the build passes it in. See
+# site.totals() for how it is derived and why Move 07's cage is not in it.
+DEFAULT_RETAINED = 0.0
+
+
+def owned_month(nodes, spares=1, retained=DEFAULT_RETAINED):
     infra = site_month(nodes, spares)
-    return {'infrastructure': infra, 'people': people_month(),
-            'total': infra + people_month()}
+    people = people_month()
+    return {'infrastructure': infra, 'people': people, 'retained': retained,
+            'total': infra + people + retained}
 
 
-def dedicated_month(nodes, d=DEDICATED, p=PEOPLE):
+def dedicated_month(nodes, retained=DEFAULT_RETAINED, d=DEDICATED, p=PEOPLE):
     infra = nodes * d['node_month']
     # Renting the metal removes the racking and the hands, not the platform work.
     people = (p['engineers_after'] - 0.25 - p['engineers_before']) \
         * p['platform_engineer_year'] / 12
-    return {'infrastructure': infra, 'people': people, 'total': infra + people}
+    # The retained line is the same either way: a content delivery network does
+    # not care whose rack the origin is in.
+    return {'infrastructure': infra, 'people': people, 'retained': retained,
+            'total': infra + people + retained}
 
 
-def egress_month(tb):
+def control_plane_month(a=AWS):
+    """What a managed Kubernetes control plane costs to be handed to you.
+
+    The same list rate at all three - EKS on standard support, GKE in either
+    mode past the free one, AKS on the Standard tier - which is why one number
+    serves the whole book. It is here rather than typed into Move 11 because
+    Move 11 used to say $220 while this file said $0.10 an hour, and one of
+    them had to be reading the other."""
+    return a['eks_cluster_hour'] * 730
+
+
+def egress_month(tb, a=AWS):
     """What moving `tb` terabytes out of AWS costs every month. The single line
-    that decides more repatriations than any other."""
-    return tb * 1024 * AWS['egress_gb']
+    that decides more repatriations than any other.
+
+    Tiered, and it has to be. This used to multiply the whole volume by the
+    first band's rate, which is right up to 10 TB and increasingly wrong above
+    it: at 100 TB a month the flat sum came to $9,216 against a real $7,987,
+    an overstatement of $1,229 and fifteen per cent. A book that invites the
+    reader to check its arithmetic against their own invoice cannot afford to
+    be the one quoting the higher number.
+
+    The free allowance is in here too. It is 100 GB a month and it changes
+    nothing at this size - nine dollars - but leaving it out is the same class
+    of error in the other direction, and the point is to be checkable."""
+    gb = max(0.0, tb * 1024 - a['egress_free_gb'])
+    total, lower = 0.0, 0.0
+    for upper, rate in a['egress_tiers']:
+        if gb <= lower:
+            break
+        total += (min(gb, upper) - lower) * rate
+        lower = upper
+    return total
 
 
 if __name__ == '__main__':
@@ -169,6 +245,9 @@ if __name__ == '__main__':
     sys.path.insert(0, __file__.rsplit('/', 1)[0])
     from kit import REFERENCE as R
     n, sp = R['nodes'], R['spares']
+    # The retained line is the Now column of the Move files and the build
+    # passes it in; this self-test has no Move files, so it prints the shape
+    # with nothing retained and says so.
     o = owned_month(n, sp)
     d = dedicated_month(n + sp)
     print(f'Reference build: {n} nodes + {sp} spare, '
@@ -182,6 +261,9 @@ if __name__ == '__main__':
     save = BILL_MONTH - o['total']
     print(f'  saving ${save:,.0f} /month, ${save * 12:,.0f} /year, '
           f'{save / BILL_MONTH * 100:.0f} per cent')
+    print(f'  (retained third-party lines are passed in by the build, and are '
+          f'${0:,.0f} here)')
+    print(f'  a managed control plane: ${control_plane_month():,.0f} /month')
     print(f'  100 TB/month of egress on AWS: ${egress_month(100):,.0f}')
     print(f'  the on-ramp: ${homelab_capex():,.0f} once and '
           f'${homelab_month():.0f}/month of electricity for '

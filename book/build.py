@@ -437,8 +437,15 @@ def build(moves):
     </div>""", 'BEFORE YOU TOUCH ANYTHING'))
 
     # ---------- what it actually costs
-    o = COSTS.owned_month(R['nodes'], R['spares'])
-    d = COSTS.dedicated_month(n_nodes + R['spares'])
+    # The Now column of every Move that states both halves: what stays on
+    # somebody else's invoice after all twenty are done. Move 04 says to write
+    # it in as a permanent line and this table used not to, which overstated
+    # the saving by exactly this much. Derived here rather than typed, for the
+    # same reason as every other number in this book.
+    retained = sum(m['now'] for m in moves
+                   if m['was'] is not None and m['now'] is not None)
+    o = COSTS.owned_month(R['nodes'], R['spares'], retained)
+    d = COSTS.dedicated_month(n_nodes + R['spares'], retained)
     capex = ((n_nodes + R['spares']) * COSTS.HARDWARE['node_capex']
              + COSTS.HARDWARE['switch_capex'])
     vcpu = n_nodes * R['cores_per_node'] * 2
@@ -460,15 +467,18 @@ def build(moves):
       of your own traffic leaving.</p></div>
       <div class="pcard"><h4>Owned, in one quarter rack</h4><p>{money(o['infrastructure'])} of
       infrastructure - metal amortised over five years, the spare, power, the space, transit, the
-      cross-connect and remote hands - plus {money(o['people'])} of additional salaried time. That
-      salary line is the largest number in this column, and a comparison without it is the reason
-      repatriations get approved and then regretted. Total <b>{money(o['total'])}</b> a
-      month.</p></div>
+      cross-connect and remote hands - plus {money(o['people'])} of additional salaried time and
+      {money(o['retained'])} that never comes home at all: the edge, the outbound mail and the
+      scrubbing of Move 04, and the residue five later Moves leave behind. That salary line is
+      the largest number in this column, the retained line is the one every other comparison
+      forgets, and a table without either is the reason repatriations get approved and then
+      regretted. Total <b>{money(o['total'])}</b> a month.</p></div>
       <div class="pcard"><h4>Rented by the month</h4><p>The same class of machine from a
       dedicated-host provider is {money(d['infrastructure'])}, and removes the racking, the spares
-      and a quarter of a person: <b>{money(d['total'])}</b> all in. At this size that is close to
-      owning, because a quarter rack's fixed costs do not amortise over six machines. You own
-      hardware when the fleet is big enough to carry the room.</p></div>
+      and a quarter of a person: <b>{money(d['total'])}</b> all in. At this size that BEATS
+      owning, by {money(o['total'] - d['total'])} a month, because a quarter rack's fixed costs do
+      not amortise over six machines. You own hardware when the fleet is big enough to carry the
+      room, and this fleet is not.</p></div>
       <div class="pcard"><h4>What the difference buys</h4><p>Against a bill of
       {money(COSTS.BILL_MONTH)} a month, roughly {money(COSTS.BILL_MONTH - o['total'])} a month or
       {money((COSTS.BILL_MONTH - o['total']) * 12)} a year, for a capital outlay of
@@ -479,9 +489,10 @@ def build(moves):
     </div>
     <div class="chartwrap">
       <div class="pkicker" style="margin-bottom:4mm">One estate, three ways, per month</div>
-      {cost_chart([('Cloud now', COSTS.BILL_MONTH, 0),
-                   ('Owned', o['infrastructure'], o['people']),
-                   ('Rented', d['infrastructure'], d['people'])], '100%', '#8A6112')}
+      {cost_chart([('Cloud now', COSTS.BILL_MONTH, 0, 0),
+                   ('Owned', o['infrastructure'], o['people'], o['retained']),
+                   ('Rented', d['infrastructure'], d['people'], d['retained'])],
+                  '100%', '#8A6112')}
     </div>
     <div class="kitwrap">
       <div class="hrule" style="margin:0 0 4.5mm"></div>
