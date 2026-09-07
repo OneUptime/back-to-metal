@@ -27,7 +27,9 @@
 *,*::before,*::after{box-sizing:border-box}
 
 :root{
-  color-scheme:light dark;
+  /* One theme. This also gives form controls, scrollbars and the
+     canvas behind the page their dark defaults for free. */
+  color-scheme:dark;
 
   /* ---- families ------------------------------------------------ */
   --fam:'Archivo',Helvetica,Arial,sans-serif;
@@ -71,22 +73,20 @@
   --eq-min:820px;                   /* what-replaces-what, likewise */
 
   /* ---- ink ----------------------------------------------------- */
-  /* Every value below is 4.5:1 or better against --bg. The greys this
-     replaced ran to 2.58:1 and carried most of the site's labels. */
-  --ink:#0B0E10; --ink2:#333A3F; --ink3:#535B61; --ink4:#6B7479;
-  --bg:#FCFCFB; --fill:#ECEEEE; --rule:#A8AFB3; --rule2:#DADEDE;
-  --accent:#0F5C8C; --warn:#B3200A; --on-c:#FFFFFF;
+  /* The site is dark, and only dark. It used to follow the reader's
+     system setting and carry two palettes; one theme is one set of
+     numbers to keep at contrast, and the printed book is where the
+     light version of this design lives. The print block at the foot
+     of this file puts paper back for anybody who hits Ctrl-P.
+     Every value below is 4.5:1 or better against --bg. */
+  --ink:#E2E5E6; --ink2:#B2B8BC; --ink3:#9AA2A7; --ink4:#7E878C;
+  --bg:#14181A; --fill:#1F2427; --rule:#434B50; --rule2:#282D30;
+  --accent:#7EC3E8; --warn:#F3A08A; --on-c:#14181A;
 
   /* ---- the five Stages ----------------------------------------- */
   /* Written by site.py out of parse.LAYERS, so the stylesheet and the
      printed book cannot hold different opinions about what Build is. */
 }
-@media (prefers-color-scheme:dark){:root{
-  --ink:#E2E5E6; --ink2:#B2B8BC; --ink3:#9AA2A7; --ink4:#7E878C;
-  --bg:#14181A; --fill:#1F2427; --rule:#434B50; --rule2:#282D30;
-  --accent:#7EC3E8; --warn:#F3A08A; --on-c:#14181A;
-}}
-
 /* A Stage colour is set by `data-part`, never by an inline hex, so one
    attribute drives the rule, the numeral and the tab, and the dark
    variant arrives without site.py knowing which theme is on. */
@@ -589,12 +589,15 @@ html.js .sn{cursor:pointer}
 
 /* ================================================================
    PRINT
-   The tokens are redeclared rather than the body patched: Firefox and
-   Safari keep matching prefers-color-scheme:dark while printing, so a
-   reader in a dark browser was getting #B2B8BC prose on white paper.
+   The tokens are redeclared rather than the body patched. The screen
+   is dark and paper is not: without this a reader hitting Ctrl-P got
+   #B2B8BC prose on white, or a printer asked to flood every page.
+   The Stage colours are put back to their paper hexes by site.py,
+   which writes a matching print block out of parse.LAYERS.
    ================================================================ */
 @media print{
   :root{
+    color-scheme:light;
     --ink:#000; --ink2:#1A1A1A; --ink3:#3A3A3A; --ink4:#5A5A5A;
     --bg:#fff; --fill:#fff; --rule:#666; --rule2:#BBB;
     --accent:#1F4E79; --warn:#A32E1F; --on-c:#fff}
@@ -607,18 +610,17 @@ html.js .sn{cursor:pointer}
   a[href^="http"]::after{content:' (' attr(href) ')';font-size:11px;color:#3A3A3A}
 }
 
-/* The five Stages, written by site.py out of parse.LAYERS. Two hexes
-   each: the one that sits on paper and the one that lifts off a
-   near-black screen. Which is correct depends on what is behind it. */
-[data-part=decide]{--c:#474F57}
-[data-part=buy]{--c:#8A6112}
-[data-part=build]{--c:#1F4E79}
-[data-part=move]{--c:#A32E1F}
-[data-part=run]{--c:#14655A}
-@media (prefers-color-scheme:dark){
+/* The five Stages, written by site.py out of parse.LAYERS. The screen
+   is dark, so the screen takes the `dark` hex; paper takes the other. */
 [data-part=decide]{--c:#A8B0B8}
 [data-part=buy]{--c:#DDB26A}
 [data-part=build]{--c:#8FB4D6}
 [data-part=move]{--c:#E39A7B}
 [data-part=run]{--c:#7FC4B2}
+@media print{
+[data-part=decide]{--c:#474F57}
+[data-part=buy]{--c:#8A6112}
+[data-part=build]{--c:#1F4E79}
+[data-part=move]{--c:#A32E1F}
+[data-part=run]{--c:#14655A}
 }

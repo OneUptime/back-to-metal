@@ -106,21 +106,21 @@ def fonts_css():
 def parts_css():
     """The five Stage colours, as attribute rules rather than inline hexes.
 
-    `parse.LAYERS` is the single source: it carries the colour that sits on paper
-    and the colour that lifts off a near-black screen. The site used to inline the
-    first one into a `style="--c:#1F4E79"` on every coloured element, which meant
-    the dark theme painted Stage signals at 2.2:1 to 3.6:1 - below the floor for a
-    graphic, let alone a numeral. One attribute now drives both."""
-    def block(prefix, key):
-        return '\n'.join(f'{prefix}[data-part={LAYERS[k]["key"]}]{{--c:{LAYERS[k][key]}}}'
-                         for k in ORDER)
+    `parse.LAYERS` is the single source, and it carries two hexes a Stage: the
+    one chosen to sit on paper and the one that lifts off a near-black screen.
+    The screen is what the site is, so `dark` is what `:root` gets; `color` is
+    correct only on paper and appears only inside the print block. Inlining the
+    paper hex into a `style="--c:#1F4E79"` on every coloured element is what the
+    site used to do, and it painted Stage signals at 2.2:1 to 3.6:1 on a dark
+    ground - below the floor for a graphic, let alone a numeral."""
+    def block(key):
+        return '\n'.join(f'[data-part={LAYERS[k]["key"]}]{{--c:{LAYERS[k][key]}}}'
+                          for k in ORDER)
     return (
-        '\n/* The five Stages, written by site.py out of parse.LAYERS. Two hexes\n'
-        '   each: the one that sits on paper and the one that lifts off a\n'
-        '   near-black screen. Which is correct depends on what is behind it. */\n'
-        + block('', 'color') + '\n'
-        + '@media (prefers-color-scheme:dark){\n'
-        + block('', 'dark') + '\n}\n')
+        '\n/* The five Stages, written by site.py out of parse.LAYERS. The screen\n'
+        '   is dark, so the screen takes the `dark` hex; paper takes the other. */\n'
+        + block('dark') + '\n'
+        + '@media print{\n' + block('color') + '\n}\n')
 
 
 # ------------------------------------------------------------------ the shell
@@ -152,8 +152,7 @@ def shell(title, body, depth=0, desc=''):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(title)}</title>
 <meta name="description" content="{attr(desc)}">
-<meta name="theme-color" content="#FCFCFB" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#14181A" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#14181A">
 <link rel="stylesheet" href="{up}assets/style.css{v}">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
 <script>document.documentElement.className='js'</script>

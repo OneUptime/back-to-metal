@@ -5,6 +5,19 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-09-07
+
+### Changed
+- **The website is dark, and only dark.** It used to carry two palettes and follow
+  the reader's system setting. One theme is one set of numbers to hold at contrast,
+  and it is the theme the cover, the wordmark and the favicon were already drawn in.
+  Every Stage colour now resolves to the hex `parse.LAYERS` chose for a near-black
+  ground rather than the one chosen for paper, so the signals read at 5.4:1 or better
+  instead of the 2.2:1 the paper hexes measured there.
+- **Paper is still paper.** The printed interior is unchanged, and the site's own
+  print stylesheet puts the light palette and the paper Stage colours back, so
+  Ctrl-P gives a readable page rather than a flooded one.
+
 ## [2.0.0] - 2026-09-07
 
 **The startup edition.** The book is rewritten from 122 Moves to 20, and the website from
