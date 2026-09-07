@@ -5,6 +5,38 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-07
+
+Nothing about the book changed; `site/` is byte-identical to 1.1.0. This is how the book
+gets published.
+
+### Added
+- **A release pipeline.** Pushing to the `release` branch runs the gates, builds the book,
+  the covers, the Kindle edition and the site, publishes the site to Firebase Hosting,
+  fetches the page it has just published and fails unless it is serving that version, then
+  cuts a GitHub release with the editions attached. Running it by hand from the Actions tab
+  offers a preview channel that publishes to an expiring URL and cuts nothing.
+- **`make releasable`**, the gate the pipeline adds on top of `verify` and `audit`: a bumped
+  version, a written changelog entry, nothing left under `[Unreleased]`, a tag that is free
+  or already on this content, and an EPUB identifier that has not moved since the previous
+  release. It writes the GitHub release notes out of the changelog, so they are never typed
+  twice. It is deliberately not part of `make`, because CI has to stay green while work is
+  in progress and this is the one check that must not pass until it should.
+- **`make artefacts`**, which builds everything a release publishes in the order it has to
+  be built. `site.py` copies the Kindle edition into `site/`, so the EPUB has to exist
+  first — which `make book site covers epub` would not have done, and which no gate would
+  have caught, because the committed-site check has to exclude the EPUB.
+- The pipeline takes either a scoped service account or a CI token, because the Firebase
+  CLI can only produce the second and asking for a credential the CLI cannot mint is a
+  poor first run.
+
+### Changed
+- **The book has a Firebase project to itself.** It was one hosting site inside the
+  imprint's project, sharing it with the imprint's own website — a shared blast radius for
+  no benefit. It is now `back-to-metal`, one project, one site, and
+  `backtometal.oneuptime.com` points at it. `.firebaserc` is the only place either name is
+  written; the workflow reads both out of it.
+
 ## [1.1.0] - 2026-09-07
 
 The website, laid out so it can be used rather than read. No Move changed; the book,
@@ -37,19 +69,6 @@ the PDF and the EPUB are the same 122 Moves. This is all presentation.
   Move — and its links point at the checklist.
 - The "how to use this" box is gone, along with the only bordered tinted panel on the
   site. The page does the three things it described instead of describing them.
-
-### Added
-- **A release pipeline.** Pushing to the `release` branch runs the gates, builds the book,
-  the covers, the Kindle edition and the site, publishes the site to Firebase Hosting,
-  checks the live page is serving that version, and cuts a GitHub release with the
-  editions attached. Running it by hand from the Actions tab offers a preview channel
-  instead. `make releasable` is the gate it adds on top of `verify` and `audit`: a bumped
-  version, a written changelog entry, nothing left under `[Unreleased]`, a free tag and an
-  EPUB identifier that has not moved.
-- `make artefacts` builds everything a release publishes in the order it has to be built.
-  `site.py` copies the Kindle edition into `site/`, so the EPUB has to exist first —
-  which `make book site covers epub` would not have done, and which nothing would have
-  caught, because the committed-site check has to exclude the EPUB.
 
 ### Fixed
 - The planner did nothing at all: `plan.html` never emitted the `.picker` root that
