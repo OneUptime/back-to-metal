@@ -64,20 +64,20 @@ before it goes out.
 ### The deploy credentials
 
 The workflow needs one repository secret, **`FIREBASE_SERVICE_ACCOUNT`**, holding the whole JSON
-key of a service account in the `hackerbay-press` project with the **Firebase Hosting Admin**
+key of a service account in the `back-to-metal` project with the **Firebase Hosting Admin**
 role. Nothing else in the pipeline needs a secret — the GitHub release uses the token the
 workflow is already given.
 
 ```bash
 gcloud iam service-accounts create back-to-metal-deploy \
-  --project hackerbay-press --display-name "Back to Metal release pipeline"
+  --project back-to-metal --display-name "Back to Metal release pipeline"
 
-gcloud projects add-iam-policy-binding hackerbay-press \
-  --member "serviceAccount:back-to-metal-deploy@hackerbay-press.iam.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding back-to-metal \
+  --member "serviceAccount:back-to-metal-deploy@back-to-metal.iam.gserviceaccount.com" \
   --role roles/firebasehosting.admin
 
 gcloud iam service-accounts keys create key.json \
-  --iam-account back-to-metal-deploy@hackerbay-press.iam.gserviceaccount.com
+  --iam-account back-to-metal-deploy@back-to-metal.iam.gserviceaccount.com
 
 gh secret set FIREBASE_SERVICE_ACCOUNT --repo OneUptime/back-to-metal < key.json
 rm key.json
@@ -93,10 +93,12 @@ project — rename it to `FIREBASE_SERVICE_ACCOUNT`, which is what this workflow
 The pipeline above is the ordinary way. These are the same commands, for when you are deploying
 something that is not a release — or when the pipeline itself is what is broken.
 
-The site lives in the **hackerbay-press** Firebase project, on a hosting site of its own
-(`back-to-metal`), so it does not share a release history with anything else in that project.
-`.firebaserc` maps the deploy target `book` to it, and both the project and the site name are
-read out of that file by the workflow rather than written down a second time.
+The book has a Firebase project to itself, **`back-to-metal`**, holding one hosting site,
+`backtometal`, at `https://backtometal.web.app`. It used to be one site inside the imprint's
+own project, sharing it with the imprint's website; it does not any more, so nothing this
+repository publishes can reach anything but the book. `.firebaserc` maps the deploy
+target `book` to that site, and both the project and the site name are read out of that file by
+the workflow rather than written down a second time.
 
 **Preview first.** A channel deploy publishes to a temporary URL that expires, is not the
 custom domain, and is not indexed. Use it for anything you would not want a stranger to read:
@@ -116,7 +118,7 @@ firebase deploy --only hosting:book
 Check what is currently public before and after:
 
 ```bash
-firebase hosting:channel:list --site back-to-metal
+firebase hosting:channel:list --site backtometal
 ```
 
 ### The custom domain
@@ -125,12 +127,13 @@ firebase hosting:channel:list --site back-to-metal
 first step has to happen in the Firebase console, because the verification token is issued
 there:
 
-1. Firebase console → Hosting → the `back-to-metal` site → **Add custom domain** →
-   `backtometal.oneuptime.com`. It issues a TXT record for verification and then two A records.
+1. Firebase console → the `back-to-metal` project → Hosting → the `backtometal` site →
+   **Add custom domain** → `backtometal.oneuptime.com`. It issues a TXT record for verification
+   and then the records to point at.
 2. In Cloudflare, on the `oneuptime.com` zone, add the TXT record, wait for Firebase to verify,
-   then add the two A records it gives you. Set those records to **DNS only** (grey cloud) —
-   proxying through Cloudflare in front of Firebase's own edge breaks the certificate issuance
-   and buys nothing, since Firebase already terminates TLS on a CDN.
+   then point `backtometal` at `backtometal.web.app`. Set the record to **DNS only** (grey
+   cloud) — proxying through Cloudflare in front of Firebase's own edge breaks the certificate
+   issuance and buys nothing, since Firebase already terminates TLS on a CDN.
 3. Firebase issues the certificate. That takes minutes to a few hours.
 
 Do not point the domain at the site until the site holds the real book. A custom domain is

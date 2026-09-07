@@ -1,12 +1,12 @@
 {
   "projects": {
-    "default": "hackerbay-press"
+    "default": "back-to-metal"
   },
   "targets": {
-    "hackerbay-press": {
+    "back-to-metal": {
       "hosting": {
         "book": [
-          "back-to-metal"
+          "backtometal"
         ]
       }
     }
