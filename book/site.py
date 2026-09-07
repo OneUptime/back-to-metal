@@ -112,11 +112,30 @@ def parts_css():
     def block(key):
         return '\n'.join(f'[data-part={LAYERS[k]["key"]}]{{--c:{LAYERS[k][key]}}}'
                           for k in ORDER)
+
+    def spectrum(key):
+        """All five Stages at once, as hard-edged bands across one gradient.
+
+        The header wears it along its bottom edge on every page, and it is
+        the only place on the site where all five appear together - which is
+        what lets a reader read a Stage colour as one of a set rather than as
+        an arbitrary hue on a rule. Hard stops, not a blend: these are five
+        categories and a gradient between them would imply a scale."""
+        n = len(ORDER)
+        stops = []
+        for i, k in enumerate(ORDER):
+            c = LAYERS[k][key]
+            stops.append(f'{c} {i / n * 100:.4g}%')
+            stops.append(f'{c} {(i + 1) / n * 100:.4g}%')
+        return f'--spectrum:linear-gradient(90deg,{",".join(stops)})'
+
     return (
         '\n/* The five Stages, written by site.py out of parse.LAYERS. The screen\n'
         '   is dark, so the screen takes the `dark` hex; paper takes the other. */\n'
         + block('dark') + '\n'
-        + '@media print{\n' + block('color') + '\n}\n')
+        + ':root{' + spectrum('dark') + '}\n'
+        + '@media print{\n' + block('color') + '\n'
+        + ':root{' + spectrum('color') + '}\n}\n')
 
 
 # ------------------------------------------------------------------ the shell
@@ -136,7 +155,16 @@ def shell(title, body, depth=0, desc=''):
     """The document. One stylesheet, and two scripts: the corpus of Moves, then
     the behaviour that reads it. `app.js` is deferred rather than inlined
     mid-body because nothing above the fold now depends on it - the header's
-    next link is already correct in the HTML."""
+    next link is already correct in the HTML.
+
+    The one inline script is the reveal's dead man's handle. It puts `rise` on
+    the root element, which is the only thing that lets the stylesheet hide
+    anything, and it immediately arms a two-second timer to take it off again.
+    app.js clears that timer as its first act. So the hidden state exists only
+    while a script that can undo it is known to be running: if app.js 404s, is
+    blocked, or throws on the way in, the timer fires and the reader gets the
+    whole page. Written into the head rather than the stylesheet because it has
+    to be true before the first paint, or the reveal is a flash instead."""
     up = '../' * depth
     v = f'?v={VERSION}'
     js = ''.join(f'\n<script src="{up}assets/{s}{v}" defer></script>'
@@ -151,10 +179,12 @@ def shell(title, body, depth=0, desc=''):
 <meta name="theme-color" content="#14181A">
 <link rel="stylesheet" href="{up}assets/style.css{v}">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
-<script>document.documentElement.className='js'</script>
+<script>var d=document.documentElement;d.className='js rise';
+window.BTM_RISE=setTimeout(function(){{d.classList.remove('rise')}},2000)</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to the content</a>
+<div class="rail" id="rail" aria-hidden="true"></div>
 {body}{js}
 </body>
 </html>"""
@@ -285,6 +315,35 @@ def figs(items):
         for v, k in items) + '</div>'
 
 
+def twenty(moves):
+    """The whole book as twenty bars, one per Move, each as tall as its own
+    effort figure and painted in its Stage's colour.
+
+    It is two things at once and that is why it earns the space: a table of
+    contents you can click, and the shape of the work - where the heavy days
+    are, and that they are in the middle rather than at the start where a
+    reader braced for a hard beginning expects them. The heights come from the
+    same numbers strips the schedule is computed from, so it cannot drift from
+    the roadmap further down the page.
+
+    With no stylesheet and no script it is a row of twenty numbered links,
+    which is a table of contents, which is what it was.
+    """
+    top = max(RM.effort_days(m) for m in moves) or 1
+    cells = []
+    for i, m in enumerate(moves):
+        first = i and m['layer'] != moves[i - 1]['layer']
+        cells.append(
+            f'<a class="tw{" first" if first else ""}" data-part="{m["l"]["key"]}" '
+            f'href="m/{page(m)}" style="--h:{RM.effort_days(m) / top:.3f};--i:{i}" '
+            f'aria-label="Move {m["num"]} \u00b7 {attr(m["title"])}, '
+            f'{attr(m["figures"][4])}" title="{attr(m["title"])}">'
+            f'<i></i><b>{m["num"]}</b></a>')
+    return (f'<nav class="twenty" aria-label="Every Move">{"".join(cells)}</nav>'
+            f'<p class="twenty-k">One bar a Move, as tall as the days it takes, '
+            f'in the colour of its stage.</p>')
+
+
 def hero(title, lede, sub='', display='page', extra=''):
     return (f'<section class="hero"><h1 class="d {display}">{title}</h1>'
             f'<p class="lede">{lede}</p>'
@@ -347,7 +406,7 @@ def build_index(moves, T):
 
     body = f"""{bar(0, first, 'index.html')}
 <main id="main" class="shell">
-{hero(IMP.wordmark_html(sep=' '),
+{hero(IMP.wordmark_html(sep='<br>'),
       f'{T["n"]} Moves that take a startup off AWS, Google Cloud or Azure and onto '
       f'hardware you own.',
       f'Written for a company with two or three engineers and a cloud bill around '
@@ -358,6 +417,7 @@ def build_index(moves, T):
       figs([(T['n'], 'Moves'), (f'{T["days"]:.0f}', 'Days of work'),
             (f'{T["weeks"]:.0f}', 'Weeks end to end'),
             (f'{T["pct"]:.0f}%', 'Off the bill')])
+      + twenty(moves)
       + f'<p class="cta"><a class="btn" href="m/{page(first)}">Start at Move '
         f'{first["num"]}</a> <a class="btn ghost" href="cost.html">Or check the '
         f'arithmetic first</a></p>')}
@@ -406,29 +466,62 @@ def cost_bars(rows):
     whole argument and hiding it inside a total is what makes a repatriation
     look better on a slide than it turns out to be.
 
+    THE DATUM is the first row, and it is what this chart is for. A dashed rule
+    stands at today's bill and runs the height of the drawing, and every row
+    below it carries a measured gap from where its bar stops to where that rule
+    is, labelled with what the gap is worth. Three bars of different lengths
+    ask the reader to do the subtraction; a bar, a gap and a figure in the gap
+    have already done it. It is also the honest way round: the gap is drawn as
+    an absence rather than as a fourth bar of "savings", because a saving is
+    not a thing you have, it is a thing you have stopped paying for.
+
     Colours come from CSS rather than from here: the site has a dark theme and a
     hex written into an SVG cannot follow it."""
     if not rows:
         return ''
-    W, PAD, ROW, BAR = 700, 120, 56, 20
+    W, PAD, ROW, BAR = 700, 120, 62, 22
     top = max(i + p for _, i, p in rows) or 1
     scale = (W - PAD) / top
+    datum = rows[0][1] + rows[0][2]          # the first row IS the comparison
+    dx = datum * scale
+    H = len(rows) * ROW
     out = []
+
+    # The datum rule first, so every bar and every figure sits on top of it.
+    out.append(f'<line class="cost-d" x1="{dx:.1f}" y1="6" x2="{dx:.1f}" y2="{H - 10}"/>')
+
     for k, (label, infra, people) in enumerate(rows):
         y = k * ROW
         wi, wp = infra * scale, people * scale
+        end = wi + wp
+        gap = dx - end
+        # `--i` is the row's place in the chart, and the only thing the
+        # stylesheet needs in order to draw the bars in reading order
+        # rather than all at once. It is a number, not a duration: the
+        # timing belongs in the CSS with the rest of the timing.
         out.append(f'<text class="cost-l" x="0" y="{y + 11}">{esc(label)}</text>')
-        out.append(f'<rect class="cost-i" x="0" y="{y + 20}" width="{wi:.1f}" '
-                   f'height="{BAR}"/>')
+        out.append(f'<rect class="cost-i" style="--i:{k}" x="0" y="{y + 20}" '
+                   f'width="{wi:.1f}" height="{BAR}"/>')
         if wp > 0:
-            out.append(f'<rect class="cost-p" x="{wi:.1f}" y="{y + 20}" '
-                       f'width="{wp:.1f}" height="{BAR}"/>')
-        out.append(f'<text class="cost-v" x="{wi + wp + 8:.1f}" y="{y + 35}">'
-                   f'{mny(infra + people)}</text>')
-    return (f'<svg class="cost" viewBox="0 0 {W} {len(rows) * ROW}" width="100%" '
+            out.append(f'<rect class="cost-p" style="--i:{k}" x="{wi:.1f}" '
+                       f'y="{y + 20}" width="{wp:.1f}" height="{BAR}"/>')
+        out.append(f'<text class="cost-v" style="--i:{k}" x="{end + 9:.1f}" '
+                   f'y="{y + 36}">{mny(infra + people)}</text>')
+        # The gap, and what it is worth. Only where there is room to set the
+        # figure without it colliding with the total it is measured from:
+        # a label that overlaps the number it explains explains nothing.
+        if gap > 150:
+            saved = datum - (infra + people)
+            out.append(f'<rect class="cost-g" style="--i:{k}" x="{end:.1f}" '
+                       f'y="{y + 20}" width="{gap:.1f}" height="{BAR}"/>')
+            out.append(f'<text class="cost-s" style="--i:{k}" x="{dx - 9:.1f}" '
+                       f'y="{y + 36}">&#8722;{mny(saved)} a month</text>')
+
+    lab = '; '.join(f'{l}, {mny(i + p)}' for l, i, p in rows)
+    return (f'<svg class="cost" viewBox="0 0 {W} {H}" width="100%" '
             f'style="height:auto;display:block" role="img" aria-label="Monthly cost '
-            f'compared: ' + '; '.join(f'{l}, {mny(i + p)}' for l, i, p in rows)
-            + f'">{"".join(out)}</svg>')
+            f'compared against today&rsquo;s bill of {mny(datum)}: {lab}">'
+            f'{"".join(out)}</svg>')
 
 
 def build_cost(moves, T):

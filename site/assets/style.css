@@ -9,10 +9,28 @@
    jump box and no planner, because the previous edition had all five
    and they were furniture for somebody running a four-year programme.
 
-   Rules rather than boxes. No rounded corners, no shadows, no pills,
-   no tinted cards, nothing centred. A panel is a rule and some space.
-   Every number is monospaced; prose is a grotesque. Colour marks a
-   Stage and does nothing else.
+   Rules rather than boxes. No rounded corners, no pills, no tinted
+   cards, nothing centred. A panel is a rule and some space. Every
+   number is monospaced; prose is a grotesque.
+
+   Three rules changed in this edition, and each is written down here
+   because a rule broken silently is just an inconsistency:
+
+   1. There is depth. The page has a ground, an atmosphere above it and
+      a machined lip on anything that lifts off it - one inset hairline
+      of white at 5 per cent, never a drop shadow used as decoration.
+      A near-black page with no depth is not restraint, it is flatness,
+      and it made every one of these pages read as the same page.
+   2. Colour does two jobs, not one. It still marks a Stage. It also
+      marks MONEY - `--hot` on anything that is a figure you are paying
+      or saving - because the argument of this book is arithmetic and
+      the arithmetic deserves to be findable.
+   3. Things move. Every animation is enhancement over a page already
+      rendered correct and complete: see MOTION below for the failsafe
+      that guarantees it, and note that all of it is inside a
+      `prefers-reduced-motion: no-preference` query, so a reader who
+      has said no never has anything hidden from them in the first
+      place.
 
    Everything below is built from the tokens in the first ninety
    lines. If you are about to type a length, a size or a colour that
@@ -44,7 +62,7 @@
      a point larger than the instrument edition set it. */
   --t-lede:21px; --t-body:17px; --t-sub:15px; --t-fine:13px;
   /* Display: Archivo at the narrow width stop, the `.d` voice */
-  --d-mast:clamp(44px,8vw,84px);
+  --d-mast:clamp(46px,10.4vw,132px);
   --d-page:clamp(30px,3.6vw,46px);
   --d-sect:clamp(21px,2.2vw,28px);
   --d-sub:18px;
@@ -63,7 +81,7 @@
   /* ---- layout -------------------------------------------------- */
   --gut:clamp(16px,4vw,32px);
   --page:1120px;                    /* the one container width */
-  --anchor:var(--s5);               /* nothing is sticky: a hash lands here */
+  --anchor:76px;                    /* a hash lands clear of the sticky bar */
   --num:44px;                       /* the ordinal gutter, everywhere */
   --tick:22px;                      /* a checkbox */
   --seg:6px;                        /* one segment of the progress bar */
@@ -78,10 +96,49 @@
      numbers to keep at contrast, and the printed book is where the
      light version of this design lives. The print block at the foot
      of this file puts paper back for anybody who hits Ctrl-P.
-     Every value below is 4.5:1 or better against --bg. */
-  --ink:#E2E5E6; --ink2:#B2B8BC; --ink3:#9AA2A7; --ink4:#7E878C;
-  --bg:#14181A; --fill:#1F2427; --rule:#434B50; --rule2:#282D30;
-  --accent:#7EC3E8; --warn:#F3A08A; --on-c:#14181A;
+
+     The ground went down from #14181A to #0C0F11 in this edition, for
+     one reason: with no depth in the page the old value had to serve
+     as both the paper and the shadow, so it was neither. A darker
+     ground gives the raised surfaces somewhere to be raised FROM, and
+     it buys every ink and every Stage colour about a point and a half
+     of contrast on the way past.
+
+     Every text value below is 4.5:1 or better against both --bg and
+     --fill, which is the pair that actually occurs: --fill is what a
+     hovered row is, and ink checked against the page but not against
+     the hover state is ink that fails exactly when it is pointed at. */
+  --ink:#E9EDEF; --ink2:#B8BFC5; --ink3:#99A2A9; --ink4:#818B92;
+  --bg:#0C0F11; --fill:#161C21; --rule:#39434A; --rule2:#1E252A;
+  --accent:#79C8F2; --warn:#F5A08A; --on-c:#0C0F11;
+  /* Money. The one thing on this site that is neither prose nor a
+     Stage, and the thing every reader came for. */
+  --hot:#F0B45F;
+
+  /* ---- depth ----------------------------------------------------- */
+  /* One lip and one lift, used everywhere or not at all. The lip is
+     the machined top edge of anything that has risen off the ground -
+     a single hairline of white at 5.5 per cent, which is what a
+     bevelled aluminium edge does to a ceiling light. The lift is the
+     shadow under it, kept dark and kept tight: a shadow with any
+     spread reads as a web page, and a shadow with none reads as a
+     panel someone screwed to a rack. */
+  --lip:inset 0 1px 0 rgba(255,255,255,.055);
+  --lift:0 18px 40px -28px rgba(0,0,0,.95);
+
+  /* ---- motion ---------------------------------------------------- */
+  /* Two curves. `--e-out` is for things ARRIVING - fast off the mark
+     and a long settle, the shape a mechanism makes coming to rest.
+     `--e-in-out` is for things CHANGING between two states they were
+     already in. Nothing on this site bounces or overshoots: this is a
+     runbook, and a control that springs is a control that looks like
+     it might not have finished. */
+  --e-out:cubic-bezier(.16,.84,.44,1);
+  --e-in-out:cubic-bezier(.65,0,.35,1);
+  --t-quick:130ms;     /* a colour, a border: below noticing */
+  --t-move:260ms;      /* a hover state resolving */
+  --t-rise:640ms;      /* something arriving on the page */
+  --t-count:900ms;     /* a figure counting up to itself */
 
   /* ---- the five Stages ----------------------------------------- */
   /* Written by site.py out of parse.LAYERS, so the stylesheet and the
@@ -92,17 +149,176 @@
    variant arrives without site.py knowing which theme is on. */
 [data-part=none]{--c:var(--ink)}
 
-html{-webkit-text-size-adjust:100%;scroll-padding-top:var(--anchor)}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:var(--anchor);
+  background:var(--bg)}
 html,body{overflow-x:clip}
-body{margin:0;background:var(--bg);color:var(--ink);
+body{margin:0;background:transparent;color:var(--ink);
   font:400 var(--t-body)/var(--lh-body) var(--fam);
   font-variation-settings:'wdth' 100;-webkit-font-smoothing:antialiased}
+
+/* ================================================================
+   THE SURFACE
+   Two fixed layers behind everything, both inert: no hit testing, no
+   scrolling, nothing to read. The ground colour is on `html` rather
+   than on `body` so these can sit at z-index -1 and still be seen -
+   a body background would paint over them.
+
+   The first is atmosphere: one cool bloom above the masthead, and a
+   hairline grid that is the substrate the whole design is set on.
+   The grid is masked away below the first screenful, because a grid
+   that runs the length of a Move page is graph paper and a reader is
+   not plotting anything - it is there to say the page has a floor,
+   and once that is said it should stop talking.
+
+   The second is grain. A near-black page at these gradient angles
+   bands on an 8-bit display, and the fix for banding is noise: three
+   octaves of it at three per cent, which is invisible as texture and
+   completely effective as dither.
+   ================================================================ */
+body::before,body::after{content:'';position:fixed;inset:0;z-index:-1;
+  pointer-events:none}
+body::before{
+  background:
+    radial-gradient(1120px 560px at 50% -12%,rgba(121,200,242,.115),transparent 72%),
+    radial-gradient(760px 420px at 88% 4%,rgba(240,180,95,.05),transparent 70%),
+    linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px) 0 -1px/100% 84px,
+    linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px) -1px 0/84px 100%;
+  -webkit-mask-image:linear-gradient(#000,#000 24vh,transparent 86vh);
+  mask-image:linear-gradient(#000,#000 24vh,transparent 86vh)}
+body::after{opacity:.032;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ================================================================
+   MOTION
+   ==================================================================
+   The whole system, in one place, and all of it inside a
+   no-preference query so that a reader who has asked for stillness
+   never has a single thing hidden from them - not hidden and then
+   revealed instantly, hidden never.
+
+   THE FAILSAFE. `html.rise` is put on by an inline script in the head
+   of every page, which then arms a two-second timer to take it off
+   again; app.js clears that timer as its first act. Nothing below can
+   hide anything except while that class is on, so the hidden state
+   exists only while a script that is known to be running is
+   responsible for undoing it. If app.js never arrives, the timer
+   fires and the reader gets the page.
+
+   THE SELECTOR LIST is duplicated in app.js, and the two copies have
+   to agree. It is a list of leaves on purpose: a reveal nested inside
+   another reveal adds the two offsets together and reads as a
+   stumble, so `.stage-head` is on the list and `.stage` is not.
+   ================================================================ */
+@media (prefers-reduced-motion:no-preference){
+  html.rise :where(.sect,.hero>p,.band>p,.sec>p,.callout,.note,.figs,.summary,
+    .cta,.actions,.twenty,.prog,.prog-bar,.stage-head,.mv>li,.ck,.symp li,.pt,
+    .rules>li,.shelf,.dl,.tablewrap,.cost,.rm,.perm,.cmp,.clouds li,.notes>div,
+    .pre-g,.mh>*,.mf,.colo,.onramp li,.tools li,.cost-key,.turnoff,
+    .needs,.unlocks){
+    opacity:0;transform:translateY(14px);
+    transition:opacity var(--t-rise) var(--e-out),
+               transform var(--t-rise) var(--e-out)}
+  /* One class beats the list above on specificity, which is why the
+     list is wrapped in :where() and this is not. */
+  html.rise .in{opacity:1;transform:none}
+
+  /* The masthead does not wait to be scrolled to: it is already on
+     screen, so it arrives on load. It does not fade - it is pulled up
+     through a mask exactly its own height, so the letters appear to
+     rise out of the rule beneath them rather than to materialise. The
+     mask is a clip-path rather than overflow:hidden, because the
+     descenders and the sheen both need to be able to leave the box. */
+  .mast{clip-path:inset(-.14em 0 0 0);animation:mast 900ms var(--e-out) both}
+  .hero>.lede{animation:mast 900ms 140ms var(--e-out) both}
+  .hero>.sub{animation:mast 900ms 240ms var(--e-out) both}
+  @keyframes mast{from{opacity:0;transform:translateY(.34em)}}
+
+  /* The twenty bars grow out of their own rule, left to right, at a
+     frame and a half apart. Thirty-two milliseconds is the smallest
+     stagger that still reads as a sequence rather than as a flicker. */
+  .tw i{animation:grow 620ms var(--e-out) both;
+    animation-delay:calc(120ms + var(--i,0) * 32ms)}
+  @keyframes grow{from{transform:scaleY(0)}}
+
+  /* Two drawings do not rise, because they have motion of their own
+     and a translate on top of it reads as two things happening. They
+     stay on the reveal list because `.in` is what starts them. */
+  html.rise :where(.cost,.rm){transform:none}
+  /* The roadmap wipes left to right in schedule order - which is the
+     order it is read in, and the order the work actually happens in.
+     A little past the right edge, so the last bar's end is not shaved
+     by a clip that stops exactly on it. */
+  html.rise .rm{clip-path:inset(0 100% 0 0)}
+  html.rise .rm.in{clip-path:inset(0 -2% 0 0);
+    transition:clip-path 1150ms var(--e-out),opacity var(--t-rise) var(--e-out)}
+
+  /* The cost bars draw themselves when the chart arrives, in the
+     order the rows are read. */
+  html.rise .cost :where(.cost-i,.cost-p){transform:scaleX(0)}
+  html.rise .cost.in :where(.cost-i,.cost-p){transform:none;
+    transition:transform 820ms var(--e-out);
+    transition-delay:calc(var(--i,0) * 110ms)}
+  html.rise .cost :where(.cost-v,.cost-s,.cost-d){opacity:0}
+  html.rise .cost.in :where(.cost-v,.cost-s){opacity:1;
+    transition:opacity 420ms linear;
+    transition-delay:calc(340ms + var(--i,0) * 110ms)}
+  /* The datum is the thing the rest is measured against, so it is
+     drawn before any of it: it is the ruler, not a result. */
+  html.rise .cost.in :where(.cost-d){opacity:1;transition:opacity 320ms linear}
+  html.rise .cost :where(.cost-g){transform:scaleX(0)}
+  html.rise .cost.in :where(.cost-g){transform:none;
+    transition:transform 620ms var(--e-out);
+    transition-delay:calc(420ms + var(--i,0) * 110ms)}
+}
+
+/* How far down the page, drawn as a hairline across the top of the
+   window. It is the one piece of chrome that is genuinely always
+   there, it is two pixels tall, and it answers the question a long
+   Move page otherwise leaves open. `--at` is set by app.js, once a
+   frame at most; with no script it stays at 0 and the rule is
+   invisible rather than wrong. */
+.rail{position:fixed;top:0;left:0;right:0;height:2px;z-index:60;
+  pointer-events:none}
+.rail::before{content:'';display:block;height:100%;
+  background:linear-gradient(90deg,var(--accent),var(--hot));
+  transform:scaleX(var(--at,0));transform-origin:0 50%;
+  transition:transform 90ms linear}
 
 /* The display voice: Archivo's width axis, not its weight axis. */
 .d{font-variation-settings:'wdth' 79;font-weight:800;text-transform:uppercase;
   letter-spacing:var(--tr-d);line-height:var(--lh-d)}
-.mast{font-size:var(--d-mast)}
+/* The masthead is a SET BLOCK, not a big heading: two lines driven to
+   Archivo's condensed end and locked at a leading tighter than the
+   glyphs are tall, so the two words read as one mass of tone with a
+   shape. It arrives by translating up through a mask the height of its
+   own line box - type coming off the press bed, rather than type
+   fading in, which is the one thing paper cannot do.
+
+   The old masthead was 84px at wdth 79. That set "BACK TO METAL" on one
+   line across less than half the column and left the rest of the screen
+   to prove there was nothing else there. */
+.mast{font-size:var(--d-mast);font-variation-settings:'wdth' 68;line-height:.86;
+  letter-spacing:-.025em}
+.mast br{line-height:0}
+/* METAL is the only word on the site that is made of metal. It is a
+   brushed gradient clipped to the glyphs, which is the one place a
+   gradient earns its keep: the word is the title, the material is the
+   subject, and the sheen crosses it once on the way in and then stops.
+   Every stop in it is 8:1 or better against the page, so the word is
+   as legible as the ink beside it - and the colour is declared first
+   and overridden inside @supports, so a browser that cannot clip a
+   background to text gets a blue word rather than an invisible one. */
 .mast em{font-style:normal;color:var(--accent)}
+@supports ((background-clip:text) or (-webkit-background-clip:text)){
+  .mast em{color:transparent;
+    background-image:linear-gradient(100deg,#CFE3EF 0%,#79C8F2 26%,#EAF4FA 44%,
+      #79C8F2 62%,#A9CFE4 100%);
+    background-size:280% 100%;background-position:100% 0;
+    -webkit-background-clip:text;background-clip:text}
+  @media (prefers-reduced-motion:no-preference){
+    .mast em{animation:sheen 1900ms 420ms var(--e-out) both}
+    @keyframes sheen{from{background-position:100% 0}to{background-position:0 0}}
+  }
+}
 .page{font-size:var(--d-page);max-width:16em}
 .sect{font-size:var(--d-sect);margin:0 0 var(--s5);padding-bottom:var(--s2);
   border-bottom:2px solid var(--ink)}
@@ -137,22 +353,61 @@ img,svg{max-width:100%}
 
 /* ================================================================
    THE HEADER
-   A rule, a wordmark, five plain-English links and the next Move. It
-   is deliberately NOT sticky: pinning 48px of chrome over a page
-   somebody reads for twenty minutes is what this edition removed.
+   A rule, a wordmark, five plain-English links and the next Move.
+
+   It is sticky now, and it was not. The old argument was that pinning
+   48px of chrome over a page somebody reads for twenty minutes is
+   furniture; the answer to it is that this is twenty-five pages with
+   a fixed order, the header carries the ONE thing that knows where
+   you are in it, and a reader four screens down a Move page had to
+   go back to the top to use it. So it stays, and it pays for the
+   space by getting out of the way: once the masthead is behind it the
+   block padding halves and the wordmark loses two points, which puts
+   it at 44px - a line of type and its rule, and nothing else.
    ================================================================ */
-.bar{border-bottom:1px solid var(--ink)}
+.bar{position:sticky;top:0;z-index:40;border-bottom:1px solid var(--rule);
+  isolation:isolate;
+  /* --bg at 84 per cent, written out: a blur needs something to blur
+     and color-mix on a custom property is not worth the round trip
+     for a value that is a constant in this file. */
+  background:rgba(12,15,17,.84);
+  -webkit-backdrop-filter:blur(16px) saturate(150%);
+  backdrop-filter:blur(16px) saturate(150%);
+  transition:border-color var(--t-move) linear}
+/* No blur means the translucency is just a smear over moving text. */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .bar{background:var(--bg)}
+}
+html.scrolled .bar{border-bottom-color:var(--ink);box-shadow:var(--lift)}
+/* The five Stages, laid across the foot of the header on every page.
+   It is the book's colour identity said once, in two pixels, and it is
+   the only thing on the site that shows all five at the same time -
+   which is what makes a Stage colour legible as one of a set rather
+   than as an arbitrary hue on a rule. Written by site.py out of
+   parse.LAYERS, like every other Stage colour here. */
+.bar::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;
+  background:var(--spectrum);opacity:.9}
 .bar-in{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3) var(--s5);
-  padding-block:var(--s4)}
+  padding-block:var(--s4);transition:padding var(--t-move) var(--e-in-out)}
+html.scrolled .bar-in{padding-block:var(--s2)}
 .wm{flex:none;text-decoration:none;font-variation-settings:'wdth' 76;font-weight:800;
   text-transform:uppercase;font-size:var(--d-sub);line-height:1;letter-spacing:-.01em;
-  white-space:nowrap}
+  white-space:nowrap;transition:font-size var(--t-move) var(--e-in-out)}
+html.scrolled .wm{font-size:16px}
 .wm em{font-style:normal;color:var(--accent)}
 .nav{display:flex;flex-wrap:wrap;gap:0 var(--s5);flex:1 1 auto;min-width:0}
-.nav a{display:inline-flex;align-items:center;min-height:32px;font-size:var(--t-sub);
-  color:var(--ink3);text-decoration:none;border-bottom:2px solid transparent}
+/* The underline grows from the middle rather than appearing, which is
+   the difference between a link that responds and a link that blinks. */
+.nav a{position:relative;display:inline-flex;align-items:center;min-height:32px;
+  font-size:var(--t-sub);color:var(--ink3);text-decoration:none;
+  transition:color var(--t-quick) linear}
+.nav a::after{content:'';position:absolute;left:0;right:0;bottom:2px;height:2px;
+  background:currentColor;transform:scaleX(0);
+  transition:transform var(--t-move) var(--e-out)}
 .nav a:hover{color:var(--ink)}
-.nav a.on{color:var(--ink);border-bottom-color:var(--ink)}
+.nav a:hover::after{transform:scaleX(1)}
+.nav a.on{color:var(--ink)}
+.nav a.on::after{transform:scaleX(1)}
 /* The one mechanic that spans every page. Move 01 is in the HTML,
    which is the right answer for anybody who has ticked nothing. */
 .next{flex:none;display:flex;align-items:baseline;gap:var(--s2);min-width:0;
@@ -161,7 +416,10 @@ img,svg{max-width:100%}
   font-variant-numeric:tabular-nums}
 .next-t{font-size:var(--t-sub);color:var(--ink);max-width:var(--next-w);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.next{transition:border-color var(--t-quick) linear}
+.next:hover{border-left-color:var(--accent)}
 .next:hover .next-t{text-decoration:underline;text-underline-offset:3px}
+.next-n{transition:color var(--t-quick) linear}
 
 /* ================================================================
    COMMON FURNITURE
@@ -179,10 +437,16 @@ img,svg{max-width:100%}
   color:var(--ink3);max-width:var(--measure)}
 .note{margin:var(--s5) 0 0;font-size:var(--t-sub);line-height:var(--lh-sub);
   color:var(--ink3);max-width:var(--measure)}
-/* A callout is a rule and some space, and never a tinted box. */
-.callout{margin:var(--s5) 0 0;padding:var(--s2) 0 var(--s2) var(--s5);
+/* A callout is a rule and some space, and still never a tinted box -
+   what it has now is a wash that falls off the rule and is gone within
+   a third of the measure. A box says "this is a different kind of
+   content"; a wash says "the rule is over here", which is the only
+   thing the callout was ever trying to say. */
+.callout{position:relative;margin:var(--s5) 0 0;
+  padding:var(--s3) var(--s4) var(--s3) var(--s5);
   border-left:3px solid var(--ink);font-size:var(--t-body);
-  line-height:var(--lh-body);color:var(--ink2);max-width:var(--measure)}
+  line-height:var(--lh-body);color:var(--ink2);max-width:var(--measure);
+  background:linear-gradient(90deg,rgba(255,255,255,.035),transparent 38%)}
 .callout .lbl{display:block;margin-bottom:var(--s2);color:var(--ink)}
 .prose{max-width:var(--measure-lede)}
 .prose p{margin:0 0 var(--s5);font-size:var(--t-lede);line-height:var(--lh-lede);
@@ -191,30 +455,117 @@ img,svg{max-width:100%}
 :where(.prose,.callout,.note,.band>p,.sec>p,.pt p,.rules p,.stage-done,.foot-note,
   .dl-m) a{color:var(--accent);text-underline-offset:2px}
 
-.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;
-  padding:0 var(--s5);font:400 var(--m-lab)/1 var(--mono);letter-spacing:var(--tr-lab);
-  text-transform:uppercase;text-decoration:none;cursor:pointer;
-  border:1px solid var(--ink);background:var(--ink);color:var(--bg)}
-.btn:hover{background:transparent;color:var(--ink)}
-.ghost{background:transparent;color:var(--ink)}
-.ghost:hover{background:var(--ink);color:var(--bg)}
+/* Two buttons, and both of them fill rather than swap. A button that
+   changes colour on hover has two states; a button whose fill sweeps
+   in from the edge you approached it from has a direction, and a
+   direction is what makes a control feel like it is made of
+   something. The sweep is a background-size on a gradient, so it costs
+   no pseudo-element and no compositing layer. */
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;
+  min-height:44px;padding:0 var(--s5);font:400 var(--m-lab)/1 var(--mono);
+  letter-spacing:var(--tr-lab);text-transform:uppercase;text-decoration:none;
+  cursor:pointer;border:1px solid var(--ink);background-color:var(--ink);
+  color:var(--bg);box-shadow:var(--lip);
+  transition:color var(--t-quick) linear,box-shadow var(--t-move) var(--e-out),
+             transform var(--t-move) var(--e-out)}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--lip),var(--lift)}
+.btn:active{transform:translateY(0);transition-duration:60ms}
+/* The filled one cannot sweep a fill it already has, so it takes a
+   sheen instead: a band of light crossing it once, on the way in. */
+.btn:not(.ghost){background-image:linear-gradient(100deg,transparent 34%,
+  rgba(255,255,255,.42) 50%,transparent 66%);
+  background-size:320% 100%;background-position:150% 0;background-repeat:no-repeat;
+  transition:color var(--t-quick) linear,box-shadow var(--t-move) var(--e-out),
+             transform var(--t-move) var(--e-out),
+             background-position 620ms var(--e-out)}
+.btn:not(.ghost):hover{background-position:-50% 0}
+.ghost{background-color:transparent;color:var(--ink);
+  background-image:linear-gradient(var(--ink),var(--ink));
+  background-repeat:no-repeat;background-position:0 50%;background-size:0 100%;
+  transition:color var(--t-quick) linear,background-size var(--t-move) var(--e-in-out),
+             box-shadow var(--t-move) var(--e-out),transform var(--t-move) var(--e-out)}
+.ghost:hover{color:var(--bg);background-size:100% 100%}
 .cta,.actions{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3);
   margin:var(--s6) 0 0}
 
 /* The figure strip and the checklist summary are one component: a big
-   mono number, a label under it, hairlines above and below. */
+   mono number, a label under it, hairlines above and below. The
+   numbers count up to themselves once, when the strip is first
+   scrolled to - they are rendered at their final value in the HTML
+   and app.js only ever replays the last second of arriving there, so
+   a reader with no script sees the answer and a reader with one sees
+   it land. Below twenty it does not bother: there is nothing to watch
+   in a two-frame run up to a number like 20, and it reads as a fault.
+
+   `tabular-nums` is not decoration here. Without it every frame of the
+   count is a different width and the strip shivers. */
 .figs,.summary{display:grid;
   grid-template-columns:repeat(auto-fit,minmax(min(160px,100%),1fr));
   gap:0 var(--s5);margin-top:var(--s6);
   border-top:1px solid var(--rule);border-bottom:2px solid var(--ink)}
-.fig,.sum{padding:var(--s4) var(--s4) var(--s4) 0}
+.fig,.sum{padding:var(--s4) var(--s4) var(--s4) 0;position:relative}
+/* A hairline between the figures, and none before the first: the
+   strip is one object with divisions, not four boxes in a row. */
+.fig+.fig::before,.sum+.sum::before{content:'';position:absolute;left:calc(-1 * var(--s5) / 2);
+  top:var(--s4);bottom:var(--s4);width:1px;background:var(--rule2)}
 .fig-n,.sum b{display:block;font:400 var(--m-fig)/1 var(--mono);color:var(--ink);
-  font-variant-numeric:tabular-nums}
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 .fig .lbl,.sum .lbl{display:block;margin-top:var(--s2)}
+
+/* ================================================================
+   THE TWENTY
+   The whole book as one strip: a bar a Move, as tall as that Move's
+   own effort figure, in its Stage's colour, and every one of them a
+   link. It is the table of contents and the shape of the work in the
+   same object - and the shape is the argument, because the heavy days
+   are in the middle and a reader braced for a hard beginning can see
+   that they are not.
+
+   The heights come from the numbers strips the schedule is computed
+   from, written into `--h` by site.py as a fraction of the longest
+   Move, so this cannot drift from the roadmap further down the page.
+   With no stylesheet it is twenty numbered links in order, which is a
+   contents page, which is what it is.
+   ================================================================ */
+.twenty{display:flex;align-items:stretch;gap:3px;margin-top:var(--s7)}
+.tw{flex:1 1 0;min-width:0;display:grid;grid-template-rows:78px auto;
+  gap:var(--s2);text-decoration:none}
+/* A Stage starts here: one space of air, so five groups of four read
+   as five groups of four without a label saying so. */
+.tw.first{margin-left:var(--s4)}
+.tw i{align-self:end;display:block;
+  /* A floor of 14 per cent, so the shortest Move is still a bar and
+     still a target, and 86 per cent of the box for the difference. */
+  height:calc(14% + var(--h,0) * 86%);
+  background:linear-gradient(var(--c),color-mix(in srgb,var(--c) 55%,transparent));
+  border-top:2px solid var(--c);opacity:.55;transform-origin:50% 100%;
+  transition:opacity var(--t-move) var(--e-out),
+             filter var(--t-move) var(--e-out)}
+.tw b{padding-top:var(--s2);border-top:1px solid var(--rule);text-align:center;
+  font:400 var(--m-lab)/1.4 var(--mono);color:var(--ink4);
+  font-variant-numeric:tabular-nums;
+  transition:color var(--t-quick) linear,border-color var(--t-quick) linear}
+.tw:hover i,.tw:focus-visible i{opacity:1;filter:drop-shadow(0 0 12px var(--c))}
+.tw:hover b,.tw:focus-visible b{color:var(--c);border-top-color:var(--c)}
+.twenty-k{margin:var(--s3) 0 0;font:400 var(--m-lab)/1.6 var(--mono);
+  letter-spacing:var(--tr-lab);text-transform:uppercase;color:var(--ink3)}
+/* color-mix is a progressive nicety; without it the bar is flat in
+   its Stage colour, which is what it was. */
+@supports not (background:color-mix(in srgb,red 50%,transparent)){
+  .tw i{background:var(--c)}
+}
 
 /* A Stage: a rule in its own colour, a tab, a name, and what done
    means. The front page and the checklist share it. */
-.stage{margin-top:var(--s7);padding-top:var(--s4);border-top:3px solid var(--c)}
+/* The Stage rule is 3px of its own colour with the colour fading out
+   along it. A rule that starts at full strength and ends in the page
+   is a rule that points somewhere, which is what a Stage heading is
+   doing; a flat bar is a divider, which is not the same job. */
+.stage{margin-top:var(--s7);padding-top:var(--s4);border-top:3px solid var(--c);
+  border-image:linear-gradient(90deg,var(--c),color-mix(in srgb,var(--c) 12%,transparent)) 1}
+@supports not (background:color-mix(in srgb,red 50%,transparent)){
+  .stage{border-image:none}
+}
 .stage-head{margin-bottom:var(--s5)}
 .stage-head>.lbl{display:block;color:var(--c)}
 .stage-head h2,.stage-head h3{margin:var(--s2) 0 0;font-size:var(--d-sect);color:var(--c)}
@@ -248,14 +599,27 @@ img,svg{max-width:100%}
    in the Stage colour, then four rows of number, title, hook, facts.
    ================================================================ */
 .stages,.mv{list-style:none;margin:0;padding:0}
-.mv>li{border-top:1px solid var(--rule2)}
+.mv>li{border-top:1px solid var(--rule2);position:relative}
 .mv a{display:grid;
   grid-template-columns:var(--num) minmax(9em,15em) minmax(0,1fr) max-content;
-  gap:0 var(--s5);align-items:baseline;padding:var(--s4) 0;text-decoration:none}
-.mv a:hover{background:var(--fill)}
+  gap:0 var(--s5);align-items:baseline;padding:var(--s4) 0;text-decoration:none;
+  transition:background var(--t-move) var(--e-out)}
+/* Hovering a row lights a 2px marker in the Stage colour down its
+   left edge, growing from the top rather than appearing, and washes
+   the fill in from the same edge. Both start at the left because the
+   ordinal is at the left and that is where the eye already is. */
+.mv>li::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:var(--c);transform:scaleY(0);transform-origin:50% 0;
+  transition:transform var(--t-move) var(--e-out)}
+.mv>li:hover::before,.mv>li:focus-within::before{transform:none}
+.mv a:hover,.mv a:focus-visible{
+  background:linear-gradient(90deg,var(--fill),transparent 72%)}
 .mv a:hover .mv-t{text-decoration:underline;text-underline-offset:3px}
 .mv-n{font:400 var(--m-val)/1.3 var(--mono);color:var(--c);
-  font-variant-numeric:tabular-nums}
+  font-variant-numeric:tabular-nums;transition:text-shadow var(--t-move) linear}
+.mv a:hover .mv-n{text-shadow:0 0 16px var(--c)}
+.mv-t{transition:transform var(--t-move) var(--e-out)}
+.mv a:hover .mv-t{transform:translateX(3px)}
 .mv-t{font-size:var(--t-item);line-height:1.3;font-variation-settings:'wdth' 92;
   font-weight:600;color:var(--ink)}
 /* Hooks run to 171 characters and the rows have to stay a scannable
@@ -270,8 +634,10 @@ img,svg{max-width:100%}
 
 .symp{list-style:none;margin:0;padding:0}
 .symp li{display:grid;grid-template-columns:minmax(0,1fr) max-content;
-  gap:0 var(--s5);align-items:baseline;padding:var(--s3) 0;
-  border-top:1px solid var(--rule2)}
+  gap:0 var(--s5);align-items:baseline;padding:var(--s3) var(--s3) var(--s3) 0;
+  border-top:1px solid var(--rule2);
+  transition:background var(--t-quick) linear}
+.symp li:hover{background:linear-gradient(90deg,var(--fill),transparent 78%)}
 .symp-q{font-size:var(--t-item);line-height:1.35;color:var(--ink)}
 .symp-a{display:flex;gap:var(--s3);font-family:var(--mono);font-size:var(--m-val);
   font-variant-numeric:tabular-nums}
@@ -304,23 +670,42 @@ img,svg{max-width:100%}
 .cmp .save th,.cmp .save td{font-weight:700;color:var(--ink)}
 .cmp .people th,.cmp .people td{border-bottom:1px solid var(--rule)}
 
-/* The chart takes its two tones from the ink scale rather than from a
-   hue, because colour on this site means a Stage and nothing else. */
-.cost{display:block;max-width:var(--chart);margin-top:var(--s5)}
+/* The chart used to take its two tones from the ink scale, on the rule
+   that colour meant a Stage and nothing else. That rule now has a
+   second job - colour also means money - and this is the chart the
+   whole book argues from, so it gets it: the metal is `--accent` and
+   the salaried time is `--hot`, which is the distinction the page is
+   trying to make and which two greys were making very quietly.
+
+   Both are above 10:1 against the page and 3.9:1 against each other,
+   and the shared edge of a stacked bar is still drawn as a rule in the
+   ground colour rather than left to the eye. */
+.cost{display:block;max-width:var(--chart);margin-top:var(--s5);overflow:visible}
 .cost text{font-family:var(--mono)}
-.cost-l{font-size:11px;fill:var(--ink3)}
-.cost-v{font-size:13px;fill:var(--ink);font-variant-numeric:tabular-nums}
-/* The two tones are 4.5:1 and 6.7:1 against the page but only 2.8:1
-   against each other, so the shared edge of a stacked bar is drawn as
-   a rule in the paper colour rather than left to the eye. */
-.cost-i,.cost-p{stroke:var(--bg);stroke-width:1.5}
-.cost-i{fill:var(--ink)}
-.cost-p{fill:var(--ink3)}
+.cost-l{font-size:11px;fill:var(--ink3);letter-spacing:.06em;
+  text-transform:uppercase}
+.cost-v{font-size:14px;fill:var(--ink);font-variant-numeric:tabular-nums}
+.cost-i,.cost-p{stroke:var(--bg);stroke-width:1.5;
+  transform-box:fill-box;transform-origin:0 50%}
+.cost-i{fill:var(--accent)}
+.cost-p{fill:var(--hot)}
+/* The datum: today's bill, standing as a dashed rule the height of the
+   drawing. Dashed rather than solid because it is a reference and not
+   a quantity - nothing is that long, it is just where the line is. */
+.cost-d{stroke:var(--ink3);stroke-width:1;stroke-dasharray:2 5}
+/* The gap between a bar and the datum: what that row does NOT spend.
+   Drawn as an absence - an outline with nothing in it - because a
+   saving is not a thing you have, it is a thing you stopped paying
+   for, and filling it in would make it look like a fourth bar. */
+.cost-g{fill:none;stroke:var(--rule);stroke-width:1;stroke-dasharray:1 3;
+  transform-box:fill-box;transform-origin:100% 50%}
+.cost-s{font-size:12px;fill:var(--hot);text-anchor:end;
+  font-variant-numeric:tabular-nums;letter-spacing:.02em}
 .cost-key{margin:var(--s6) 0 0;font:400 var(--m-lab)/1.6 var(--mono);
   letter-spacing:var(--tr-lab);text-transform:uppercase;color:var(--ink3)}
 .k-i,.k-p{display:inline-block;width:var(--s4);height:var(--s2);vertical-align:0}
-.k-i{background:var(--ink);margin-right:var(--s2)}
-.k-p{background:var(--ink3);margin:0 var(--s2) 0 var(--s5)}
+.k-i{background:var(--accent);margin-right:var(--s2)}
+.k-p{background:var(--hot);margin:0 var(--s2) 0 var(--s5)}
 
 .perm-n{width:var(--num)}
 .perm-n a{font-family:var(--mono);color:var(--c);text-decoration:none;
@@ -340,6 +725,11 @@ img,svg{max-width:100%}
   border-bottom:1px solid var(--rule)}
 .eq-yours a:hover{border-color:var(--accent)}
 .cmp tr:hover td,.perm tbody tr:hover td,.eq tr:hover td{background:var(--fill)}
+.cmp td,.perm td,.eq td{transition:background var(--t-quick) linear}
+/* The saved row is the answer to the page's question, so it is the one
+   figure on it in the money colour. */
+.cmp .save td{color:var(--hot)}
+.perm tfoot .perm-v:last-child,.perm tbody td:last-child{color:var(--hot)}
 
 /* ================================================================
    YOUR CHECKLIST
@@ -353,15 +743,55 @@ img,svg{max-width:100%}
    No count in the CSS: the columns come from however many there are. */
 .prog-bar{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:var(--s1);
   height:var(--seg);margin-top:var(--s4)}
-.prog-bar i{background:var(--rule2)}
-.prog-bar i.on,.prog-bar i.done{background:var(--c)}
+/* A segment fills by growing out of its own left edge, not by changing
+   colour: twenty of them changing colour at once is a flash, twenty
+   of them growing is a bar filling. The transform is on a child so the
+   grid track keeps its width whatever the segment is doing. */
+.prog-bar i{background:var(--rule2);position:relative;overflow:hidden}
+.prog-bar i::before{content:'';position:absolute;inset:0;background:var(--c);
+  transform:scaleX(0);transform-origin:0 50%;
+  transition:transform var(--t-move) var(--e-out)}
+.prog-bar i.on::before,.prog-bar i.done::before{transform:none}
 
-.ck{display:grid;
+/* ---- the checklist rows ------------------------------------------- */
+.ck{transition:background var(--t-quick) linear}
+.ck-t,.ck-n{transition:color var(--t-move) linear,
+  text-decoration-color var(--t-move) linear}
+
+.ck{position:relative;display:grid;
   grid-template-columns:var(--tick) var(--num) minmax(0,1fr) max-content;
   gap:0 var(--s3);align-items:center;padding:var(--s3) 0;min-height:44px;
   cursor:pointer;border-top:1px solid var(--rule2)}
-.ck:hover,.ck:focus-within{background:var(--fill)}
-.ck-box{width:var(--tick);height:var(--tick);margin:0;flex:none;accent-color:var(--c)}
+.ck:hover,.ck:focus-within{background:linear-gradient(90deg,var(--fill),transparent 72%)}
+/* The same marker the front page's Move rows use, so a row is a row
+   wherever the reader meets it. */
+.ck::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:var(--c);transform:scaleY(0);transform-origin:50% 0;
+  transition:transform var(--t-move) var(--e-out)}
+.ck:hover::before,.ck:focus-within::before{transform:none}
+
+/* ---- the tick box -------------------------------------------------
+   Drawn rather than borrowed. `accent-color` on a native box gets you
+   the platform's own control - a blue rounded square on one machine, a
+   grey one on the next, and on neither of them the Stage colour that
+   every other mark on the row is in. This is a square, a hairline and
+   a tick that draws itself, it is the same object at both sizes, and
+   it is still an <input type=checkbox> underneath: it focuses, it
+   toggles from the keyboard, and a form reset resets it. */
+.ck-box,.kt-box{appearance:none;-webkit-appearance:none;
+  width:var(--tick);height:var(--tick);margin:0;flex:none;
+  display:inline-grid;place-content:center;cursor:pointer;
+  border:1px solid var(--rule);background:transparent;
+  transition:border-color var(--t-quick) linear,
+             background-color var(--t-quick) linear}
+.ck-box::before,.kt-box::before{content:'';width:5px;height:10px;
+  margin-top:-2px;border:solid var(--on-c);border-width:0 2px 2px 0;
+  transform:rotate(45deg) scale(0);
+  transition:transform var(--t-move) var(--e-out)}
+.ck:hover .ck-box,.kt:hover .kt-box{border-color:var(--ink3)}
+.ck-box:checked{background-color:var(--c);border-color:var(--c)}
+.kt-box:checked{background-color:var(--accent);border-color:var(--accent)}
+.ck-box:checked::before,.kt-box:checked::before{transform:rotate(45deg) scale(1)}
 .ck-n{font:400 var(--m-val)/1.3 var(--mono);color:var(--c);
   font-variant-numeric:tabular-nums}
 .ck-t{font-size:var(--t-item);line-height:1.3;font-variation-settings:'wdth' 92;
@@ -382,8 +812,11 @@ img,svg{max-width:100%}
 .pts,.rules{list-style:none;margin:0;padding:0}
 .pt,.rules>li{display:grid;grid-template-columns:var(--num) minmax(0,1fr);
   gap:0 var(--s4);padding:var(--s5) 0;border-top:1px solid var(--rule2)}
+.pt,.rules>li{transition:background var(--t-quick) linear}
+.pt:hover,.rules>li:hover{background:linear-gradient(90deg,var(--fill),transparent 76%)}
 .pt .n,.rules .n{font:400 var(--m-val)/1.55 var(--mono);color:var(--ink3);
-  font-variant-numeric:tabular-nums}
+  font-variant-numeric:tabular-nums;transition:color var(--t-quick) linear}
+.pt:hover .n,.rules>li:hover .n{color:var(--accent)}
 .pt h3,.rules h3{margin:0 0 var(--s2);font-size:var(--t-item-lg);line-height:1.3;
   font-variation-settings:'wdth' 92;font-weight:600}
 .pt p,.rules p{margin:0;font-size:var(--t-body);line-height:var(--lh-body);
@@ -400,9 +833,8 @@ img,svg{max-width:100%}
 .kt{display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s3) 0;
   min-height:44px;cursor:pointer;font-size:var(--t-sub);line-height:var(--lh-sub);
   color:var(--ink2)}
-.kt-box{width:var(--tick);height:var(--tick);margin:0;flex:none;
-  accent-color:var(--accent)}
 .kt-box:checked+span{color:var(--ink4);text-decoration:line-through}
+.kt-box+span{transition:color var(--t-move) linear}
 .sub-h{margin:var(--s8) 0 var(--s4);font-size:var(--d-sub);padding-bottom:var(--s2);
   border-bottom:1px solid var(--rule)}
 .tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(180px,100%),1fr));
@@ -417,9 +849,15 @@ img,svg{max-width:100%}
    ================================================================ */
 .dls{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));
   gap:0 var(--s6);margin-top:var(--s5)}
-.dl{display:block;padding:var(--s4) var(--s4) var(--s4) 0;text-decoration:none;
-  border-top:2px solid var(--ink)}
-.dl:hover{background:var(--fill)}
+.dl{display:block;padding:var(--s4);text-decoration:none;
+  border-top:2px solid var(--ink);background:var(--fill);box-shadow:var(--lip);
+  transition:transform var(--t-move) var(--e-out),
+             box-shadow var(--t-move) var(--e-out),
+             border-color var(--t-quick) linear}
+.dl:hover{transform:translateY(-2px);border-top-color:var(--accent);
+  box-shadow:var(--lip),var(--lift)}
+.dl:hover .dl-t{color:var(--accent)}
+.dl-t{transition:color var(--t-quick) linear}
 .dl-t{display:block;font-size:var(--t-item-lg);font-variation-settings:'wdth' 92;
   font-weight:600}
 .dl-m{display:block;margin-top:var(--s1);font:400 var(--m-lab)/1.5 var(--mono);
@@ -429,7 +867,12 @@ img,svg{max-width:100%}
 .colo,.facts{display:grid;
   grid-template-columns:repeat(auto-fit,minmax(min(150px,100%),1fr));
   gap:0 var(--s5);margin:var(--s5) 0 0;border-top:1px solid var(--rule)}
-.colo>div,.facts>div{padding:var(--s3) var(--s4) var(--s3) 0}
+.colo>div,.facts>div{position:relative;padding:var(--s3) var(--s4) var(--s3) 0}
+/* The same hairline division the figures strip uses, so a strip of
+   facts and a strip of figures are recognisably the same object. */
+.facts>div+div::before,.colo>div+div::before{content:'';position:absolute;
+  left:calc(-1 * var(--s5) / 2);top:var(--s3);bottom:var(--s3);width:1px;
+  background:var(--rule2)}
 .colo dt,.facts dt{margin-bottom:var(--s1)}
 .colo dd,.facts dd{margin:0;display:flex;align-items:center;gap:var(--s2);
   font-family:var(--mono);font-size:var(--m-val);color:var(--ink);
@@ -458,13 +901,25 @@ img,svg{max-width:100%}
    over-painted in the Stage colour for every step ticked: a rule
    filling, not a disc and not a box. */
 .steps{list-style:none;margin:0;padding:0;position:relative}
-.steps::before{content:'';position:absolute;left:var(--num);top:var(--s2);
-  bottom:var(--s5);width:1px;background:var(--rule2)}
+.steps::before,.steps::after{content:'';position:absolute;left:var(--num);
+  top:var(--s2);bottom:var(--s5);width:1px}
+.steps::before{background:var(--rule2)}
+/* The same rule again, in the Stage colour, scaled to how far down the
+   runbook the reader has got. `--done` is a fraction written by app.js
+   off the DEEPEST step ticked, because the rule is a position in the
+   job and not a percentage of it. It defaults to 0, so with no script
+   the hairline is a hairline. */
+.steps::after{background:var(--c);transform:scaleY(var(--done,0));
+  transform-origin:50% 0;transition:transform 420ms var(--e-out)}
 .steps>li{display:grid;grid-template-columns:var(--num) minmax(0,1fr);
   padding-bottom:var(--s6)}
 .sn{font:400 var(--m-val)/1.6 var(--mono);color:var(--c);
   font-variant-numeric:tabular-nums}
-html.js .sn{cursor:pointer}
+html.js .sn{cursor:pointer;transition:color var(--t-quick) linear,
+  text-shadow var(--t-quick) linear}
+html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
+.steps>li>div{transition:border-color var(--t-move) var(--e-out),
+  color var(--t-move) linear}
 .steps>li>div{margin-left:-1px;padding-left:var(--s5);
   border-left:3px solid transparent;font-size:var(--t-body);
   line-height:var(--lh-body);color:var(--ink2);max-width:var(--measure)}
@@ -484,7 +939,9 @@ html.js .sn{cursor:pointer}
 
 .clouds{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
 .clouds li{display:grid;grid-template-columns:7em 13em minmax(0,1fr);gap:0 var(--s5);
-  align-items:baseline;padding:var(--s3) 0;border-bottom:1px solid var(--rule2)}
+  align-items:baseline;padding:var(--s3) 0;border-bottom:1px solid var(--rule2);
+  transition:background var(--t-quick) linear}
+.clouds li:hover{background:linear-gradient(90deg,var(--fill),transparent 80%)}
 .clouds b{font:400 var(--m-lab)/1.6 var(--mono);letter-spacing:var(--tr-lab);
   text-transform:uppercase;color:var(--ink3)}
 .svc{font-size:var(--t-item);line-height:1.3;font-variation-settings:'wdth' 92;
@@ -522,12 +979,21 @@ html.js .sn{cursor:pointer}
    Below the header the second tier has to live somewhere, so the
    footer carries every destination in full.
    ================================================================ */
-.foot{margin-top:var(--s9);border-top:5px solid var(--ink)}
+/* The header wears the five Stages along its bottom edge; the footer
+   wears them along its top. Between the two of them the page is a
+   spread with the book's colours on both edges, which is what a
+   running head and a folio do on paper. */
+.foot{margin-top:var(--s9);border-top:4px solid transparent;
+  border-image:var(--spectrum) 1}
+@supports not (border-image:linear-gradient(90deg,red,blue) 1){
+  .foot{border-top:4px solid var(--ink)}
+}
 .foot-in{padding-top:var(--s5);padding-bottom:var(--s8)}
 .foot-nav{display:flex;flex-wrap:wrap;gap:0 var(--s5);padding-bottom:var(--s3);
   margin-bottom:var(--s5);border-bottom:1px solid var(--rule2)}
 .foot-nav a{display:inline-flex;align-items:center;min-height:44px;
-  font-size:var(--t-sub);color:var(--ink3);text-decoration:none}
+  font-size:var(--t-sub);color:var(--ink3);text-decoration:none;
+  transition:color var(--t-quick) linear}
 .foot-nav a:hover{color:var(--ink)}
 .foot-note{margin:0 0 var(--s3);font-size:var(--t-sub);line-height:var(--lh-sub);
   color:var(--ink3);max-width:var(--measure)}
@@ -541,6 +1007,18 @@ html.js .sn{cursor:pointer}
 @media (max-width:900px){
   .next{order:2;margin-left:auto}
   .nav{order:3;flex-basis:100%;gap:0 var(--s4)}
+  /* A phone cannot afford a two-row sticky header. The nav is the row
+     that folds: once the reader is past the masthead the header keeps
+     the wordmark and the next Move - the two things that are worth
+     44px - and gives the other 60 back to the page. Scrolling up to
+     the top brings it back, which is where a reader goes to navigate
+     anyway. `grid-template-rows` rather than `display:none`, so it
+     collapses rather than disappearing between frames. */
+  .nav{overflow:hidden;max-height:9rem;
+    transition:max-height var(--t-move) var(--e-in-out),
+               opacity var(--t-quick) linear}
+  html.scrolled .nav{max-height:0;opacity:0;pointer-events:none}
+  html.scrolled .bar-in{row-gap:0}
   .mv a{grid-template-columns:var(--num) minmax(0,1fr);gap:var(--s1) var(--s4)}
   .mv-t,.mv-h,.mv-f{grid-column:2}
   .symp li{grid-template-columns:minmax(0,1fr);gap:var(--s2) 0}
@@ -596,12 +1074,46 @@ html.js .sn{cursor:pointer}
    which writes a matching print block out of parse.LAYERS.
    ================================================================ */
 @media print{
+  /* Nothing on paper has been scrolled to, so nothing on paper may be
+     waiting to be. This is belt and braces - the reveal already lives
+     inside a no-preference query and a class a script has to set - but
+     a sheet of A4 with a paragraph missing is not a failure anybody
+     gets to see before it has happened. */
+  html.rise :where(*):not(.vh){opacity:1!important;transform:none!important}
+  /* Not a blanket clip-path reset: `.vh` IS a clip-path, and clearing
+     it would print every screen-reader label on the page. */
+  .mast,.rm{clip-path:none!important}
   :root{
     color-scheme:light;
     --ink:#000; --ink2:#1A1A1A; --ink3:#3A3A3A; --ink4:#5A5A5A;
     --bg:#fff; --fill:#fff; --rule:#666; --rule2:#BBB;
     --accent:#1F4E79; --warn:#A32E1F; --on-c:#fff}
+  /* The two fixed atmosphere layers would each flood every sheet, and
+     a scroll rule is meaningless on paper. */
+  body::before,body::after,.rail{display:none}
   .bar,.foot,.skip,.cta,.actions,.prog-bar{display:none}
+  .bar::after{display:none}
+  /* The twenty is a picture of the book and it prints well, so it
+     stays - but flat, at a fixed height, and with the ink put back. */
+  .twenty{break-inside:avoid}
+  .tw{grid-template-rows:52px auto}
+  .tw i{opacity:1;background:var(--c);filter:none}
+  .tw b{color:#3A3A3A}
+  .twenty-k{margin-top:var(--s4)}
+  /* The masthead's metal is a gradient clipped to the glyphs, and on
+     paper that clips to whatever the print engine feels like - the
+     word came out at about 1.9:1 on white. Paper gets the ink. */
+  .mast em{color:var(--accent);background:none;-webkit-text-fill-color:currentColor}
+  .dl{background:none;box-shadow:none;transform:none}
+  .callout{background:none}
+  .cost-i{fill:#1F4E79}
+  .cost-p{fill:#8A6112}
+  .cost-s{fill:#8A6112}
+  .cost-d{stroke:#3A3A3A}
+  .cost-g{stroke:#BBB}
+  .cmp .save td,.perm tbody td:last-child,
+  .perm tfoot .perm-v:last-child{color:#000}
+  .ck-box,.kt-box{border-color:#666}
   #how-long,.tablewrap,.perm,.nums{overflow:visible}
   .rm,.eq{min-width:0}
   .steps>li,.mv>li,.ck,.pt,.rules>li,.pre-g,.notes>div,.symp li,
@@ -617,10 +1129,12 @@ html.js .sn{cursor:pointer}
 [data-part=build]{--c:#8FB4D6}
 [data-part=move]{--c:#E39A7B}
 [data-part=run]{--c:#7FC4B2}
+:root{--spectrum:linear-gradient(90deg,#A8B0B8 0%,#A8B0B8 20%,#DDB26A 20%,#DDB26A 40%,#8FB4D6 40%,#8FB4D6 60%,#E39A7B 60%,#E39A7B 80%,#7FC4B2 80%,#7FC4B2 100%)}
 @media print{
 [data-part=decide]{--c:#474F57}
 [data-part=buy]{--c:#8A6112}
 [data-part=build]{--c:#1F4E79}
 [data-part=move]{--c:#A32E1F}
 [data-part=run]{--c:#14655A}
+:root{--spectrum:linear-gradient(90deg,#474F57 0%,#474F57 20%,#8A6112 20%,#8A6112 40%,#1F4E79 40%,#1F4E79 60%,#A32E1F 60%,#A32E1F 80%,#14655A 80%,#14655A 100%)}
 }

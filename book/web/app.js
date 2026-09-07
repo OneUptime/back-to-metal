@@ -194,11 +194,20 @@
     }
     const paintSteps = () => {
       const on = new Set(read(STEPS, {})[n] || []);
-      for (const sn of $$('.sn', steps)) {
-        const lit = on.has(+sn.dataset.step);
+      const all = $$('.sn', steps);
+      let deep = 0;
+      for (const sn of all) {
+        const i = +sn.dataset.step;
+        const lit = on.has(i);
+        if (lit && i > deep) deep = i;
         sn.closest('li').classList.toggle('done', lit);
         sn.setAttribute('aria-pressed', lit ? 'true' : 'false');
       }
+      /* How far down the runbook's hairline the Stage colour has got. It
+         tracks the DEEPEST step ticked rather than the count, because the
+         rule is a position in the job and not a percentage of it: a reader
+         who ticked steps 1, 2 and 5 is at 5. */
+      steps.style.setProperty('--done', all.length ? deep / all.length : 0);
     };
     const toggle = sn => {
       const all = read(STEPS, {});
@@ -225,4 +234,176 @@
   for (const box of $$('input.kt-box[data-kit]')) box.checked = kitOn.has(box.dataset.kit);
 
   paint();
+
+  /* ==================================================================
+     MOTION
+     ==================================================================
+     None of this is load-bearing. Every figure it animates is already
+     rendered correct in the HTML, and every element it reveals is
+     already in the document at its final position.
+
+     The failsafe is the point. Each page's <head> puts `rise` on the
+     root element and arms a timer to take it off again; the stylesheet
+     hides the revealable things only while that class is on. So if this
+     file 404s, arrives corrupt or throws before this line, the timer
+     fires and the page is a page, with nothing hidden and nothing lost.
+     Clearing that timer is the first thing done here, and it is the
+     only thing that earns this module the right to hide anything.
+     ================================================================== */
+  const root = document.documentElement;
+  clearTimeout(window.BTM_RISE);
+
+  /* Asked once, and asked again if the reader changes it mid-visit. A
+     reader who has said they do not want motion gets the finished page
+     immediately: nothing hidden, nothing counted up, nothing swept. */
+  const still = matchMedia('(prefers-reduced-motion: reduce)');
+
+  /* THE SAME LIST style.css hides under `html.rise`, and the two copies
+     have to agree: a selector added there and not here leaves an element
+     invisible for ever. It is deliberately a list of LEAVES - a reveal
+     inside a reveal double-counts the offset and reads as a stumble - so
+     `.stage-head` is named and `.stage` is not, and the Moves under it
+     arrive as their own row each. */
+  const RISE = [
+    '.sect', '.hero>p', '.band>p', '.sec>p', '.callout', '.note', '.figs',
+    '.summary', '.cta', '.actions', '.twenty', '.prog', '.prog-bar',
+    '.stage-head', '.mv>li', '.ck', '.symp li', '.pt', '.rules>li', '.shelf',
+    '.dl', '.tablewrap', '.cost', '.rm', '.perm', '.cmp', '.clouds li',
+    /* The runbook is NOT on this list, and that is deliberate. Every
+       other page here is read; a Move page is worked, open beside a
+       terminal, and a step that fades in as you scroll to it is a step
+       arguing with the person running it. The runbook's motion is the
+       gutter rule filling as steps are ticked, and that is all. */
+    '.notes>div', '.pre-g', '.mh>*', '.mf', '.colo',
+    '.onramp li', '.tools li', '.cost-key', '.turnoff', '.needs', '.unlocks',
+  ].join(',');
+
+  /* One shot, and then it stops watching. A reveal that re-ran on the
+     way back up the page would be a page that never settles. */
+  const show = el => {
+    el.classList.add('in');
+    el.style.transitionDelay = '';
+  };
+
+  const armRise = () => {
+    if (still.matches || !('IntersectionObserver' in window)) {
+      root.classList.remove('rise');
+      return;
+    }
+    const io = new IntersectionObserver((entries, obs) => {
+      /* ALREADY PAST. An observer only ever reports what is on screen,
+         and a browser restoring a scroll position - or a link with a
+         fragment in it - lands the reader halfway down a document whose
+         top half has never intersected anything and never will. Those
+         elements are shown at once and without a delay: they are not
+         arriving, they are already here, and animating them would be
+         animating something the reader has scrolled back to rather than
+         towards. This is the branch that stops a reload leaving the top
+         of a page blank. */
+      const past = [], arriving = [];
+      for (const e of entries) {
+        if (e.isIntersecting) arriving.push(e);
+        else if (e.boundingClientRect.bottom <= 0) past.push(e);
+      }
+      for (const e of past) {
+        e.target.style.transitionDelay = '0s';
+        show(e.target);
+        obs.unobserve(e.target);
+      }
+      /* Everything that crossed the line in this frame, in document
+         order, so a list of twenty Moves arrives as a list rather than
+         as twenty things that happened at once. The stagger is capped:
+         past about a fifth of a second the reader is waiting rather
+         than watching. */
+      arriving.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+        .forEach((e, i) => {
+          e.target.style.transitionDelay = Math.min(i, 6) * 45 + 'ms';
+          show(e.target);
+          obs.unobserve(e.target);
+        });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.01 });
+    for (const el of $$(RISE)) io.observe(el);
+  };
+
+  /* ---- the figures count up --------------------------------------------
+     Only the ones the build wrote, and only once. The text is parsed
+     rather than re-derived, so a number this file has never heard of -
+     a currency, a percentage, a bare count - still counts. Whatever
+     cannot be parsed is left exactly as it was rendered. */
+  const NUMBER = /^(\D*?)([\d][\d,]*)(\D*)$/;
+
+  const countUp = el => {
+    const m = NUMBER.exec(el.textContent.trim());
+    if (!m) return;
+    const [, pre, digits, post] = m;
+    const end = +digits.replace(/,/g, '');
+    /* Under about twenty there is nothing to watch, and a two-frame
+       flicker on "20 Moves" reads as a fault rather than as motion. */
+    if (!isFinite(end) || end < 20) return;
+    const grouped = digits.includes(',');
+    const t0 = performance.now();
+    const DUR = 900;
+    const frame = now => {
+      const t = Math.min(1, (now - t0) / DUR);
+      /* Fast, then a long settle: the shape of a mechanical counter
+         coming to rest, not a linear sweep. */
+      const v = Math.round(end * (1 - Math.pow(1 - t, 4)));
+      el.textContent = pre + (grouped ? v.toLocaleString('en-GB') : v) + post;
+      if (t < 1) requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  };
+
+  const armCounts = () => {
+    const figs = $$('.fig-n,.summary .sum b,.prog b');
+    if (!figs.length) return;
+    if (still.matches || !('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver((entries, obs) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        obs.unobserve(e.target);
+        countUp(e.target);
+      }
+    }, { threshold: 0.5 });
+    for (const f of figs) io.observe(f);
+  };
+
+  /* ---- how far down the page, in the header's own rule -------------------
+     A hairline the width of the window, and the class that lets the
+     header shrink once the masthead is behind it. One listener, one
+     frame at a time, and no layout read outside it. */
+  const rail = $('#rail');
+  let ticking = false;
+
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      const y = window.scrollY || 0;
+      const run = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+      if (rail) rail.style.setProperty('--at', Math.min(1, y / run));
+      root.classList.toggle('scrolled', y > 24);
+    });
+  };
+
+  /* ---- put it all on ------------------------------------------------------ */
+  const arm = () => {
+    if (still.matches) {
+      root.classList.remove('rise');
+      return;
+    }
+    armRise();
+    armCounts();
+  };
+
+  arm();
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* A reader who turns motion off mid-visit gets the settled page, and
+     one who turns it on does not get a page that suddenly hides itself. */
+  const listen = still.addEventListener ? still.addEventListener.bind(still, 'change')
+    : still.addListener && still.addListener.bind(still);
+  if (listen) listen(() => { if (still.matches) root.classList.remove('rise'); });
 })();
