@@ -2,14 +2,14 @@
 # was installed globally or into .venv (see README).
 PY := $(shell [ -x .venv/bin/python3 ] && echo .venv/bin/python3 || echo python3)
 
-.PHONY: all deps verify audit webcheck releasable book covers epub pricing amazon artefacts site kdp readme clean
+.PHONY: all deps verify audit webcheck agree releasable book covers epub pricing amazon artefacts site kdp readme clean
 
 # The build is a chain of renders, none of which parallelises, and one of the
 # links is an ordering nobody would guess from the dependency graph alone - see
 # `artefacts` below. Serial is what this Makefile means, so it says so.
 .NOTPARALLEL:
 
-all: verify audit book site webcheck readme
+all: verify audit book site webcheck readme agree
 
 deps:
 	npm install
@@ -28,6 +28,14 @@ audit:
 # 3.0.0. Needs site/ built, and playwright, which `make deps` installs.
 webcheck: site
 	$(PY) book/webcheck.py
+
+# The fourth gate. The same figures are published by three different renderers
+# into a website, a printed interior and a README, and the saving can honestly
+# be divided by two denominators - so it has been divided by the wrong one
+# three times, in three files, each caught by somebody reading two outputs side
+# by side. This reads the built artefacts and fails if they disagree.
+agree: site readme
+	$(PY) book/agree.py
 
 # The release gate: a bumped version, a written changelog entry, nothing left
 # under [Unreleased], a tag that is free, and an EPUB identifier that has not
@@ -66,7 +74,7 @@ amazon: verify audit book covers epub
 # the site is generated, or site/ ships whichever one happened to be committed.
 # `make book site covers epub` looks equivalent and is not: make walks goals
 # left to right, and site.py would run first.
-artefacts: book covers epub site webcheck
+artefacts: book covers epub site webcheck readme agree
 
 site: book
 	$(PY) book/site.py

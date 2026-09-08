@@ -5,6 +5,24 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+### Added
+
+- **A fourth gate, `book/agree.py` and `make agree`.** The same figures are
+  published by three different renderers into a website, a printed interior and
+  a README, and the saving can honestly be divided by two denominators — the
+  bare cloud bill, or that bill with the cloud's own operations time in it.
+  Both are true; only one can be the headline. It has been divided by the wrong
+  one **three times, in three files** — `costs.py`'s self-test printing 79 per
+  cent against the site's 56, `readme.py` printing 50 against 36, and
+  `build.py` one edit away from the same — and every one was caught by somebody
+  reading two outputs side by side, which is not a method. This reads the built
+  artefacts rather than the model (the model agreeing with itself was never in
+  doubt; the failure was a caller doing its own arithmetic on the way to the
+  page), pulls eight figures out of each, and fails if they disagree. Confirmed
+  against the bug: reinstating `readme.py`'s bare-bill denominator makes it
+  fail with `the headline percentage: DISAGREE - 36 in index.html; 50 in
+  README.md`.
+
 ## [5.0.0] - 2026-09-08
 
 The reference estate is $10,000 a month, not $24,000. Every figure in the book
