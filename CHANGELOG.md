@@ -5,6 +5,31 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [6.1.0] - 2026-09-08
+
+The effort figures had not followed the estate. 6.0.0 re-based the bill to
+$100,000 and rewrote Move 02 to say the estate is forty or fifty services, and
+left Move 14 booking ten days and one week of wait to move all of them — while
+its own runbook said two services a week, which is twenty weeks and not one.
+
+### Changed
+
+- **Move 14 moves five services a week, not two**, batched by the team that
+  owns each one so a single person is not the queue, and its strip books the
+  twenty days and eight weeks that actually takes. The rate at this size is set
+  by how many teams can watch their own service go, not by the platform.
+- **Seven other Moves re-booked for the estate they now describe**: the
+  inventory covers forty or fifty services rather than a dozen (3 → 4 days),
+  racking is eighteen machines rather than four (4 → 6), Postgres is a handful
+  of clusters rather than one (6 → 12), and Ceph, the registry and staging, the
+  buckets and caches, and the account closure all grew with what they hold.
+- **The programme is 107 person-days across 44 weeks**, from 80 across 32.
+  Effort and cadence are independent: moving five a week rather than two
+  changes the calendar, not the work, so the same 107 days land in 44 weeks
+  instead of 56. The book's argument against the 122-Move edition — 975
+  person-days and four and a half years — still holds by a wide margin, but
+  "short enough to finish" is now doing more work than it was.
+
 ## [6.0.0] - 2026-09-08
 
 The reference estate is $100,000 a month, and the palette was re-spaced on the

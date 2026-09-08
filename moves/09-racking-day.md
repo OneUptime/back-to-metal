@@ -46,7 +46,7 @@ Nothing here carries data: a mistake is undone by unracking a machine the same a
 
 | Was | Now | Saved | Cutover | Effort | Wait |
 |---|---|---|---|---|---|
-| — | — | — | 0 min | 4 days | — |
+| — | — | — | 0 min | 6 days | — |
 
 ## What you can turn off
 Nothing yet. Six machines draw power in one building while the whole cloud bill runs in another.

@@ -32,11 +32,11 @@ The first service to leave is chosen for how little it matters, because its job 
 3. With no live traffic, drive synthetic requests at the new copy and compare latency percentiles against the cloud copy. Write the added milliseconds down.
 4. Ramp the weighted record: one per cent, ten, fifty, all of it. Hold each step a business day, confirm the split with `dig`, and stop on any rise in error rate or the ninety-ninth percentile.
 5. Soak a week at full weight, watching node disk with `kubectl`: scratch files that were ephemeral on the managed runtime still are, but now they fill a machine you own.
-6. Then repeat across the stateless estate, two services a week. After the third, nobody asks for a plan. This is most of the Move: the first service is five days and the dozen behind it are about half a day each, which is what the strip books as effort. The five weeks of cadence are not booked twice — they are the calendar the ten days are spread across, not a window in which nobody works.
+6. Then repeat across the stateless estate, five services a week, batched by the team that owns them so one person is not the queue. After the third, nobody asks for a plan. This is most of the Move: the first service is five days and the forty-odd behind it are about a third of a day each, which is what the strip books as effort. The eight weeks of cadence are not booked twice — they are the calendar those days are spread across, not a window in which nobody works.
 
 ## Operator's notes
 - **Swap:** If the service sits behind a proxy you already control, shift weight there rather than in DNS; the abort is then immediate, not TTL-bound.
-- **Do it faster:** Ramp on a Tuesday morning with the owner beside you. Two people reading one graph is most of what the first one is for.
+- **Do it faster:** Ramp on a Tuesday morning with the owner beside you. Two people reading one graph is most of what the first one is for. After that the rate is set by how many teams can watch their own service go, not by the platform: five a week is a team a day, and a smaller estate should run slower rather than pretending the graph reads itself.
 - **Watch out:** A mean response time stays flat while one pod in four times out. Alert on percentiles and status codes, not averages.
 - **Leftovers:** The old record sits at zero weight and the allowlists carry both ranges. Both are free and both get forgotten, so date each.
 
@@ -47,7 +47,7 @@ Every step before the ramp is additive: two copies exist and the cloud copy carr
 
 | Was | Now | Saved | Cutover | Effort | Wait |
 |---|---|---|---|---|---|
-| $30,980/mo | $0/mo | 100% | 0 min | 10 days | 1 week |
+| $30,980/mo | $0/mo | 100% | 0 min | 20 days | 8 weeks |
 
 ## What you can turn off
-The managed container service, its task revisions and its log retention — but not after the first service's week at full weight, which is the mistake this line used to invite. It goes when the LAST service off step 6 has held for a week, which is a week after the cadence ends rather than a week after it starts.
+The managed container service, its task revisions and its log retention — but not after the first service's week at full weight, which is the mistake this line used to invite. It goes when the LAST service off step 6 has held for a week, which is a week after the eight-week cadence ends rather than a week after it starts.

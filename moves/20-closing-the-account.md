@@ -47,7 +47,7 @@ Until the closure request this is ordinary work: an account switched off can be 
 
 | Was | Now | Saved | Cutover | Effort | Wait |
 |---|---|---|---|---|---|
-| $3,200/mo | $0/mo | 100% | 0 min | 3 days | 4 weeks |
+| $3,200/mo | $0/mo | 100% | 0 min | 4 days | 4 weeks |
 
 ## What you can turn off
 The account itself, and with it the support plan, the idle gateways, the log ingestion and the snapshot retention still billing a month after the last user request left. What is left is a platform rather than a project.

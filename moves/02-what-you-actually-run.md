@@ -44,7 +44,7 @@ Nothing here touches a running system, so backing out is discarding a document n
 
 | Was | Now | Saved | Cutover | Effort | Wait |
 |---|---|---|---|---|---|
-| — | — | — | 0 min | 3 days | — |
+| — | — | — | 0 min | 4 days | — |
 
 ## What you can turn off
 The fourth pile, once its owners confirm: orphaned volumes, snapshots of vanished disks, idle load balancers and the proof-of-concept accounts. The cheapest saving in the book.

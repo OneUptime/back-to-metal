@@ -1,6 +1,6 @@
 {
   "name": "back-to-metal",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "private": true,
   "description": "Twenty moves that take a startup off AWS, Google Cloud or Azure and onto Kubernetes on hardware you own, typeset into a printable book, an EPUB and a static site.",
   "scripts": {

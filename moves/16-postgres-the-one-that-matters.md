@@ -47,7 +47,7 @@ Until writes resume, backing out is releasing the pause. The point of no return 
 
 | Was | Now | Saved | Cutover | Effort | Wait |
 |---|---|---|---|---|---|
-| $19,500/mo | $0/mo | 100% | 15 min | 6 days | — |
+| $19,500/mo | $0/mo | 100% | 15 min | 12 days | — |
 
 ## What you can turn off
 The managed instance, its read replicas and their snapshots, after the seven days and once an invoice shows the line gone.

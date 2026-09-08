@@ -153,8 +153,8 @@ give credit.
 | Stage 3 · Build | 4, 09–12 |
 | Stage 4 · Move | 4, 13–16 |
 | Stage 5 · Run | 4, 17–20 |
-| Work | 80 person-days |
-| End to end, two engineers | 32 weeks, most of it waiting for hardware |
+| Work | 107 person-days |
+| End to end, two engineers | 44 weeks, most of it waiting for hardware |
 | At zero downtime | 18 of 20 |
 | Whole book, end to end | 25 minutes of user-visible outage |
 | Cannot be undone | 0 |
