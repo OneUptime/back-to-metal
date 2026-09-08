@@ -407,6 +407,18 @@
   const rail = $('#rail');
   let ticking = false;
 
+  /* WHERE A HASH LANDS. The header is sticky, so an anchor scrolled to the top
+     of the document lands underneath it. `--anchor` in the stylesheet is a
+     guess at its height, and a guess is wrong the moment the nav wraps to two
+     rows - which it does at six items, and on every phone. Measured here and
+     written back, so the offset is whatever the header actually is. */
+  const topbar = $('.bar');
+  const measureAnchor = () => {
+    if (!topbar) return;
+    const h = Math.round(topbar.getBoundingClientRect().height);
+    if (h) root.style.setProperty('--anchor', (h + 16) + 'px');
+  };
+
   const onScroll = () => {
     if (ticking) return;
     ticking = true;
@@ -430,6 +442,8 @@
   };
 
   arm();
+  measureAnchor();
+  addEventListener('resize', measureAnchor, { passive: true });
   addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 

@@ -153,15 +153,15 @@ give credit.
 | Stage 3 · Build | 4, 09–12 |
 | Stage 4 · Move | 4, 13–16 |
 | Stage 5 · Run | 4, 17–20 |
-| Work | 79 person-days |
-| End to end, two engineers | 34 weeks, most of it waiting for hardware |
+| Work | 80 person-days |
+| End to end, two engineers | 32 weeks, most of it waiting for hardware |
 | At zero downtime | 18 of 20 |
 | Whole book, end to end | 25 minutes of user-visible outage |
 | Cannot be undone | 0 |
 | Risk | 3 low, 7 medium, 10 high |
 | Dependencies | 31, every one pointing backwards |
 | Line savings across the Moves | $20,123 a month, before the salary and the cage |
-| Saving, with everything counted | $10,538 a month &mdash; $126,456 a year, 44 per cent of a $24,000 bill |
+| Saving, with everything counted | $16,625 a month &mdash; $199,500 a year, 69 per cent of a $24,000 bill |
 
 Every Move names the real service on AWS, Google Cloud and Azure, and the one thing that differs on each.
 

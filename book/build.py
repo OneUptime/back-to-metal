@@ -455,6 +455,16 @@ def build(moves):
 
     o = dollars(COSTS.owned_month(R['nodes'], R['spares'], retained))
     d = dollars(COSTS.dedicated_month(n_nodes + R['spares'], retained))
+    # Both columns carry their own people. A cloud invoice bills for machines,
+    # not for the person who upgrades the managed cluster and carries the
+    # pager, so the left-hand column used to be a bill with the salary taken
+    # out of it sitting beside a column with the salary left in.
+    cloud_people = round(COSTS.cloud_people_month())
+    cloud_total = COSTS.BILL_MONTH + cloud_people
+    save = cloud_total - (o['total'] + cloud_people)
+    infra_save = COSTS.BILL_MONTH - (o['infrastructure'] + o['retained'])
+    rvo = COSTS.rent_vs_own_5yr(n_nodes + R['spares'])
+    fy = COSTS.five_year(R['nodes'], R['spares'], retained)
     capex = ((n_nodes + R['spares']) * COSTS.HARDWARE['node_capex']
              + COSTS.HARDWARE['switch_capex'])
     vcpu = n_nodes * R['cores_per_node'] * 2
@@ -483,30 +493,53 @@ def build(moves):
       forgets, and a table without either is the reason repatriations get approved and then
       regretted. Total <b>{money(o['total'])}</b> a month.</p></div>
       <div class="pcard"><h4>Rented by the month</h4><p>The same class of machine from a
-      dedicated-host provider is {money(d['infrastructure'])}, and removes the racking, the spares
-      and a quarter of a person: <b>{money(d['total'])}</b> all in. Read that one with a
-      raised eyebrow: the rent per machine is the one figure in this book that a re-check could
-      not settle, and the answer moves between comfortably under owning and level with it
-      depending on which provider you quote. What is not in doubt is the shape - a quarter rack's
-      fixed costs do not amortise over six machines, so at this size renting is at worst
-      competitive and it keeps the {money(capex)}. You own hardware when the fleet is big enough
-      to carry the room.</p></div>
-      <div class="pcard"><h4>What the difference buys</h4><p>Against a bill of
-      {money(COSTS.BILL_MONTH)} a month, roughly {money(COSTS.BILL_MONTH - o['total'])} a month or
-      {money((COSTS.BILL_MONTH - o['total']) * 12)} a year, for a capital outlay of
-      {money(capex)} &mdash; six machines and a pair of switches &mdash; which pays for itself in
-      about {capex / max(COSTS.BILL_MONTH - o['total'], 1):.0f}
-      months. Every Move states its own version of this table, and every one is a slice of
-      this.</p></div>
+      dedicated-host provider is {money(d['infrastructure'])} &mdash; MORE than owning, not less,
+      and it should be: over {rvo['months']} months you hand over {money(rvo['rent_total'])} for
+      machines that cost {money(rvo['own_capex'])} to buy, which is
+      {rvo['multiple']:.1f} times the purchase price. A landlord buys the same box you would and
+      takes a margin. What renting actually buys is no capital, no lead time, no cage and no
+      contract, and it lands within a few hundred dollars a month of owning because it drops the
+      facility. On eighteen months of runway that is the right trade; it is not a cheaper
+      one.</p></div>
+      <div class="pcard"><h4>What the difference buys</h4><p>{money(save)} a month, or
+      {money(save * 12)} a year, for a capital outlay of {money(capex)} &mdash; six machines and
+      a pair of switches &mdash; which pays for itself in about
+      {capex / max(save, 1):.0f} months. That is {save / cloud_total * 100:.0f} per cent of a
+      fully loaded {money(cloud_total)}, with the salary counted on both sides; on the
+      infrastructure line alone, which is what every other comparison quotes, it is
+      {infra_save / COSTS.BILL_MONTH * 100:.0f} per cent. Both are true and the difference
+      between them is the people.</p></div>
     </div>
     <div class="chartwrap">
       <div class="pkicker" style="margin-bottom:4mm">One estate, three ways, per month</div>
-      {cost_chart([('Cloud now', COSTS.BILL_MONTH, 0, 0),
-                   ('Owned', o['infrastructure'], o['people'], o['retained']),
-                   ('Rented', d['infrastructure'], d['people'], d['retained'])],
+      {cost_chart([('Cloud now', COSTS.BILL_MONTH, cloud_people, 0),
+                   ('Owned', o['infrastructure'], cloud_people + o['people'], o['retained']),
+                   ('Rented', d['infrastructure'], cloud_people + d['people'], d['retained'])],
                   '100%', '#8A6112')}
     </div>
     <div class="kitwrap">
+      <div class="hrule" style="margin:0 0 4.5mm"></div>
+      <div class="pkicker" style="margin-bottom:3mm">The same computers, three ways, over
+      {fy['months'] // 12} years</div>
+      <table class="fivey">
+        <thead><tr><th></th><th>Capital</th><th>Running, a month</th>
+        <th>Total over {fy['months'] // 12} years</th><th>Against the cloud</th></tr></thead>
+        <tbody>{''.join(
+          '<tr><th>' + esc(r['label']) + '</th>'
+          + '<td>' + (money(r['capex']) if r['capex'] else '&mdash;') + '</td>'
+          + '<td>' + money(r['month']) + '</td>'
+          + '<td>' + money(r['total']) + '</td>'
+          + '<td>' + ('&mdash;' if not r['saved']
+                      else money(r['saved']) + ' (' + f"{r['pct']:.0f}" + '%)') + '</td></tr>'
+          for r in fy['rows'])}</tbody>
+      </table>
+      <p class="legend-note" style="margin:3mm 0 4mm">A month is the wrong window for a
+      capital decision. Owning is capital on day one and cheap running afterwards; renting is
+      no capital and dearer running. Over five years the two land within
+      {money(abs(fy['rows'][1]['total'] - fy['rows'][2]['total']))} of each other, and the whole
+      of that difference is the residual: machines of this class run seven or eight years, so
+      after sixty months you still hold a working fleet, counted here at a conservative fifteen
+      per cent of what it cost.</p>
       <div class="hrule" style="margin:0 0 4.5mm"></div>
       <p class="legend-note" style="margin:0">Every AWS figure is a public list price for
       us-east-1 observed while writing, before any Savings Plan, private pricing agreement or

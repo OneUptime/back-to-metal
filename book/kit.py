@@ -133,8 +133,9 @@ RULES = [
      'accept at the start becomes an incident you attend in person, at night, in a '
      'year.'),
     ('Count the salary.',
-     'A saving that costs half an engineer is a real saving only if you write the '
-     'half an engineer into the comparison. Most of these still win by a wide '
+     'A saving that costs engineer-hours is a real saving only if you write the '
+     'hours into the comparison - on both sides, because the cloud takes them '
+     'too. Most of these still win by a wide '
      'margin once you do. The ones that do not, you want to know about in week one '
      'rather than month ten.'),
     ('Keep paying for the three things you will not beat.',

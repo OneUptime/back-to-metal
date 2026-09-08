@@ -28,7 +28,7 @@ Moves 01 and 02 produced a grouped bill and an inventory that accounts for it. T
 1. Write the decision rule before any figure goes in: owned must land at least a third under rented, or the programme stops here. A thinner margin sits inside your own forecasting error.
 2. Fill the rented column from the three invoices at the rate you actually paid, discounts in and tax out on both sides. One monthly number, checkable against Move 01.
 3. Fill the owned column from the hardware quote and the facility quote: five machines and a spare over sixty months, the quarter rack, committed power, transit, the cross-connect, remote hands.
-4. Add the salary line. Five machines in one cage need about half an engineer, ongoing, beside whoever already carries the pager: near $7,900 a month loaded, and more than twice the whole of the hardware, the space and the link put together. Anybody who will not write that down is not ready.
+4. Add the salary line to BOTH columns, because both columns have one. The cloud estate already costs somebody sixty hours a month — the managed cluster upgrades itself on somebody's Tuesday, the credentials rotate, the bill gets argued with, the pager gets carried — and a cloud invoice bills for none of it. Owning adds about twenty hours a month on top of that, not a second person. Write both down. A column with the salary on one side only is not a comparison, whichever side it is missing from.
 5. Add the line that does not come home. Move 04 settles which capabilities you keep renting — the edge, outbound mail, scrubbing — and there is a residue besides: archived object storage nobody will pay the egress to extract, a registry, a queue, an off-site backup copy. It is inside the rented column already, so it has to be inside the owned column too. Leaving it out is the same error as leaving out the salary, and it is worth about a tenth of the bill.
 6. Total both columns and apply the rule. If owned is not a third under rented, stop and keep the spreadsheet. Stopping costs three Moves and a week, against a programme abandoned in month five with two estates billing.
 7. If it clears, put the capital question to the founder who signs. About $87,000 leaves the bank before anything serves a request — six machines and a pair of switches, and on eighteen months of runway that is a fair refusal; renting dedicated machines by the month is the way round it, in Move 07.
@@ -36,7 +36,7 @@ Moves 01 and 02 produced a grouped bill and an inventory that accounts for it. T
 ## Operator's notes
 - **Swap:** Price the three largest lines only; that lands within about ten per cent in an afternoon.
 - **Do it faster:** Use one calculator, not three. The comparison is owned against what you pay now, not a cheaper landlord.
-- **Watch out:** The salary line moves the answer further than anything else in the sheet. Amortisation over seven years instead of five shifts the total by about three per cent; half an engineer is most of the owned column.
+- **Watch out:** The ops-hours line moves the answer further than anything else in the sheet, and it is the one people guess at. Amortisation over seven years instead of five shifts the total by about three per cent; doubling the hours you think owning will take shifts it by ten times that. Put your own number in before you argue with the conclusion.
 - **Leftovers:** The committed-spend agreement bills to the end of its term, and that renewal date is the deadline.
 
 ## Rollback

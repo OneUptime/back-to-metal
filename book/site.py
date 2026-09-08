@@ -36,6 +36,7 @@ import roadmap as RM
 import costs as COSTS
 import imprint as IMP
 import mission as MISSION
+import why as WHY
 
 SITE = ROOT / 'site'
 ASSETS = SITE / 'assets'
@@ -187,6 +188,7 @@ def rise_css():
 # a nav that fits on one line of a phone does not need a disclosure to hide in.
 NAV = [
     ('index.html', 'The guide'),
+    ('index.html#why', 'Why leave'),
     ('cost.html', 'What it costs'),
     ('checklist.html', 'Your checklist'),
     ('start.html', 'Before you start'),
@@ -362,7 +364,19 @@ def totals(moves):
                 'total': i + pp + k}
 
     owned, dedicated = dollars(owned), dollars(dedicated)
-    save = COSTS.BILL_MONTH - owned['total']
+
+    # BOTH COLUMNS CARRY THEIR OWN PEOPLE. The saving is a delta and is
+    # unchanged by this - a delta is a delta - but the percentage is not, and
+    # the old denominator was a cloud bill with the salary taken out of it
+    # sitting beside an owned column with the salary left in. Two numbers are
+    # quoted now because two are true: `pct` is the honest total-cost figure
+    # with the salary on both sides, and `pct_infra` is the infrastructure
+    # line alone, which is what every other comparison in the world quotes and
+    # what the reader will have been shown by somebody else.
+    cloud_people = round(COSTS.cloud_people_month())
+    cloud_total = COSTS.BILL_MONTH + cloud_people
+    save = cloud_total - (owned['total'] + cloud_people)
+    infra_save = COSTS.BILL_MONTH - (owned['infrastructure'] + owned['retained'])
     return {
         'n': len(moves),
         'stages': RM.stages(moves, sched),
@@ -376,7 +390,11 @@ def totals(moves):
         'retained': retained,
         'save': save,
         'year': save * 12,
-        'pct': save / COSTS.BILL_MONTH * 100 if COSTS.BILL_MONTH else 0,
+        'cloud_people': cloud_people,
+        'cloud_total': cloud_total,
+        'infra_save': infra_save,
+        'pct': save / cloud_total * 100 if cloud_total else 0,
+        'pct_infra': infra_save / COSTS.BILL_MONTH * 100 if COSTS.BILL_MONTH else 0,
         'zero': sum(1 for m in moves if m['cutover'] == 0),
         'cutover': sum(m['cutover'] for m in moves),
         'oneway': sum(1 for m in moves if m['oneway']),
@@ -441,6 +459,53 @@ def band(bid, heading, inner):
 
 
 # ------------------------------------------------------------- 1. the guide
+def why_facts(T):
+    """Every figure the case-for-leaving section quotes, computed here so it
+    cannot drift from the cost page - they are literally the same numbers."""
+    FY = COSTS.five_year(REFERENCE['nodes'], REFERENCE['spares'], T['retained'])
+    own = FY['rows'][2]
+    return {
+        'five_year_saved': mny(own['saved']),
+        'five_year_pct': f'{own["pct"]:.0f}',
+        'egress_100tb': mny(COSTS.egress_month(100)),
+        'capex': mny(own['capex']),
+        'weeks': f'{T["weeks"]:.0f}',
+        'days': f'{T["days"]:.0f}',
+        'ops_hours': COSTS.PEOPLE['owned_ops_hours_month']
+                     - COSTS.PEOPLE['cloud_ops_hours_month'],
+        'owned_hours': COSTS.PEOPLE['owned_ops_hours_month'],
+        'cloud_hours': COSTS.PEOPLE['cloud_ops_hours_month'],
+        'retained': mny(T['retained']),
+    }
+
+
+def why_section(T):
+    """The case for leaving: what you gain, what it costs, and when not to.
+
+    The three lists are one component - an ordinal, a heading, a paragraph -
+    which is the same shape the safety page's points and the rules use, so a
+    reader who has met one has met all three."""
+    f = why_facts(T)
+    gains = ''.join(
+        f'<li class="pt"><b class="n">{i + 1:02d}</b><div>'
+        f'<h3>{esc(h)}</h3><p>{inline(b)}</p></div></li>'
+        for i, (h, b) in enumerate(WHY.gains(f)))
+    costs = ''.join(
+        f'<li class="pt"><b class="n">{i + 1:02d}</b><div>'
+        f'<h3>{esc(h)}</h3><p>{inline(b)}</p></div></li>'
+        for i, (h, b) in enumerate(WHY.costs(f)))
+    stay = ''.join(f'<li>{inline(x)}</li>' for x in WHY.STAY)
+    return (
+        f'<p class="lede">{esc(WHY.LEDE)}</p>'
+        f'<ol class="pts">{gains}</ol>'
+        f'<h3 class="d sub-h">{esc(WHY.COSTS_HEADING)}</h3>'
+        f'<p>{esc(WHY.COSTS_LEDE)}</p>'
+        f'<ol class="pts">{costs}</ol>'
+        f'<h3 class="d sub-h">{esc(WHY.STAY_HEADING)}</h3>'
+        f'<ul class="onramp stay">{stay}</ul>'
+        f'<p class="callout">{esc(WHY.CLOSER)}</p>')
+
+
 def build_index(moves, T):
     by = {m['num']: m for m in moves}
     first = moves[0]
@@ -507,6 +572,8 @@ def build_index(moves, T):
         f'{first["num"]}</a> <a class="btn ghost" href="cost.html">Or check the '
         f'arithmetic first</a></p>')}
 
+{band('why', WHY.HEADING, why_section(T))}
+
 {band('plan', 'The whole plan, on one page',
       f'<p>{len(T["stages"])} stages, run in order, and every dependency points at a '
       f'lower number. '
@@ -542,7 +609,7 @@ def build_index(moves, T):
 
 
 # ------------------------------------------------------------ 2. what it costs
-def cost_bars(rows):
+def cost_bars(rows, unit='a month'):
     """Three totals, one scale, drawn rather than charted.
 
     The point is a comparison a reader can check in their head, so there are no
@@ -618,26 +685,60 @@ def cost_bars(rows):
             out.append(f'<rect class="cost-g" style="--i:{k}" x="{end:.1f}" '
                        f'y="{y + 20}" width="{gap:.1f}" height="{BAR}"/>')
             out.append(f'<text class="cost-s" style="--i:{k}" x="{dx - 9:.1f}" '
-                       f'y="{y + 36}">&#8722;{mny(saved)} a month</text>')
+                       f'y="{y + 36}">&#8722;{mny(saved)} {esc(unit)}</text>')
 
     lab = '; '.join(f'{r[0]}, {mny(sum(r[1:]))}' for r in rows)
     return (f'<svg class="cost" viewBox="0 0 {W} {H}" width="100%" '
-            f'style="height:auto;display:block" role="img" aria-label="Monthly cost '
-            f'compared against today&rsquo;s bill of {mny(datum)}: {lab}">'
+            f'style="height:auto;display:block" role="img" aria-label="Cost '
+            f'{esc(unit)} compared against {mny(datum)}: {lab}">'
             f'{"".join(out)}</svg>')
+
+
+def fy_table(fy):
+    """The five-year comparison. Capital on its own line, because that is the
+    line a founder actually argues about, and a residual column because every
+    rent-versus-buy comparison that omits it is answering a different question
+    from the one it printed."""
+    heads = ['', 'Capital, day one', 'Running, a month',
+             f'Total over {fy["months"] // 12} years', 'Against the cloud']
+    body = []
+    for r in fy['rows']:
+        cap = mny(r['capex']) if r['capex'] else '&mdash;'
+        against = ('&mdash;' if not r['saved']
+                   else f'{mny(r["saved"])} <i>({r["pct"]:.0f}%)</i>')
+        body.append(
+            f'<tr{" class=" + chr(34) + "save" + chr(34) if r["key"] == "owned" else ""}>'
+            f'<th scope="row">{esc(r["label"])}</th>'
+            f'<td data-h="{attr(heads[1])}">{cap}</td>'
+            f'<td data-h="{attr(heads[2])}">{mny(r["month"])}</td>'
+            f'<td data-h="{attr(heads[3])}">{mny(r["total"])}</td>'
+            f'<td data-h="{attr(heads[4])}">{against}</td></tr>')
+    return ('<div class="tablewrap" tabindex="0" role="region" aria-label="Five years, '
+            'three ways, a scrollable table"><table class="cmp fy"><thead><tr>'
+            + ''.join(f'<th scope="col">{esc(h)}</th>' for h in heads)
+            + f'</tr></thead><tbody>{"".join(body)}</tbody></table></div>')
 
 
 def build_cost(moves, T):
     by = {m['num']: m for m in moves}
     first = moves[0]
     owned, ded, bill = T['owned'], T['dedicated'], T['bill']
+    FY = COSTS.five_year(REFERENCE['nodes'], REFERENCE['spares'], T['retained'])
 
     heads = ['Cloud now', 'Own the machines', 'Rent the machines by the month']
+    cloud_people = COSTS.cloud_people_month()
     cmp_rows = [
         ('Infrastructure', '', [mny(bill), mny(owned['infrastructure']),
                                 mny(ded['infrastructure'])]),
-        ('People', 'people', ['Already in the bill', mny(owned['people']),
-                              mny(ded['people'])]),
+        # The cloud's people cost is NOT nought and this cell used to say
+        # "Already in the bill", which claimed it was. An AWS invoice bills for
+        # machines. Somebody still upgrades the managed cluster, rotates the
+        # credentials, chases the bill and carries the pager, and leaving that
+        # off the left-hand column while charging the right-hand column for its
+        # own people is the mirror of the error this book argues against.
+        ('People', 'people', [mny(COSTS.cloud_people_month()),
+                              mny(COSTS.cloud_people_month() + owned['people']),
+                              mny(COSTS.cloud_people_month() + ded['people'])]),
         # A row label goes through esc(), so it is written with a real
         # apostrophe rather than an entity - an entity here arrives on the
         # page spelled out, which is how it shipped for exactly one build.
@@ -719,13 +820,26 @@ def build_cost(moves, T):
 
 {band('compare', 'The comparison, with the salary in it',
       cmp_html
-      + f'<p class="callout"><span class="lbl">The people row</span> The salaried time '
-        f'is the largest number in the owned column, and a comparison without it is the '
-        f'reason repatriations get approved and then regretted. The cloud already costs '
-        f'{COSTS.PEOPLE["engineers_before"]} of an engineer to run; owning the machines '
-        f'costs {COSTS.PEOPLE["engineers_after"]}, so the difference is what appears '
-        f'here. If your answer changes when that line goes in, you want to know in week '
-        f'one rather than month ten.</p>'
+      + f'<p class="callout"><span class="lbl">The people row</span> Both columns carry '
+        f'it, because both columns have it. A cloud invoice bills for machines, not for '
+        f'the person who upgrades the managed cluster, rotates the credentials, chases '
+        f'the bill and carries the pager &mdash; about '
+        f'{COSTS.PEOPLE["cloud_ops_hours_month"]} hours a month, or '
+        f'{mny(COSTS.cloud_people_month())}. Owning adds '
+        f'{COSTS.PEOPLE["owned_ops_hours_month"] - COSTS.PEOPLE["cloud_ops_hours_month"]} '
+        f'hours on top of that, not a whole extra person: the measured figure on a real '
+        f'two-site fleet larger than this one is fourteen engineer-hours a month, and '
+        f'this book books twenty because the people who measured it had done it '
+        f'before. That fourteen was measured and published by the company that '
+        f'publishes this book, so take it as corroboration rather than as proof; '
+        f'the twenty stands on an independent estimate of ten to twenty hours for '
+        f'a stack self-hosting its own database, cluster and cache, and this takes '
+        f'the top of it. Vendors selling managed clusters will tell you half an '
+        f'engineer to two &mdash; but their itemised effort is setup, which this '
+        f'book already prices once as the {T["days"]:.0f} person-days in the '
+        f'roadmap. A table that puts the salary on one side only is the reason '
+        f'repatriations get approved and then regretted, whichever side it leaves '
+        f'it off.</p>'
       + f'<p class="callout"><span class="lbl">The row under it</span> '
         f'{mny(T["retained"])} a month never comes home and was missing from this table '
         f'until it was checked: the content network, outbound mail and edge scrubbing '
@@ -742,6 +856,28 @@ def build_cost(moves, T):
                     owned['retained']),
                    ('Rent by the month', ded['infrastructure'], ded['people'],
                     ded['retained'])]))}
+
+{band('five-years', 'Five years, three ways',
+      f'<p>A month is the wrong window for this decision. Owning is capital on day one '
+      f'and cheap running afterwards; renting is no capital and dearer running; the cloud '
+      f'is no capital and dearest running. Compared a month at a time the capital either '
+      f'vanishes into an amortisation line or sits there looking like the whole story, '
+      f'and neither is what somebody signing the cheque is choosing between. So here is '
+      f'the life of one generation of machines, with the salary counted on all three '
+      f'sides and the capital on the line where it actually happens.</p>'
+      + fy_table(FY)
+      + f'<p class="callout"><span class="lbl">The residual</span> After sixty months the '
+      f'owned machines are five years old and still working &mdash; hardware of this class '
+      f'is routinely run for seven or eight. What you hold is a fleet with years left in '
+      f'it, counted here at a conservative fifteen per cent of what it cost. It is also '
+      f'the whole of the difference between owning and renting at this size: strip the '
+      f'residual out and the two columns are the same number. You do not own hardware to '
+      f'save money against renting it. You own it when the fleet is big enough to carry '
+      f'the room, and to stop asking somebody else for permission.</p>'
+      + cost_bars([('Cloud', FY['rows'][0]['total'], 0, 0),
+                   ('Rented metal', FY['rows'][1]['total'], 0, 0),
+                   ('Colocation', FY['rows'][2]['total'], 0, 0)],
+                  unit=f'over {FY["months"] // 12} years'))}
 
 {band('where-money', 'Where the money goes',
       f'<p>One row per Move, in the order you run them. Some Moves buy safety rather '

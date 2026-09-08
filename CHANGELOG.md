@@ -5,6 +5,111 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-09-08
+
+The arithmetic was wrong in the book's own favour's opposite direction, the
+accent was the same colour as one of the five Stages, and the one question
+every reader arrives with had no answer anywhere. Headline figures moved, so
+this is a major version.
+
+### Fixed — the cost model
+
+- **Half an extra engineer was a guess sitting in the load-bearing position.**
+  It was 0.5 FTE, $7,917 a month, fifty-nine per cent of the whole owned
+  column — about eighty-seven engineer-hours a month of incremental work on
+  six machines, for ever. Nothing published supports it at this fleet size.
+  The independent estimate of the delta is ten to twenty operations hours a
+  month for a stack self-hosting its database, cluster and cache; this book
+  now takes **twenty**, the top of that range. 37signals report a delta of
+  **zero** at a hundred times the fleet — "the same people who were operating
+  HEY and Basecamp and the other apps in the cloud are now operating them on
+  our own hardware" — and Ahrefs the same at 850 machines.
+- **The interest is declared.** There is a measured figure close to this stack
+  — about fourteen engineer-hours a month — and it was published by the
+  company that publishes this book. It is corroboration and it is not
+  independent, and a book that quietly cited its own publisher to move its own
+  headline in its own favour would deserve everything it got. It is named in
+  `costs.py`, named in the prose on the cost page, and the twenty hours stand
+  on the independent figure without it.
+- **The evidence against is in the file too.** Vendors selling managed
+  Kubernetes put self-hosting at half an engineer to two. The rebuttal is not
+  that they are biased — everyone here is — but that their itemised effort is
+  SETUP, which this book already prices once as the person-days in the
+  roadmap. Counting it again monthly charges the reader twice.
+- **The cloud's own people cost was written as "already in the bill".** It is
+  not: a cloud invoice bills for machines, not for whoever upgrades the
+  managed cluster, rotates the credentials, argues with the bill and carries
+  the pager. Both columns carry their own hours now, and Move 03 tells the
+  reader to write both down. The saving is a delta and is unchanged by this;
+  the percentage is not, and the old denominator was a bill with the salary
+  taken out of it beside a column with the salary left in.
+- **Renting looked cheaper than owning over five years, which is not
+  possible.** Two errors cancelling: the rented machine was priced at $420 a
+  month — $25,200 over sixty months for a box that costs $13,000 — and the
+  model still came out ahead because the rented column also dropped the cage.
+  The rent is $650, and `rent_vs_own_5yr()` now shows the arithmetic rather
+  than asserting it: six machines cost $78,000 to buy and $234,000 to rent,
+  three times the purchase price. Renting is correctly dearer on
+  infrastructure. What it buys is no capital, no lead time, no cage and no
+  contract.
+- **Move 14 was charged twice for the same five weeks.** `wait_days` is
+  defined as calendar time in which nobody works, and 3.0.1 booked the
+  stateless rollout cadence as Wait *on top of* the ten days of effort spread
+  across it. Thirty weeks end to end, not thirty-four.
+
+### Added
+
+- **"Why leave at all", the first section on the front page.** The book had no
+  such section for three editions and the omission was deliberate — the front
+  matter says the argument has been had. That was fair to the reader who had
+  already decided and unfair to the one who had not. Five gains, every
+  measurable one computed from the same model the cost page uses; four costs,
+  written at the same length by the same hand; and four reasons to **stay
+  exactly where you are**, which is the list that lets the rest be believed.
+- **Five years, three ways.** Cloud against rented metal against colocation
+  over the life of one generation of machines, with the capital on the line
+  where it actually happens rather than buried in an amortisation figure. Both
+  metal options save about a million dollars, and they land within a few
+  thousand of each other — the whole of that difference being the residual,
+  because after sixty months you still hold a working fleet.
+- **Staging moves first, in Move 13.** Nothing told the reader to move the
+  non-production estate before production, which is the sequencing decision
+  the whole stage rests on. Staging is a real workload with real people who
+  complain within the hour, and the only one whose bad afternoon appears on no
+  invoice and wakes nobody. With a warning that staging still pointed at
+  production data stores has not moved, it has been relocated.
+
+### Changed — the design
+
+- **The accent is green, and not only because blue was asked about.** The old
+  `#79C8F2` sat a CIE distance of **12** from Stage 3's Build blue — about the
+  point at which two colours stop being distinguishable — so the site had six
+  colours doing five jobs and two of them were the same colour. `#7ED957` is
+  **50** from its nearest neighbour, 125 degrees of hue away, 10.94:1 on the
+  page and 9.78:1 on the hover fill. Paper gets `#2E6B18` at 6.5:1.
+- **Two rules now keep money and interaction apart**, and they are structural
+  because the problem is: under the commonest colour deficiency the accent and
+  the money ochre sit at almost the same luminance, and no hue fixes that with
+  blue off the table. So the accent is never a quantity, the money colour is
+  never interactive, every money figure carries a `$` in a tabular column and
+  every accent carries a shape. Colour is the second signal in both cases.
+- **The masthead is brushed steel, not blue.** The largest object on the site
+  was Cloud Blue, on a book about leaving the cloud.
+- **The five Stage colours were respaced.** Chosen one at a time, they read
+  together as five greys — which is the whole job of a Stage colour. The
+  nearest pair in the palette is now 50 apart where about 10 is the threshold.
+- Anchors no longer land under the sticky header: `--anchor` is measured from
+  the real header height at runtime, because a guess is wrong the moment the
+  nav wraps, which it does at six items and on every phone.
+
+### Fixed — consistency
+
+- Four places still said "half an engineer" after the model stopped believing
+  it, and Move 03's rhetoric — the salary being "more than twice the whole of
+  the hardware, the space and the link" — had silently inverted. All rewritten.
+- `costs.py`'s self-test printed a different headline from the site, because
+  it was still using the delta framing. Both now put the salary on both sides.
+
 ### Fixed
 
 - **The book is four pages too short to print, and nothing said so.** KDP will

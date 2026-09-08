@@ -234,6 +234,24 @@ body{font-family:'Archivo',Helvetica,Arial,sans-serif;color:var(--ink);
 .eqt td:first-child{font-weight:700;color:var(--ink);}
 .eqt td.yours{color:var(--ink);}
 .eqt tr.keep td.yours{font-weight:700;color:#A32E1F;}
+/* The five-year comparison. Same grammar as .eqt, but every cell after the
+   first is a figure, so the whole thing is tabular mono and right-aligned -
+   a column of money a reader is meant to add up has to line up. */
+.fivey{width:100%;border-collapse:collapse;font-size:7.4pt;}
+.fivey th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:6.2pt;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);
+  padding:0 3mm 1.6mm 0;border-bottom:.3mm solid var(--rule);}
+.fivey thead th:nth-child(n+2){text-align:right;}
+.fivey tbody th{font-family:inherit;font-size:8pt;letter-spacing:0;
+  text-transform:none;color:var(--ink);font-weight:700;
+  padding:1.6mm 3mm 1.6mm 0;border-bottom:.18mm solid var(--rule2);}
+.fivey td{padding:1.6mm 0 1.6mm 3mm;border-bottom:.18mm solid var(--rule2);
+  color:var(--ink);text-align:right;white-space:nowrap;
+  font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;}
+/* The owned row is the answer, so it carries the ochre the rest of the book
+   uses for money. */
+.fivey tbody tr:last-child th,.fivey tbody tr:last-child td{color:#8A6112;font-weight:700;}
+
 .whens{display:grid;grid-template-columns:1fr 1fr;gap:0 11mm;}
 .when{display:block;padding:2.2mm 0;border-bottom:.18mm solid var(--rule2);break-inside:avoid;}
 .when .wq{font-size:9pt;line-height:1.26;margin-bottom:1.2mm;

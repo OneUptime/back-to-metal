@@ -2,7 +2,7 @@
 
 **Layer:** Move · **Leaving:** Managed registries, secret stores and hosted CI runners · **Risk:** Medium · **Cutover:** 0 min · **Reversible:** Immediately
 
-> Three pieces of plumbing — a registry of record, cluster state in Git, secrets with a key held outside the cluster — and every Move after this becomes a commit.
+> Three pieces of plumbing, then staging moves onto them: the first real workload on hardware you own, and the only one whose bad afternoon costs you nothing.
 
 ## Leaving from
 - **AWS:** ECR and Secrets Manager — the registry token expires every twelve hours, and a secret you remove holds its name for thirty days unless you ask for the seven-day minimum.
@@ -11,6 +11,8 @@
 
 ## Why this works
 Nothing real has moved yet, so this is the moment for plumbing. A registry you own makes a build that cannot reach its base image a problem you fix, not an outage you watch. Cluster state in a repository, reconciled by Argo CD, makes every Move that follows a commit, and a commit can be reverted. Secrets encrypted there, under a key held outside the cluster, mean a cluster rebuilt from bare metal gets its credentials back. Runners come last because they hold most of the $640: hosted minutes bill by the minute, and a spiky build queue pays for waiting.
+
+Then staging goes, and it goes before anything a customer touches. This is the sequencing decision the whole stage rests on. Staging is a real workload — real images, real secrets, real deploys, real people who will tell you within the hour when it is wrong — and it is the only real workload whose bad afternoon appears on no invoice, breaches no agreement and wakes nobody. Every class of problem the platform has, it has under staging first: a storage class that does not bind, a network policy nobody wrote down, a base image that only existed in a cache, a deploy that works once and not twice. You would rather find those with your own engineers complaining in a channel than with Move 14's production service in front of users. It is also the honest rehearsal for the ones after it, because a staging estate is usually the same shapes as production at a tenth of the size.
 
 ## Before you start
 
@@ -33,11 +35,13 @@ Nothing real has moved yet, so this is the moment for plumbing. A registry you o
 4. Encrypt every secret into the same repository with `sops`, under an `age` key kept in a password manager and one offline copy. A rebuilt cluster is seeded with that key by hand; the key never lives inside the thing being rebuilt.
 5. Delete a non-production namespace and let the reconciler put it back. Do this only after step four, and check the workload returns with its secrets attached.
 6. Install the ephemeral runner controller at chart version 0.12.1 and route builds to it by label. Then the acceptance test: an engineer changes one line and the image builds, lands in your registry and deploys with nobody at a console.
+7. Move the whole non-production estate — staging, review environments, whatever the branch builds deploy to — and leave it there. Point its DNS at the new cluster, let its data stay wherever it is for now, and tell the engineers who use it that it has moved and where to complain. Then use it: for a fortnight, every branch deploys here and nowhere else. The bugs this finds are the bugs Move 14 would otherwise find in front of users, and the cost of finding them here is somebody saying the preview is slow.
 
 ## Operator's notes
 - **Swap:** A plain registry over the same object store drops the database and cache Harbor needs, and with them projects, quotas and scanning.
 - **Do it faster:** Do the cache in an afternoon and leave the registry of record a fortnight; most of the benefit arrives with the first half.
 - **Watch out:** The registry has to run for the cluster to start, and the cluster for the registry to serve. Power the rack down and up once, deliberately, before an outage asks it.
+- **Watch out:** Staging that still talks to production data stores has not moved, it has been relocated. Point it at its own copies before step seven, or the first thing your new cluster does is write to the database Move 16 has not migrated yet.
 - **Leftovers:** The cloud registry bills storage and egress until its images go, a Move 20 decision, and hosted runner minutes continue for anything still routed at them.
 
 ## Rollback
@@ -47,7 +51,7 @@ All of this is a repository: a bad change is a revert, and the reconciler catche
 
 | Was | Now | Saved | Cutover | Effort | Wait |
 |---|---|---|---|---|---|
-| $640/mo | $60/mo | 91% | 0 min | 4 days | — |
+| $640/mo | $60/mo | 91% | 0 min | 5 days | 2 weeks |
 
 ## What you can turn off
-The hosted runner minutes, once a week of builds has passed on your own nodes with no fallback. The cloud registry and its secret store stay funded until Move 20.
+The hosted runner minutes, once a week of builds has passed on your own nodes with no fallback. The non-production estate's cloud compute, once the fortnight in step seven is done and nobody has asked to go back. The cloud registry and its secret store stay funded until Move 20.

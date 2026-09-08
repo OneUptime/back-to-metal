@@ -23,6 +23,25 @@
       marks MONEY - `--hot` on anything that is a figure you are paying
       or saving - because the argument of this book is arithmetic and
       the arithmetic deserves to be findable.
+
+      Two rules keep the second job from colliding with the first, and
+      they are structural rather than chromatic because the problem is:
+      under the commonest colour deficiency the accent and `--hot` sit
+      at almost the same luminance, and no choice of hue fixes that
+      while blue is off the table and five of the reserved colours are
+      warm. So:
+
+        THE ACCENT IS NEVER A QUANTITY. It is interaction and
+        structure - a link, a focus ring, a rule, the fill of a
+        control somebody has operated.
+        `--hot` IS NEVER INTERACTIVE. It is a currency figure and
+        nothing else.
+
+      Every money figure also carries a `$` and sits in a labelled
+      tabular column; every accent carries a shape - an underline, a
+      1px rule, a 2px edge. Colour is the second signal in both cases,
+      never the only one. And the accent is never a surface larger
+      than 3px unless the reader turned it on: at 11:1 it shouts.
    3. Things move. Every animation is enhancement over a page already
       rendered correct and complete: see MOTION below for the failsafe
       that guarantees it, and note that all of it is inside a
@@ -108,7 +127,12 @@
      the hover state is ink that fails exactly when it is pointed at. */
   --ink:#E9EDEF; --ink2:#B8BFC5; --ink3:#99A2A9; --ink4:#818B92;
   --bg:#0C0F11; --fill:#161C21; --rule:#39434A; --rule2:#1E252A;
-  --accent:#79C8F2; --warn:#F5A08A; --on-c:#0C0F11;
+  /* NOT BLUE, and not only because it was asked for. The old #79C8F2 sat a
+     CIE distance of 12 from Stage 3's Build blue - about the point at which
+     two colours stop being distinguishable - so the site had six colours
+     doing five jobs and two of them were the same colour. This green is 50
+     from its nearest neighbour and 125 degrees of hue from where it was. */
+  --accent:#7ED957; --warn:#F5A08A; --on-c:#0C0F11;
   /* Money. The one thing on this site that is neither prose nor a
      Stage, and the thing every reader came for. */
   --hot:#F0B45F;
@@ -191,8 +215,8 @@ body::before,body::after{content:'';position:fixed;inset:0;z-index:-1;
   pointer-events:none}
 body::before{
   background:
-    radial-gradient(1120px 560px at 50% -12%,rgba(121,200,242,.115),transparent 72%),
-    radial-gradient(760px 420px at 88% 4%,rgba(240,180,95,.05),transparent 70%),
+    radial-gradient(1120px 560px at 50% -12%,rgba(126,217,87,.075),transparent 72%),
+    radial-gradient(760px 420px at 88% 4%,rgba(240,180,95,.045),transparent 70%),
     linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px) 0 -1px/100% 84px,
     linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px) -1px 0/84px 100%;
   -webkit-mask-image:linear-gradient(#000,#000 24vh,transparent 86vh);
@@ -343,11 +367,16 @@ body::after{opacity:.032;background-image:url("data:image/svg+xml,%3Csvg xmlns='
    as legible as the ink beside it - and the colour is declared first
    and overridden inside @supports, so a browser that cannot clip a
    background to text gets a blue word rather than an invisible one. */
-.mast em{font-style:normal;color:var(--accent)}
+.mast em{font-style:normal;color:#E7ECEF}
 @supports ((background-clip:text) or (-webkit-background-clip:text)){
   .mast em{color:transparent;
-    background-image:linear-gradient(100deg,#CFE3EF 0%,#79C8F2 26%,#EAF4FA 44%,
-      #79C8F2 62%,#A9CFE4 100%);
+    /* ACHROMATIC. It was a five-stop blue, which made the largest object
+       on the site - up to 132px of it - Cloud Blue, on a book about
+       leaving the cloud. Brushed steel says the same thing about
+       material without saying the wrong thing about the subject, and it
+       leaves the accent free to mean interaction. Darkest stop 6.5:1. */
+    background-image:linear-gradient(100deg,#9AA3A8 0%,#E7ECEF 24%,#FFFFFF 42%,
+      #B8C0C5 58%,#E7ECEF 78%,#8E979C 100%);
     background-size:280% 100%;background-position:100% 0;
     -webkit-background-clip:text;background-clip:text}
   @media (prefers-reduced-motion:no-preference){
@@ -706,6 +735,13 @@ html.scrolled .wm{font-size:16px}
   text-transform:none;color:var(--ink);border-bottom:1px solid var(--rule2)}
 .cmp .tot th,.cmp .tot td{border-top:2px solid var(--ink)}
 .cmp .save th,.cmp .save td{font-weight:700;color:var(--ink)}
+/* The five-year table is the comparison table in another hat: same grammar,
+   same rules, one extra column, and the money colour on the row that is the
+   answer. `i` carries the percentage beside the figure without being a
+   second column nobody would read across. */
+.fy td i{font-style:normal;color:var(--ink3)}
+.fy .save td{color:var(--hot)}
+.fy .save td i{color:var(--hot)}
 .cmp .people th,.cmp .people td{border-bottom:1px solid var(--rule2)}
 .cmp .kept th,.cmp .kept td{border-bottom:1px solid var(--rule)}
 
@@ -909,6 +945,13 @@ html.scrolled .wm{font-size:16px}
   padding:var(--s2) 0}
 .onramp li{padding:var(--s2) 0;font-size:var(--t-sub);line-height:var(--lh-sub);
   color:var(--ink2);max-width:var(--measure)}
+/* The four reasons not to do any of this. They get the warn colour on their
+   rule, because they are the only list on the site whose job is to stop the
+   reader rather than move them along, and a reader skimming for permission to
+   proceed should have to look at them. */
+.stay li{padding:var(--s3) 0 var(--s3) var(--s5);border-bottom:0;
+  border-left:3px solid var(--warn);margin-top:var(--s2);
+  background:linear-gradient(90deg,rgba(255,255,255,.03),transparent 40%)}
 
 /* ================================================================
    ABOUT
@@ -1173,7 +1216,9 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
     color-scheme:light;
     --ink:#000; --ink2:#1A1A1A; --ink3:#3A3A3A; --ink4:#5A5A5A;
     --bg:#fff; --fill:#fff; --rule:#666; --rule2:#BBB;
-    --accent:#1F4E79; --warn:#A32E1F; --on-c:#fff;
+    /* The accent inked. #7ED957 is 1.6:1 on white; this is the same
+       colour at 6.5:1, which is what the screen green means on paper. */
+    --accent:#2E6B18; --warn:#A32E1F; --on-c:#fff;
     /* --hot had no paper value and inherited the screen's #F0B45F,
        which is 1.84:1 on white. Every figure the money colour is for -
        the saved column, the saved total, the delta on the chart, the
