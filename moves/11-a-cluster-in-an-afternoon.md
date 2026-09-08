@@ -12,6 +12,8 @@
 ## Why this works
 A control plane is three machines that agree with each other, and the agreement is etcd. Talos Linux removes the reason hand-built clusters rot: no shell, no package manager, no login, so changing a machine means changing the YAML in Git and applying it. Drift stops being a category. Doing this while nothing runs is what makes the risk survivable — every mistake costs a rebuild, and an empty cluster rebuilds in twenty minutes. Be plain about the money: a managed control plane is about $73 a month — the same ten cents an hour on all three — so this is not the Move that pays for the migration.
 
+Everybody arriving from EC2 asks why there is no hypervisor — why this sits on the metal rather than on Proxmox, with as many virtual machines as you like. Because you are not moving virtual machines: Move 02's inventory is already containers, and a hypervisor under a container platform is a second control plane to patch, licence and back up for a problem this estate does not have. It also puts back the shell that Talos removes, which is what the ongoing-hours figure assumes you did not do. The Swap says when to take the other branch.
+
 ## Before you start
 
 **Access**
@@ -36,6 +38,7 @@ A control plane is three machines that agree with each other, and the agreement 
 
 ## Operator's notes
 - **Swap:** If replacing kube-proxy on day one is a step too far, run Cilium alongside it and take kube-proxy out a week later.
+- **Swap:** Proxmox underneath, cluster in virtual machines, is right in three cases: workloads that are not containers and never will be; rebuilding or resizing a node without walking to the rack; or snapshotting a whole machine before an upgrade rather than only its workloads. The price is a second platform to patch. Take it deliberately, not by habit.
 - **Do it faster:** Build the cluster twice from the same commit. The second build takes twenty minutes and shows whether the first was reproducible or lucky.
 - **Watch out:** On flash without power-loss protection, etcd throws leader elections under write load, which reads as an intermittent network fault.
 - **Leftovers:** Write the upgrade cadence down today — one minor behind, reviewed quarterly. Nobody picks it calmly once a version is out of support.

@@ -47,7 +47,7 @@ Nothing here alters what serves traffic, so backing out is removing two schedule
 
 | Was | Now | Saved | Cutover | Effort | Wait |
 |---|---|---|---|---|---|
-| $1,100/mo | $340/mo | 69% | 0 min | 5 days | — |
+| $480/mo | $150/mo | 69% | 0 min | 5 days | — |
 
 ## What you can turn off
 Managed backup vaults, their cross-region copies, the alarms and their ingestion, and the rented pager seats — once a restore of your own has been timed and one real page has woken somebody.

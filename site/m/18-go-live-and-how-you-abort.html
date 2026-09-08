@@ -6,7 +6,7 @@
 <title>18 · Go-live, and how you abort — Back to Metal</title>
 <meta name="description" content="The weight moves in four steps and comes back in one, which is why the time-to-live drops a day early and the old edge stays up a week.">
 <meta name="theme-color" content="#0C0F11">
-<link rel="stylesheet" href="../assets/style.css?v=4.1.1">
+<link rel="stylesheet" href="../assets/style.css?v=5.0.0">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
 <script>var d=document.documentElement;d.className='js rise';
 window.BTM_RISE_T=setTimeout(function(){d.classList.remove('rise')},2000)</script>
@@ -44,9 +44,9 @@ window.BTM_RISE_T=setTimeout(function(){d.classList.remove('rise')},2000)</scrip
     <p>Putting the weight back returns new connections to the managed edge inside one time-to-live, which is why it was lowered first. That is the whole procedure for seven days. The point of no return is not the weight change but switching the managed edge off when the week is out. If the data failed rather than the traffic, no weight helps and the way back is the database restore.</p></section>
 
   <section class="sec"><h2 class="d sect">The numbers</h2>
-    <table class="nums"><thead><tr><th scope="col">Was</th><th scope="col">Now</th><th scope="col">Saved</th><th scope="col">Cutover</th><th scope="col">Effort</th><th scope="col">Wait</th></tr></thead><tbody><tr><td>$1,900/mo</td><td>$0/mo</td><td>100%</td><td>10 min</td><td>3 days</td><td>1 week</td></tr></tbody></table>
+    <table class="nums"><thead><tr><th scope="col">Was</th><th scope="col">Now</th><th scope="col">Saved</th><th scope="col">Cutover</th><th scope="col">Effort</th><th scope="col">Wait</th></tr></thead><tbody><tr><td>$760/mo</td><td>$0/mo</td><td>100%</td><td>10 min</td><td>3 days</td><td>1 week</td></tr></tbody></table>
     <p class="turnoff"><span class="lbl">What you can turn off</span>
-      The weighted record and the managed edge behind it, seven days after full weight, and with them the egress line that was most of the $1,900.</p></section>
+      The weighted record and the managed edge behind it, seven days after full weight, and with them the egress line that was most of the $760.</p></section>
 
   <footer class="mf">
     <label class="ck big"><input type="checkbox" class="ck-box" data-n="18">
@@ -56,8 +56,8 @@ window.BTM_RISE_T=setTimeout(function(){d.classList.remove('rise')},2000)</scrip
   </footer>
 </article>
 </main>
-<footer class="foot"><div class="foot-in"><nav class="foot-nav" aria-label="Every page"><a href="../index.html">The guide</a><a href="../index.html#why">Why leave</a><a href="../cost.html">What it costs</a><a href="../checklist.html">Your checklist</a><a href="../start.html">Before you start</a><a href="../about.html">About</a><a href="../Back-to-Metal.pdf" download>PDF</a><a href="../Back-to-Metal.epub" download>EPUB</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav><p class="foot-note">Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves&rsquo; own effort figures and the dependency graph rather than asserted, and every price is a public list rate observed while writing. <a href="../start.html">Read the safety page</a> before running anything.</p><a class="by" href="https://oneuptime.com"><img src="../assets/oneuptime.svg" alt="OneUptime" width="160" height="32"><span>By the makers of OneUptime</span></a><p class="foot-note"><a href="https://oneuptime.com">oneuptime.com</a> is an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Stage 5, and the interest is declared on the <a href="../about.html">about page</a>.</p><p class="foot-note">Open source: the Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> &mdash; software MIT, text CC BY 4.0. <span class="ver">v4.1.1</span></p></div></footer>
-<script src="../assets/moves-index.js?v=4.1.1" defer></script>
-<script src="../assets/app.js?v=4.1.1" defer></script>
+<footer class="foot"><div class="foot-in"><nav class="foot-nav" aria-label="Every page"><a href="../index.html">The guide</a><a href="../index.html#why">Why leave</a><a href="../cost.html">What it costs</a><a href="../checklist.html">Your checklist</a><a href="../start.html">Before you start</a><a href="../about.html">About</a><a href="../Back-to-Metal.pdf" download>PDF</a><a href="../Back-to-Metal.epub" download>EPUB</a><a href="https://github.com/OneUptime/back-to-metal">Source</a></nav><p class="foot-note">Every Move states its cutover in minutes of user-visible downtime, its risk as blast radius, and how long the thing it replaces must stay warm before you turn it off. The schedule is computed from the Moves&rsquo; own effort figures and the dependency graph rather than asserted, and every price is a public list rate observed while writing. <a href="../start.html">Read the safety page</a> before running anything.</p><a class="by" href="https://oneuptime.com"><img src="../assets/oneuptime.svg" alt="OneUptime" width="160" height="32"><span>By the makers of OneUptime</span></a><p class="foot-note"><a href="https://oneuptime.com">oneuptime.com</a> is an open-source platform for uptime, incidents, on-call and status pages. It is recommended in Stage 5, and the interest is declared on the <a href="../about.html">about page</a>.</p><p class="foot-note">Open source: the Moves and the typesetter that builds this are <a href="https://github.com/OneUptime/back-to-metal">on GitHub</a> &mdash; software MIT, text CC BY 4.0. <span class="ver">v5.0.0</span></p></div></footer>
+<script src="../assets/moves-index.js?v=5.0.0" defer></script>
+<script src="../assets/app.js?v=5.0.0" defer></script>
 </body>
 </html>

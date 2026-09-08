@@ -46,7 +46,7 @@ Nothing is bound yet, so removing Rook and handing the devices back is a morning
 
 | Was | Now | Saved | Cutover | Effort | Wait |
 |---|---|---|---|---|---|
-| $2,100/mo | $180/mo | 91% | 0 min | 4 days | — |
+| $880/mo | $80/mo | 91% | 0 min | 4 days | — |
 
 ## What you can turn off
 Nothing this week. The managed disks and shares carry production until Stage 4 moves what is on them; the line dies in Move 15 for the buckets and Move 16 for the database.

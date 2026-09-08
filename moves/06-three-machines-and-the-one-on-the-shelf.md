@@ -1,8 +1,8 @@
-# 06 · Five machines, and the one on the shelf
+# 06 · Three machines, and the one on the shelf
 
 **Layer:** Buy · **Leaving:** Elastic node capacity and cluster autoscaling · **Risk:** High · **Cutover:** 0 min · **Reversible:** Until the order is signed
 
-> Three nodes is a quorum; five survives losing one; the sixth is bought with them and never plugged in, because iron does not autoscale
+> Three nodes are a quorum, and losing one costs a third of the capacity. The fourth is bought with them and never plugged in, because iron does not autoscale
 
 ## Leaving from
 - **AWS:** EC2 Auto Scaling groups — the fleet ceiling is a per-region vCPU quota, raised by support ticket.
@@ -10,7 +10,9 @@
 - **Azure:** Virtual Machine Scale Sets — the platform fault domain count is fixed at creation and cannot be edited.
 
 ## Why this works
-Five is the smallest fleet that makes the arithmetic of failure tolerable. Three nodes give a control plane its quorum and nothing more: lose one and a third of the capacity goes, while the survivors carry a load nobody sized them for. At five, a dead machine costs twenty per cent. The sixth is not in the rack. It is built, burned in, configured identically and then unplugged, because the replacement path left behind was an API call and the one ahead is a return authorisation and three weeks. Those weeks cost more than the machine that prevents them.
+Three is the smallest fleet that is a cluster at all, and at this size the book is honest that it is the floor rather than the comfortable answer. Three nodes give a control plane its quorum; lose one and a third of the capacity goes with it, and the two survivors carry a load you have to have sized them for deliberately. That is the trade a $10,000 estate makes: at twice the bill you buy five and a dead machine costs twenty per cent instead of thirty-three. Size the workload so two can hold it, or accept that a failure is a degraded afternoon rather than a shrug.
+
+The fourth machine is what makes that survivable, and it is not in the rack. It is built, burned in, configured identically and then unplugged, because the replacement path you left behind was an API call and the one ahead is a return authorisation and three weeks. Those weeks cost more than the machine that prevents them, and at three nodes they cost more again.
 
 ## Before you start
 

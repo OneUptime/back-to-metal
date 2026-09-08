@@ -50,9 +50,16 @@ def main():
     # the metal, the salaried time and the lines that never come home.
     retained = sum(m['now'] for m in moves
                    if m['was'] is not None and m['now'] is not None)
+    # THE SAME FRAMING THE SITE AND THE BOOK USE, or this table prints a
+    # headline that contradicts them - which it did, at 50 per cent against
+    # their 36, because it divided by the bare bill while they divide by the
+    # bill with the cloud's own operations time added to it. The dollar saving
+    # is a delta and is identical either way; only the denominator moves.
     _o = COSTS.owned_month(REFERENCE['nodes'], REFERENCE['spares'], retained)
     owned = round(_o['infrastructure']) + round(_o['people']) + round(_o['retained'])
-    saved = COSTS.BILL_MONTH - owned
+    _cp = round(COSTS.cloud_people_month())
+    loaded = COSTS.BILL_MONTH + _cp
+    saved = loaded - (owned + _cp)
 
     out = [MARKER, '']
     out.append('## The book at a glance')
@@ -82,8 +89,9 @@ def main():
                    f'before the salary and the cage |')
     if saved:
         out.append(f'| Saving, with everything counted | ${saved:,.0f} a month '
-                   f'&mdash; ${saved * 12:,.0f} a year, {saved / COSTS.BILL_MONTH * 100:.0f} '
-                   f'per cent of a ${COSTS.BILL_MONTH:,.0f} bill |')
+                   f'&mdash; ${saved * 12:,.0f} a year, {saved / loaded * 100:.0f} '
+                   f'per cent of a ${loaded:,.0f} bill with the salary on both '
+                   f'sides |')
     out.append('')
     out.append('Every Move names the real service on AWS, Google Cloud and Azure, and the one '
                'thing that differs on each.')

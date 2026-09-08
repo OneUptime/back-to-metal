@@ -358,7 +358,7 @@ def totals(moves):
     # network, outbound mail and edge scrubbing, which it explicitly tells the
     # reader to write in as permanent, plus the residue five other Moves keep -
     # archived object storage, a registry, a queue, off-site backup. Every
-    # dollar of it is inside the $24,000 before-state, so leaving it out of the
+    # dollar of it is inside the before-state on the left, so leaving it out of the
     # after-state overstated the saving by exactly this much.
     #
     # It comes off the priced Moves rather than off every Move, and that is
@@ -889,8 +889,9 @@ def build_cost(moves, T):
          ['Already in the bill', mny(owned['retained']), mny(ded['retained'])]),
         # EVERY COLUMN IS THE SUM OF ITS OWN ROWS. The cloud column carries its
         # people now, so its total is the bill PLUS them - printing the bill
-        # here would put $24,000 under a column whose visible rows come to
-        # $29,491, which is the sloppiness this page accuses other people of.
+        # here would put the bare bill under a column whose visible rows come
+        # to more than it, which is the sloppiness this page accuses other
+        # people of.
         ('Total a month', 'tot',
          [mny(cloud_total),
           mny(owned['infrastructure'] + cloud_people + owned['people']
@@ -991,6 +992,13 @@ def build_cost(moves, T):
                      f'cluster and carries the pager &mdash; about '
                      f'{COSTS.PEOPLE["cloud_ops_hours_month"]} hours a month, or '
                      f'{mny(COSTS.cloud_people_month())}.')
+      + mg_note('Why owning is booked as dearer',
+                'Every first-hand account says the difference is nought &mdash; '
+                'the same people, before and after. The only estimate that is '
+                'not nought is an outside one at ten to twenty hours, and this '
+                'takes twenty. The book is declining the most favourable '
+                'reading of its own evidence, not reporting that a rack is '
+                'harder work than an invoice.')
       + mg_note('Where the twenty hours came from',
                 f'An outside estimate puts the extra at ten to twenty hours a month; '
                 f'this takes the top of it. We make OneUptime and we made this move, '
@@ -1015,7 +1023,14 @@ def build_cost(moves, T):
       f'the life of one generation of machines, with the salary counted on all three '
       f'sides and the capital on the line where it actually happens.</p>'
       ,
-      margin=mg_note('The residual', 'After sixty months the '
+      margin=mg_note('Level, not a winner',
+                     'The two metal columns are within one per cent of each '
+                     'other, and both numbers behind that margin are marked '
+                     'in the model as not re-verified: the rent per machine, '
+                     'and how many hours renting actually saves. Treat them '
+                     'as the same answer with different cash flows, and let '
+                     'your own quote break the tie.')
+      + mg_note('The residual', 'After sixty months the '
       f'owned machines are five years old and still working &mdash; hardware of this class '
       f'is routinely run for seven or eight. What you hold is a fleet with years left in '
       f'it, counted here at a conservative fifteen per cent of what it cost. It is also '

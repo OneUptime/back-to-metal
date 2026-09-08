@@ -3,18 +3,19 @@ rules the whole book rests on.
 
 Shared by the printed book's front matter and the website, so a change here
 lands in both. The specification is a worked reference point sized for a
-company - roughly what one spending $24,000 a month on a single cloud actually
+company - roughly what one spending $10,000 a month on a single cloud actually
 needs - and not a shopping list to copy blindly.
 """
 
 # The reference cluster the Moves are written against. One site, five nodes and
 # a spare on the shelf.
 #
-# Five, because three is the smallest control plane with a quorum and losing one
-# of three leaves two machines carrying a load they were never sized for. Six,
-# because the sixth is not in the rack: it is burned in, configured and
-# unplugged, and it costs less than three weeks of degraded capacity during your
-# first quarter on your own hardware.
+# Three, because it is the smallest control plane with a quorum. Four, because
+# the fourth is not in the rack: it is burned in, configured and unplugged, and
+# it costs less than three weeks of degraded capacity during your first quarter
+# on your own hardware. At a larger bill this becomes five and a spare, and the
+# arithmetic on the cost page follows the numbers here rather than the other
+# way round.
 #
 # One site. An earlier edition of this book specified two, and two sites is the
 # single most common reason a repatriation runs out of energy: double the
@@ -22,7 +23,12 @@ needs - and not a shopping list to copy blindly.
 # One site with proven off-site backups is the honest answer at this size.
 REFERENCE = {
     'sites': 1,
-    'nodes': 5,
+    # THREE, not five. Five was sized against a $24,000 estate; this edition is
+    # written against $10,000, which is roughly half the compute, and three is
+    # the smallest number that is still a control plane with a quorum. Losing
+    # one of three leaves two carrying a load they were sized for, because the
+    # fourth machine is on the shelf and can be in the rack the same afternoon.
+    'nodes': 3,
     'spares': 1,
     'cores_per_node': 32,
     'ram_gb_per_node': 256,

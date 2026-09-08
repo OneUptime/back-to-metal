@@ -47,7 +47,7 @@ Every step before the ramp is additive: two copies exist and the cloud copy carr
 
 | Was | Now | Saved | Cutover | Effort | Wait |
 |---|---|---|---|---|---|
-| $6,800/mo | $0/mo | 100% | 0 min | 10 days | 1 week |
+| $2,940/mo | $0/mo | 100% | 0 min | 10 days | 1 week |
 
 ## What you can turn off
 The managed container service, its task revisions and its log retention — but not after the first service's week at full weight, which is the mistake this line used to invite. It goes when the LAST service off step 6 has held for a week, which is a week after the cadence ends rather than a week after it starts.

@@ -5,6 +5,73 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-09-08
+
+The reference estate is $10,000 a month, not $24,000. Every figure in the book
+is a slice of that bill, so every figure moved; the fleet is three machines and
+a spare rather than five and a spare; and the exercise surfaced two errors and
+one question the book had never answered.
+
+### Changed — the estate
+
+- **`BILL_MONTH` is $10,000.** It is not one constant: eleven Moves state a
+  "Was" and they sum to the bill, which is what makes the arithmetic
+  checkable. All eleven were re-derived line by line rather than multiplied,
+  because the lines do not scale together — a managed control plane is $73 at
+  any size, a load balancer and a Multi-AZ database have floors, and egress and
+  object storage scale with traffic and data. The Was column sums to $10,003.
+- **The reference build is 3 nodes + 1 spare**, 96 cores and 768 GB, down from
+  5 + 1. Move 06 is retitled and says the honest thing about it: three is a
+  quorum and losing one costs a **third** of the capacity rather than a fifth.
+  At twice the bill you buy five and a dead machine costs twenty per cent. The
+  smaller fleet is the floor, not the comfortable answer.
+- **New headline: $4,967 a month, $59,604 a year, 36 per cent** of the loaded
+  bill, 63 per cent of the infrastructure line.
+
+### Fixed
+
+- **The ops hours were absolute constants and had to scale with the estate.**
+  Holding 60 and 80 while the bill fell 58 per cent left the same person
+  running half the services, and it was the difference between the book
+  clearing its own decision rule and failing it: at 60/80 owned lands 29.1 per
+  cent under cloud, and Move 03 requires a third. They are 40 and 55 — the
+  cloud figure falls by a third rather than a half because somebody still
+  upgrades the cluster and rotates the credentials whatever its size, and the
+  delta falls from 20 to 15 because it is driven by the machines and there are
+  four of them now.
+- **`readme.py` printed 50 per cent where the site printed 36**, because it
+  divided the saving by the bare bill while the site divides by the bill with
+  the cloud's own operations time added. Third occurrence of the same
+  two-denominators bug; it now uses the loaded framing like everything else.
+- **The "when to stay" threshold contradicted the new reference estate.** It
+  said the saving stops being worth the distraction below about ten thousand a
+  month, which is exactly where this edition now sits. The real break-even is
+  about **nine thousand** — the quarter rack costs $1,400 whether it holds
+  three machines or thirty, so the saving falls faster than the bill — and the
+  item says that, with the arithmetic, rather than a round number.
+
+### Added
+
+- **Why there is no hypervisor.** The book went from EC2 to Kubernetes on the
+  metal without once mentioning Proxmox or KVM, which is the first question
+  anyone arriving from EC2 asks. Move 11 answers it — you are not moving
+  virtual machines, and a hypervisor under a container platform is a second
+  control plane bought for a problem this estate does not have — with a Swap
+  naming the three cases where it is the right call.
+- **The rent-versus-own comparison no longer picks a winner.** The margin was
+  $249 a month, one per cent, and it flips on two inputs the model marks as not
+  re-verified. Sweeping both across their defensible ranges puts owning ahead
+  in three of four combinations. The book now says the two are level at this
+  size, names the numbers that decide it, and tells the reader to break the tie
+  with their own quote.
+- **Why owning is booked as dearer at all**, written down rather than implied:
+  every first-hand account says the delta is nought, the only non-zero estimate
+  is an outside ten to twenty hours, and the book takes twenty. It is the book
+  declining the most favourable reading of its own evidence, not a finding that
+  a rack is harder work than an invoice. The same note explains why the cloud's
+  own hours are booked generously: the dollar saving cancels them, so a larger
+  cloud figure only makes the headline percentage smaller.
+
 ## [4.1.1] - 2026-09-08
 
 The printed interior had content hanging off three pages, and the check that

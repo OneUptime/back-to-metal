@@ -160,9 +160,12 @@ STAY = [
     'and it is paid for in attention. A team that resents the pager will run the platform '
     'badly and blame the hardware.',
 
-    'The bill is small. Below about ten thousand dollars a month the saving is real and '
-    'the distraction is larger; Move 03 gives you permission to do the arithmetic and '
-    'stop, and stopping is a perfectly good outcome.',
+    'The bill is small. This edition is written against ten thousand dollars a month, '
+    'which is close to the floor: the quarter rack costs $1,400 whether it holds three '
+    'machines or thirty, so the saving falls faster than the bill does and Move 03\u2019s '
+    'rule stops clearing at about nine thousand. Below that the saving is real and the '
+    'distraction is larger; Move 03 gives you permission to do the arithmetic and stop, '
+    'and stopping is a perfectly good outcome.',
 ]
 
 CLOSER = ('If none of those four is true and the arithmetic in Move 03 clears, the rest '

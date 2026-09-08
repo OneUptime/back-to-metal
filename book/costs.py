@@ -12,10 +12,26 @@ out the people is the reason repatriations get approved and then regretted.
 """
 
 # --- the estate this edition is written against ---------------------------
-# A company of a size, not an enterprise. One cloud, one region, about $24,000 a month.
-# Every Move's numbers strip is a slice of this bill, and the slices add up to
-# it, which is what makes the roadmap page's arithmetic checkable.
-BILL_MONTH = 24000
+# One cloud, one region, about $10,000 a month. Every Move's numbers strip is a
+# slice of this bill, and the slices add up to it, which is what makes the
+# roadmap page's arithmetic checkable.
+#
+# IT WAS $24,000 AND IT IS NOW $10,000, and that is close to the floor. The
+# quarter rack's fixed cost - space, transit, cross-connect, hands - is $1,400
+# a month whether it holds three machines or thirty, and it does not shrink
+# when the bill does. So the saving falls faster than the bill, and Move 03's
+# rule (owned must land a third under) stops clearing at about $9,000:
+#
+#     bill      owned      cloud      under     Move 03's rule
+#     $24,000   $10,594    $27,661    61.7%     clears
+#     $12,000   $ 8,827    $15,661    43.6%     clears
+#     $10,000   $ 8,633    $13,661    36.8%     clears, and this is the edition
+#     $ 8,000   $ 8,439    $11,661    27.6%     FAILS - the book says stop
+#
+# This edition therefore sits about one thousand dollars above its own advice
+# to stop, which is deliberate: a reader at $10,000 is exactly who needs the
+# arithmetic done in front of them rather than asserted.
+BILL_MONTH = 10000
 
 # --- AWS list prices, us-east-1, on-demand, USD ---------------------------
 # Observed while writing. On-demand and undiscounted on purpose: a reader with a
@@ -85,7 +101,7 @@ HARDWARE = {
 # column. Loaded cost, not salary: employer taxes, equipment, benefits and the
 # recruiter you paid once.
 #
-# Half an engineer, not two. Five machines in one cage is not an enterprise
+# Half an engineer, not two. Three machines in one cage is not an enterprise
 # platform team, and a book that asks a company to hire two people to save
 # $3,000 of hardware is asking it to lose money. Move 03 makes the reader write
 # this number down before the arithmetic, so the arithmetic cannot be argued
@@ -141,10 +157,42 @@ PEOPLE = {
     # What the cloud estate costs in engineer time. NOT ZERO, which is what a
     # comparison that puts "already in the bill" in this cell is claiming: an
     # AWS invoice contains no salary. Somebody upgrades the managed cluster,
-    # rotates the credentials, chases the bill and carries the pager.
-    'cloud_ops_hours_month': 60,
-    # What the owned platform costs on top of that. See above.
-    'owned_ops_hours_month': 80,
+    # rotates the credentials, chases the bill, answers the quota refusal,
+    # re-architects around a service limit and carries the pager.
+    #
+    # WHY THIS IS SIXTY AND NOT SMALLER, since it looks at first like the book
+    # flattering itself: it does the opposite. The dollar saving is a delta and
+    # does not move with this number at all - it cancels, because owned is
+    # cloud plus twenty. What it moves is the DENOMINATOR, so a larger cloud
+    # figure makes the headline percentage SMALLER:
+    #
+    #     cloud ops    saving        headline
+    #      0 h/mo      $16,625       69 per cent
+    #     30 h/mo      $16,625       62 per cent
+    #     60 h/mo      $16,625       56 per cent
+    #
+    # Sixty was the figure for a $24,000 estate. THESE HOURS SCALE WITH THE
+    # ESTATE, and holding them fixed while the bill fell by 58 per cent was
+    # the first thing that went wrong when this edition was re-based: it left
+    # the same person running half the services and made owning look worse
+    # than it is. Forty against a $10,000 estate, with floors - somebody still
+    # upgrades the cluster and rotates the credentials whatever its size, so
+    # this falls by a third rather than by a half.
+    'cloud_ops_hours_month': 40,
+    # What the owned platform costs on top of that.
+    #
+    # AND WHY OWNING IS BOOKED AS DEARER AT ALL, which is the fair question:
+    # every primary account this file cites says the delta is ZERO. 37signals -
+    # "the same people who were operating HEY and Basecamp"; our own fleet -
+    # "the toil moved; it did not multiply". The only estimate that is not zero
+    # is an outside one at ten to twenty hours, and the book takes twenty, the
+    # top of it. So this is not a finding that colocation is harder work. It is
+    # the book declining to take the most favourable reading of its own
+    # evidence, on the number its whole argument turns on.
+    #
+    # Fifteen hours over the cloud rather than twenty, because the delta is
+    # driven by the machines and there are four of them now instead of six.
+    'owned_ops_hours_month': 55,
 }
 
 # Dedicated hosts by the month, for the reader who wants the saving without the
@@ -275,7 +323,7 @@ def people_month(p=PEOPLE):
 # and tells the reader to write them into the comparison as a PERMANENT line.
 # Five more Moves retire most of a service and keep a residue: object storage
 # that stays archived, a registry, a queue, a certificate authority, off-site
-# backup. All of that is inside the $24,000 before-state and all of it is still
+# backup. All of that is inside the before-state on the left and all of it is still
 # there afterwards, and a model that counts it on the left and not on the right
 # is the exact error this book was written to argue against.
 #
@@ -300,6 +348,21 @@ def owned_month(nodes, spares=1, retained=DEFAULT_RETAINED):
 # Ten hours, not twenty. Racking is a one-off (Move 09), not a monthly cost,
 # and the measured hardware intervention rate on a fleet this size is two
 # call-outs in twenty-four months. Ten hours a month is already generous.
+#
+# AND THIS NUMBER, WITH node_month ABOVE, DECIDES WHICH COLUMN WINS - which is
+# why neither the book nor this file claims one does. Sweeping both across
+# their defensible ranges flips the answer:
+#
+#     rent/node   hours saved   owned      rented     winner
+#     $650        0             $12,866    $13,532    owning
+#     $650        10            $12,866    $12,617    renting, by $249
+#     $800        10            $12,866    $13,517    owning
+#     $1,100      20            $12,866    $14,401    owning
+#
+# A margin of a couple of hundred dollars on this bill is inside noise, and both inputs behind it
+# are marked NOT RE-VERIFIED. So the honest statement is that at this size the
+# two are level and the difference is inside the error bars, and the book says
+# that rather than picking the winner its own uncertainty cannot support.
 RENT_SAVES_HOURS = 10
 
 
