@@ -2,7 +2,7 @@
 
 **Layer:** Build · **Leaving:** The managed Kubernetes control plane · **Risk:** High · **Cutover:** 0 min · **Reversible:** Immediately
 
-> The frightening part is the short part: six machines, one file in Git, and an operating system with no shell to log into.
+> The frightening part is the short part: eighteen machines, one file in Git, and an operating system with no shell to log into.
 
 ## Leaving from
 - **AWS:** EKS — tearing a cluster down leaves its IAM OIDC provider behind, still trusting an issuer URL nothing resolves.
@@ -17,7 +17,7 @@ Everybody arriving from EC2 asks why there is no hypervisor — why this sits on
 ## Before you start
 
 **Access**
-- The six machines from Move 10, powered and reachable on the management VLAN
+- The eighteen machines from Move 10, powered and reachable on the management VLAN
 - One unused address on the server VLAN, for the API virtual IP
 
 **Software**
@@ -31,7 +31,7 @@ Everybody arriving from EC2 asks why there is no hypervisor — why this sits on
 ## The runbook
 1. Commit the machine configuration before applying it. Generate the base with `talosctl gen config`, pin the Kubernetes version one minor behind the newest, point the API endpoint at the virtual address on the server VLAN, and give etcd a partition on its own NVMe device — every etcd commit is an fsync, and nothing doing bulk writes shares that device.
 2. Apply it to the three control-plane machines and run `talosctl bootstrap` on one. The installer wipes and repartitions the target disk, so confirm each machine's serial against the rack map first.
-3. Join the rest. Two become workers; the sixth takes the same configuration and stays cordoned, so replacing a dead node is an uncordon rather than a build. Leave the control-plane nodes schedulable — six machines cannot spare three that only run etcd.
+3. Join the rest. Thirteen become workers; the two spares take the same configuration and stay cordoned, so replacing a dead node is an uncordon rather than a build. At this size the control-plane nodes can stop taking workload — sixteen machines can spare three that only run etcd, and three that do nothing else are three that never get evicted at the wrong moment.
 4. Install Cilium with `helm install` at the pinned chart version, kube-proxy replacement on, and the API host set to the virtual address, never a name: a name needs DNS, and DNS needs the network this step builds. Disable kube-proxy in the machine configuration in the same commit.
 5. Verify with `kubectl` that no kube-proxy service chains survive on any node, then run the `cilium` connectivity test and read all of its output.
 6. The acceptance test: pull the power on one machine at random, watch the API stay reachable and the pods reschedule, then power it back on and confirm it rejoins untouched. Do it while the cluster is empty; that is the last time it is cheap.

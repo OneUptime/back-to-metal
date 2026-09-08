@@ -425,9 +425,9 @@ def build(moves):
     <p class="pintro">Every Move in this book is written against one cluster, so that a runbook
     can name a real thing rather than a category: one site, {R['nodes']} nodes and
     {R['spares']} on the shelf, {R['cores_per_node']} cores and {R['ram_gb_per_node']} GB a node,
-    {R['uplink_gbps']} GbE to the switch. {R['nodes']} because three is the smallest control
-    plane with a quorum and losing one of three leaves two machines carrying a load nobody sized
-    them for; the spare because a dead board is a return authorisation and three weeks. Scale the
+    {R['uplink_gbps']} GbE to the switch. {R['nodes']} because that is what the bill buys and a little over,
+    and because at this size losing one costs six per cent of the fleet rather than a third; the
+    spares because a dead board is a return authorisation and three weeks. Scale the
     numbers; do not scale away the redundancy.</p>
     <div class="hrule" style="margin:5mm 0"></div>
     <div class="shelves">{shelves_html}</div>
@@ -576,7 +576,7 @@ def build(moves):
       facility. On eighteen months of runway that is the right trade; it is not a cheaper
       one.</p></div>
       <div class="pcard"><h4>What the difference buys</h4><p>{money(save)} a month, or
-      {money(save * 12)} a year, for a capital outlay of {money(capex)} &mdash; six machines and
+      {money(save * 12)} a year, for a capital outlay of {money(capex)} &mdash; {R['nodes'] + R['spares']} machines and
       a pair of switches &mdash; which pays for itself in about
       {capex / max(save, 1):.0f} months. That is {save / cloud_total * 100:.0f} per cent of a
       fully loaded {money(cloud_total)}, with the salary counted on both sides; on the

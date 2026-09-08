@@ -2,7 +2,7 @@
 
 **Layer:** Build · **Leaving:** The provider's serial console and boot diagnostics · **Risk:** Medium · **Cutover:** 0 min · **Reversible:** Immediately
 
-> Six boxes become six machines reachable from a hotel room. Rails, power and labels take the day; the proof takes twenty minutes.
+> Eighteen boxes become eighteen machines reachable from a hotel room. Rails, power and labels take the day; the proof takes twenty minutes.
 
 ## Leaving from
 - **AWS:** EC2 Serial Console — granted per account, Nitro types only, and no virtual media, so your own image never boots.
@@ -31,7 +31,7 @@ The physical work is ordered so nothing has to be undone: rails across all six p
 3. Cable data in one colour and management in another, both ends labelled before anything is plugged in. Label the position, not the machine.
 4. Give each controller a static address on the management VLAN, serial-over-LAN on, and a password the cluster cannot reach. Run each operation through `ipmitool` and Redfish, noting which answers.
 5. Leave the building. From a laptop elsewhere, over the out-of-band line, watch a node POST, enter firmware setup, mount an image over virtual media and power-cycle it. Until that works from outside, nothing here is built.
-6. Run the memory tester and the drive exerciser overnight on all six nodes, level them all to one firmware bundle, and before leaving site take front and rear photographs, the port map and a file naming which node is in which rack unit.
+6. Run the memory tester and the drive exerciser overnight on all eighteen nodes, level them all to one firmware bundle, and before leaving site take front and rear photographs, the port map and a file naming which node is in which rack unit.
 
 ## Operator's notes
 - **Swap:** Remote hands will rack and cable to a drawing at about $150 an hour; buy that for the lifting, not the controllers.
@@ -49,4 +49,4 @@ Nothing here carries data: a mistake is undone by unracking a machine the same a
 | — | — | — | 0 min | 6 days | — |
 
 ## What you can turn off
-Nothing yet. Six machines draw power in one building while the whole cloud bill runs in another.
+Nothing yet. Eighteen machines draw power in one building while the whole cloud bill runs in another.

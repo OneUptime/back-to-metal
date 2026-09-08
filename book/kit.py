@@ -7,8 +7,8 @@ company - roughly what one spending $100,000 a month on a single cloud actually
 needs - and not a shopping list to copy blindly.
 """
 
-# The reference cluster the Moves are written against. One site, five nodes and
-# a spare on the shelf.
+# The reference cluster the Moves are written against. One site, sixteen nodes
+# and two on the shelf.
 #
 # Sixteen, because that is what the bill buys and a little over: at this size
 # losing a node costs six per cent of the fleet rather than a third, which is

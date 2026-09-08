@@ -140,6 +140,52 @@ def head_words(line):
     return [w for w in s.split() if w not in STOP and len(w) > 2]
 
 
+# ---- the fleet, as the prose spells it -----------------------------------
+# THE COUNTS ONLY EXIST IN ONE PLACE, and prose has to agree with it. The
+# reference build has been resized three times in one edition - five nodes and
+# a spare, then three and a spare, then sixteen and two - and each time a
+# handful of "six machines" survived in Move hooks, runbook steps and code
+# comments, because a number written as a word is invisible to every check
+# that looks for figures. Ten of them shipped.
+#
+# So: every spelled-out count next to machines, nodes or boxes is compared with
+# kit.REFERENCE. The allowlist is for the ones that are legitimately a
+# different number - the homelab's three, a Ceph quorum's three, an etcd
+# control plane's three - and each entry says why, because an allowlist nobody
+# has to justify is a way of turning a check off.
+WORDS = {'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6,
+         'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10, 'eleven': 11,
+         'twelve': 12, 'thirteen': 13, 'fourteen': 14, 'fifteen': 15,
+         'sixteen': 16, 'seventeen': 17, 'eighteen': 18, 'twenty': 20}
+
+FLEET = re.compile(
+    r'\b(' + '|'.join(WORDS) + r')[\s-](machines|nodes|boxes)\b', re.I)
+
+# (the count, what it is counting, why it is not the fleet)
+FLEET_OK = {
+    (3, 'machines'): 'the homelab on-ramp, and an etcd control-plane quorum',
+    (3, 'nodes'): 'the homelab on-ramp, and an etcd control-plane quorum',
+    (2, 'machines'): 'a pair - switches, feeds, the survivors of a failure',
+    (2, 'nodes'): 'a pair',
+}
+
+
+def check_fleet(out):
+    """Every fleet count in prose against kit.REFERENCE."""
+    from kit import REFERENCE as R
+    ok = {R['nodes'], R['spares'], R['nodes'] + R['spares']}
+    for path in sorted(MOVES.glob('*.md')):
+        for m in FLEET.finditer(path.read_text(encoding='utf-8')):
+            n, noun = WORDS[m.group(1).lower()], m.group(2).lower()
+            if n in ok or (n, noun) in FLEET_OK:
+                continue
+            out.append(
+                f'{path.name}: "{m.group(0)}" - the reference build is '
+                f'{R["nodes"]} nodes and {R["spares"]} spares, so a count of '
+                f'{n} is either stale or needs an entry in FLEET_OK saying '
+                f'what it is counting')
+
+
 def main():
     ms = load_all()
     if not ms:
@@ -272,6 +318,10 @@ def main():
     for t, c in Counter(m['title'].lower() for m in ms).items():
         if c > 1:
             problems['book'].append(f'duplicate title: {t}')
+
+    fleet = []
+    check_fleet(fleet)
+    problems['book'].extend(fleet)
 
     problems = {k: v for k, v in problems.items() if v}
     total = sum(len(v) for v in problems.values())

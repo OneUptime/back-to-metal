@@ -35,7 +35,7 @@ The two on the shelf are what make it survivable, and they are not in the rack. 
 5. Raise the purchase order, have the person who signs capital expenditure sign it, and put the ship date in the calendar. Moves 07 and 08 run against that date.
 
 ## Operator's notes
-- **Swap:** Lease the six machines over three years. The total is higher, but the monthly line resembles the cloud bill it replaces.
+- **Swap:** Lease the eighteen machines over three years. The total is higher, but the monthly line resembles the cloud bill it replaces.
 - **Do it faster:** Ask for a configuration the vendor stocks. Wanting 288 GB because the model said 240 turns a two-week delivery into an eight-week build.
 - **Watch out:** Rails, power leads, 25 GbE optics and the support contract are quoted separately. A bill of materials listing only servers is short by thousands.
 - **Leftovers:** A spare helps only if it stays current. Firmware and the Talos version drift within a quarter, so the shelf machine boots and updates with the rest.

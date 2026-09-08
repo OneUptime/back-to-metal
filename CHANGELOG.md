@@ -5,6 +5,44 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [6.1.1] - 2026-09-08
+
+Eleven stale machine counts were live in 6.0.0 and 6.1.0.
+
+### Fixed
+
+- **The prose still said six machines.** The reference build was resized three
+  times in one day — five nodes and a spare, then three and a spare, then
+  sixteen and two — and each time a handful of counts survived in Move hooks,
+  runbook steps, "what you can turn off" lines and code comments. Move 09's
+  hook said "Six boxes become six machines", Move 11's said "six machines, one
+  file in Git", and its third runbook step still handed a role to "the sixth".
+  Eleven of them, against a fleet of eighteen.
+
+  **A number written as a word is invisible to every check that looks for
+  figures**, which is why none of the five gates saw any of it: they check the
+  shape of a Move, its spelling, its rendering in a browser, its overflow on
+  paper and whether the artefacts agree with each other — and not one of them
+  could see prose contradicting the model it is generated beside.
+- **Move 11's runbook was wrong about its own cluster**, not just its count: it
+  told the reader to make two machines workers and cordon "the sixth". At
+  sixteen and two it is thirteen workers, two cordoned spares, and control
+  planes that can now stop taking workload — which is a better answer than the
+  small build could afford, and it says so.
+- **Move 12 argued erasure coding on "five nodes"** as though the fleet had not
+  changed. It is arguable at sixteen and wrong at five, and the reason to
+  replicate here is that the pool sits under a database either way.
+
+### Added
+
+- **`audit.py` derives fleet counts from `kit.REFERENCE`.** Every spelled-out
+  count beside machines, nodes or boxes is checked against the build, with an
+  allowlist for the ones that are legitimately something else — the homelab's
+  three, an etcd quorum's three, a pair — and each entry has to say what it is
+  counting, because an allowlist nobody must justify is a way of turning a
+  check off. It found a twelfth on its first run that a hand grep had missed,
+  because the word was capitalised.
+
 ## [6.1.0] - 2026-09-08
 
 The effort figures had not followed the estate. 6.0.0 re-based the bill to

@@ -109,7 +109,7 @@ HARDWARE = {
 #
 # It was half an extra engineer - 0.5 FTE, $7,917 a month, fifty-nine per cent
 # of the whole owned column. That is about eighty-seven engineer-hours a month
-# of incremental work on six machines: fourteen hours per machine per month,
+# of incremental work on the fleet: fourteen hours per machine per month,
 # for ever. Nothing published supports it at this fleet size, and it was a
 # guess sitting in the load-bearing position.
 #
@@ -124,7 +124,7 @@ HARDWARE = {
 # operating them on our own hardware" - across four thousand vCPUs and 384 TB
 # of NVMe. Ahrefs reports the same at eight hundred and fifty machines. A delta
 # of zero at that size does not prove a delta of zero at this one; it does make
-# half an engineer for six machines very hard to believe.
+# half an engineer for a fleet this size very hard to believe.
 #
 # OUR OWN NUMBER, SAID PLAINLY. We make OneUptime, we made this move, and we
 # measured our own fleet: about fourteen engineer-hours a month across two
@@ -197,7 +197,7 @@ PEOPLE = {
 # Dedicated hosts by the month, for the reader who wants the saving without the
 # cage. Roughly a comparable machine at a European provider, list, ex-VAT.
 #
-# At six machines - which is what every caller passes, the five racked and the
+# At eighteen machines - which is what every caller passes, the sixteen racked and the
 # one on the shelf - this comes out BELOW owning rather than close to it,
 # because a quarter rack's fixed costs (space, transit, cross-connect, hands)
 # do not amortise over a fleet this small. Move 07 says so rather than hiding
