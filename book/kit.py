@@ -3,7 +3,7 @@ rules the whole book rests on.
 
 Shared by the printed book's front matter and the website, so a change here
 lands in both. The specification is a worked reference point sized for a
-startup - roughly what a company spending $24,000 a month on one cloud actually
+company - roughly what one spending $24,000 a month on a single cloud actually
 needs - and not a shopping list to copy blindly.
 """
 
@@ -19,7 +19,7 @@ needs - and not a shopping list to copy blindly.
 # One site. An earlier edition of this book specified two, and two sites is the
 # single most common reason a repatriation runs out of energy: double the
 # hardware, double the operational surface, and a failover nobody has tested.
-# One site with proven off-site backups is the honest answer for a startup.
+# One site with proven off-site backups is the honest answer at this size.
 REFERENCE = {
     'sites': 1,
     'nodes': 5,

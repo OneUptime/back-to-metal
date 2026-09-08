@@ -1,6 +1,6 @@
 """Generate the website from the same Move files that make the book.
 
-Five pages and one page per Move. The reader is a startup engineer with a cloud
+Five pages and one page per Move. The reader is an engineer with a cloud
 bill and two colleagues, and they arrive wanting three things: what is this,
 what does it cost, and what do I do next. So there is a page for each, plus the
 page you have to read before touching anything and the page that says who wrote
@@ -276,8 +276,11 @@ def foot(depth=0):
         f'effort figures and the dependency graph rather than asserted, and every price is a '
         f'public list rate observed while writing. '
         f'<a href="{up}start.html">Read the safety page</a> before running anything.</p>'
-        f'<p class="foot-note">{esc(IMP.BYLINE)} &mdash; '
-        f'<a href="https://{IMP.ONEUPTIME_SITE}">{IMP.ONEUPTIME_SITE}</a>, an open-source '
+        f'<a class="by" href="https://{IMP.ONEUPTIME_SITE}">'
+        f'<img src="{up}assets/oneuptime.svg" alt="OneUptime" width="160" height="32">'
+        f'<span>{esc(IMP.BYLINE)}</span></a>'
+        f'<p class="foot-note">'
+        f'<a href="https://{IMP.ONEUPTIME_SITE}">{IMP.ONEUPTIME_SITE}</a> is an open-source '
         f'platform for uptime, incidents, on-call and status pages. It is recommended in '
         f'Stage 5, and the interest is declared on the '
         f'<a href="{up}about.html">about page</a>.</p>'
@@ -285,6 +288,29 @@ def foot(depth=0):
         f'are <a href="{GH_URL}">on GitHub</a> &mdash; software MIT, text CC BY 4.0. '
         f'<span class="ver">v{VERSION}</span></p>'
         f'</div></footer>')
+
+
+# The wordmark's dark ink, and what it becomes on a near-black page.
+LOGO_INK, LOGO_ON_DARK = '#121212', '#E9EDEF'
+
+
+def write_logo():
+    """OneUptime's own mark, vendored and recoloured for a dark ground.
+
+    It is a file rather than inline markup because it is twenty kilobytes of
+    traced paths and there are twenty-five pages: inlined it would cost half a
+    megabyte to say the same thing twenty-five times, where a file is fetched
+    once and cached. Same origin, so the rule about making no external request
+    still holds - the site drops onto a static host and works from file://.
+
+    Only the wordmark is recoloured. The mark itself is already #7ED957, which
+    is - with no arrangement between them - the exact hex this edition's accent
+    was chosen as, on contrast and collision grounds, before anybody looked at
+    the logo.
+    """
+    svg = (HERE / 'web' / 'oneuptime.svg').read_text(encoding='utf-8')
+    (ASSETS / 'oneuptime.svg').write_text(
+        svg.replace(LOGO_INK, LOGO_ON_DARK), encoding='utf-8')
 
 
 def moves_index_js(moves):
@@ -390,6 +416,7 @@ def totals(moves):
         'retained': retained,
         'save': save,
         'year': save * 12,
+        'five_year': COSTS.five_year(R['nodes'], R['spares'], retained),
         'cloud_people': cloud_people,
         'cloud_total': cloud_total,
         'infra_save': infra_save,
@@ -447,15 +474,99 @@ def twenty(moves):
             f'in the colour of its stage.</p>')
 
 
+def hero_index(T, first):
+    """The front page above the fold: the masthead on the left, and on the
+    right THE BALANCE - the subtraction this book performs, shown once.
+
+    What was here was a four-across strip setting 20 / 80 / 32 / 56% at one
+    size in one colour: four equal figures on a page whose argument is one
+    figure. Three of them are context and the fourth is the claim, and giving
+    them the same weight is how a reader ends up reading twenty row titles to
+    find out what is being asserted.
+
+    It is a ledger, read top to bottom as a subtraction rather than left to
+    right as four unrelated facts, and it adds up - the parts are the rounded
+    parts the cost page prints, and the total is their sum. Every figure
+    interpolates T, so a re-costed Move moves the front page.
+    """
+    return f"""
+<section class="hero led">
+  <div class="acct">
+    <h1 class="d mast">{IMP.wordmark_html(sep='<br>')}</h1>
+    <p class="open">{T['n']} Moves that take a company off AWS, Google Cloud or
+      Azure and onto hardware you own.</p>
+    <p class="sub">Written for a company with two or three engineers and a cloud
+      bill around {mny(T['bill'])} a month. About {T['days']:.0f} days of work
+      spread across {T['weeks']:.0f} weeks, and most of that is waiting for
+      hardware rather than working.</p>
+    <p class="cta"><a class="btn" href="m/{page(first)}">Start at Move
+      {first['num']}</a> <a class="btn ghost" href="#why">The case for
+      leaving</a></p>
+  </div>
+  <aside class="amt bal" aria-label="The bill, before and after">
+    <p class="lbl">The bill, a month</p>
+    <dl class="bal-l">
+      <div><dt>Cloud infrastructure</dt><dd class="was">{mny(T['bill'])}</dd></div>
+      <div><dt>Machines you own</dt><dd>{mny(T['owned']['infrastructure'])}</dd></div>
+      <div><dt>The extra ops time</dt><dd>{mny(T['owned']['people'])}</dd></div>
+      <div><dt>Still somebody else&rsquo;s invoice</dt>
+        <dd>{mny(T['owned']['retained'])}</dd></div>
+      <div class="tot"><dt>Owned, a month</dt>
+        <dd>{mny(T['owned']['total'])}</dd></div>
+    </dl>
+    <p class="bal-t"><span class="lbl">Saved a month</span>
+      <b class="bal-n">{mny(T['save'])}</b></p>
+    <p class="bal-y">{mny(T['year'])} a year &middot; {T['pct']:.0f} per cent, with
+      {mny(T['cloud_people'])} of salary counted on both sides.
+      <a class="mg-x" href="cost.html">How the figure is built &rarr;</a></p>
+  </aside>
+</section>"""
+
+
 def hero(title, lede, sub='', display='page', extra=''):
     return (f'<section class="hero"><h1 class="d {display}">{title}</h1>'
             f'<p class="lede">{lede}</p>'
             + (f'<p class="sub">{sub}</p>' if sub else '') + extra + '</section>')
 
 
-def band(bid, heading, inner):
-    return (f'<section class="band" id="{bid}">'
-            f'<h2 class="d sect">{esc(heading)}</h2>{inner}</section>')
+def band(bid, heading, inner, margin='', full=''):
+    """A section, on the ledger grid.
+
+    `inner` is the account - the argument. `margin` is what the argument is
+    about: figures, a Stage key, a cross-reference, a note that used to
+    interrupt the prose. `full` is anything that has earned the whole width -
+    a chart, a table, the twenty - and breaks both tracks.
+
+    A section with nothing for the margin collapses to one column and says so
+    with `.solo`, because a page of pure argument is allowed to be one column
+    and a ruled-off empty gutter is not.
+    """
+    solo = '' if margin else ' solo'
+    return (f'<section class="band led{solo}" id="{bid}">'
+            f'<h2 class="d sect">{esc(heading)}</h2>'
+            f'<div class="acct">{inner}</div>'
+            + (f'<aside class="amt">{margin}</aside>' if margin else '')
+            + (f'<div class="full">{full}</div>' if full else '')
+            + '</section>')
+
+
+def stage_key(moves):
+    """The five Stages, together, with their Move ranges. Shown together they
+    are five colours; met one at a time on a rule they are five greys."""
+    out = []
+    for k in ORDER:
+        rows = [m for m in moves if m['layer'] == k]
+        if not rows:
+            continue
+        info = LAYERS[k]
+        out.append(f'<li data-part="{info["key"]}"><i></i>{esc(info["label"])}'
+                   f'<b>{rows[0]["num"]}&ndash;{rows[-1]["num"]}</b></li>')
+    return f'<ul class="key" aria-label="The five stages">{"".join(out)}</ul>'
+
+
+def mg_note(label, body):
+    """A margin note. The callouts that used to interrupt the account."""
+    return (f'<div class="mg-note"><span class="lbl">{esc(label)}</span>{body}</div>')
 
 
 # ------------------------------------------------------------- 1. the guide
@@ -486,17 +597,28 @@ def why_section(T):
     which is the same shape the safety page's points and the rules use, so a
     reader who has met one has met all three."""
     f = why_facts(T)
+    # Every claim carries the test that would disprove it. That is what keeps
+    # this section from being an advertisement: a page that tells the reader
+    # how to prove it wrong is not selling them anything, and this audience
+    # believes a falsifiable claim and distrusts a confident one.
     gains = ''.join(
         f'<li class="pt"><b class="n">{i + 1:02d}</b><div>'
-        f'<h3>{esc(h)}</h3><p>{inline(b)}</p></div></li>'
-        for i, (h, b) in enumerate(WHY.gains(f)))
+        f'<h3>{esc(h)}</h3><p>{inline(b)}</p>'
+        f'<p class="chk"><span class="lbl">Check it</span>{inline(c)}</p>'
+        f'</div></li>'
+        for i, (h, b, c) in enumerate(WHY.gains(f)))
+    ours = ''.join(
+        f'<li><b>{esc(n)}</b><span>{esc(t)}</span></li>' for n, t in WHY.OURS)
     costs = ''.join(
         f'<li class="pt"><b class="n">{i + 1:02d}</b><div>'
         f'<h3>{esc(h)}</h3><p>{inline(b)}</p></div></li>'
         for i, (h, b) in enumerate(WHY.costs(f)))
     stay = ''.join(f'<li>{inline(x)}</li>' for x in WHY.STAY)
     return (
-        f'<p class="lede">{esc(WHY.LEDE)}</p>'
+        f'<p class="lede">{inline(WHY.lede(f))}</p>'
+        f'<h3 class="d sub-h">{esc(WHY.OURS_HEADING)}</h3>'
+        f'<ul class="ours">{ours}</ul>'
+        f'<p class="note">{esc(WHY.OURS_NOTE)}</p>'
         f'<ol class="pts">{gains}</ol>'
         f'<h3 class="d sub-h">{esc(WHY.COSTS_HEADING)}</h3>'
         f'<p>{esc(WHY.COSTS_LEDE)}</p>'
@@ -556,35 +678,44 @@ def build_index(moves, T):
 
     body = f"""{bar(0, first, 'index.html')}
 <main id="main" class="shell">
-{hero(IMP.wordmark_html(sep='<br>'),
-      f'{T["n"]} Moves that take a startup off AWS, Google Cloud or Azure and onto '
-      f'hardware you own.',
-      f'Written for a company with two or three engineers and a cloud bill around '
-      f'{mny(T["bill"])} a month. About {T["days"]:.0f} days of work spread across '
-      f'{T["weeks"]:.0f} weeks, and most of that is waiting for hardware rather than '
-      f'working.',
-      'mast',
-      figs([(T['n'], 'Moves'), (f'{T["days"]:.0f}', 'Days of work'),
-            (f'{T["weeks"]:.0f}', 'Weeks end to end'),
-            (f'{T["pct"]:.0f}%', 'Off the bill')])
-      + twenty(moves)
-      + f'<p class="cta"><a class="btn" href="m/{page(first)}">Start at Move '
-        f'{first["num"]}</a> <a class="btn ghost" href="cost.html">Or check the '
-        f'arithmetic first</a></p>')}
+{hero_index(T, first)}
 
-{band('why', WHY.HEADING, why_section(T))}
+{band('why', WHY.HEADING, why_section(T),
+      margin=f'<p class="lbl">What is at stake</p>'
+      f'<dl class="bal-l">'
+      f'<div><dt>Over five years</dt><dd>{mny(T["five_year"]["rows"][2]["saved"])}</dd></div>'
+      f'<div><dt>Capital, day one</dt><dd>{mny(T["five_year"]["rows"][2]["capex"])}</dd></div>'
+      f'<div><dt>Extra hours a month</dt>'
+      f'<dd>{COSTS.PEOPLE["owned_ops_hours_month"] - COSTS.PEOPLE["cloud_ops_hours_month"]}</dd></div>'
+      f'<div><dt>Days of work</dt><dd>{T["days"]:.0f}</dd></div>'
+      f'</dl>'
+      + mg_note('The list that matters',
+                'Four reasons to stay exactly where you are are at the foot of '
+                'this section. A page with nine benefits and no costs is an '
+                'advertisement.'))}
 
 {band('plan', 'The whole plan, on one page',
       f'<p>{len(T["stages"])} stages, run in order, and every dependency points at a '
       f'lower number. '
       f'{T["zero"]} of the {T["n"]} Moves are invisible to a user; the whole programme '
       f'costs {T["cutover"]} minutes of downtime between them{oneway_line}.</p>'
-      f'<ol class="stages">{"".join(blocks)}</ol>')}
+      f'<ol class="stages">{"".join(blocks)}</ol>',
+      margin=stage_key(moves)
+      + mg_note('The shape of it',
+                f'The heavy days are in the middle, not at the start. Stage 4 '
+                f'carries the state, and it is the only stage that costs a user '
+                f'anything: {T["cutover"]} minutes, once.'),
+      full=twenty(moves))}
 
 {band('where', 'Start where it hurts',
       f'<p>Nobody sits down at nine in the morning thinking in stages. Find the line '
       f'that sounds like your week and go straight to the Move.</p>'
-      f'<ul class="symp">{symps}</ul>')}
+      f'<ul class="symp">{symps}</ul>',
+      margin=mg_note('If none of these is you',
+                     f'That is an answer too. Move 03 gives you permission to do the '
+                     f'arithmetic and stop, and stopping after three Moves costs a '
+                     f'week against a programme abandoned in month five with two '
+                     f'estates billing.'))}
 
 {band('how-long',
       'How long it takes',
@@ -595,16 +726,27 @@ def build_index(moves, T):
       f'It is the circuit order, the hardware lead time and the thirty-day windows a '
       f'Move has to sit through before the next one may start, and nobody is working '
       f'during any of it.</p>'
-      + RM.svg(moves, DEFAULT_CREW, href=lambda m: 'm/' + page(m))
+      ,
+      margin=f'<p class="lbl">However many people you put on it</p>'
+      f'<dl class="bal-l">'
+      + ''.join(f'<div><dt>{w} engineer{"" if w == 1 else "s"}</dt>'
+                f'<dd>{T["crew_weeks"][w]:.0f} wk</dd></div>'
+                for w in CREWS if w in T['crew_weeks'])
+      + f'<div class="tot"><dt>Unlimited</dt>'
+        f'<dd>{T["critical_weeks"]:.0f} wk</dd></div></dl>'
+      + mg_note('Why it barely moves',
+                'The gap is not labour. It is the circuit order, the hardware lead '
+                'time and the thirty-day windows a Move sits through before the '
+                'next may start, and nobody is working during any of it.'),
+      full=RM.svg(moves, DEFAULT_CREW, href=lambda m: 'm/' + page(m))
       + f'<p class="note">One bar per Move, drawn from each Move&rsquo;s own effort '
         f'figure and the dependency graph rather than from a plan somebody typed. The '
-        f'outlined bars are the critical path. Adding people barely moves the end date: '
-        f'{crews}.</p>')}
+        f'outlined bars are the critical path.</p>')}
 </main>
 {foot(0)}"""
     (SITE / 'index.html').write_text(shell(
         f'{IMP.TITLE} \u2014 the whole plan', body, 0,
-        f'{T["n"]} Moves in five stages that take a startup off AWS, Google Cloud or '
+        f'{T["n"]} Moves in five stages that take a company off AWS, Google Cloud or '
         f'Azure and onto hardware it owns.'), encoding='utf-8')
 
 
@@ -726,7 +868,8 @@ def build_cost(moves, T):
     FY = COSTS.five_year(REFERENCE['nodes'], REFERENCE['spares'], T['retained'])
 
     heads = ['Cloud now', 'Own the machines', 'Rent the machines by the month']
-    cloud_people = COSTS.cloud_people_month()
+    cloud_people = round(COSTS.cloud_people_month())
+    cloud_total = bill + cloud_people
     cmp_rows = [
         ('Infrastructure', '', [mny(bill), mny(owned['infrastructure']),
                                 mny(ded['infrastructure'])]),
@@ -744,9 +887,22 @@ def build_cost(moves, T):
         # page spelled out, which is how it shipped for exactly one build.
         ("Still on somebody else's invoice", 'kept',
          ['Already in the bill', mny(owned['retained']), mny(ded['retained'])]),
-        ('Total a month', 'tot', [mny(bill), mny(owned['total']), mny(ded['total'])]),
-        ('Saved a month', 'save', ['&mdash;', mny(bill - owned['total']),
-                                   mny(bill - ded['total'])]),
+        # EVERY COLUMN IS THE SUM OF ITS OWN ROWS. The cloud column carries its
+        # people now, so its total is the bill PLUS them - printing the bill
+        # here would put $24,000 under a column whose visible rows come to
+        # $29,491, which is the sloppiness this page accuses other people of.
+        ('Total a month', 'tot',
+         [mny(cloud_total),
+          mny(owned['infrastructure'] + cloud_people + owned['people']
+              + owned['retained']),
+          mny(ded['infrastructure'] + cloud_people + ded['people']
+              + ded['retained'])]),
+        ('Saved a month', 'save',
+         ['&mdash;',
+          mny(cloud_total - (owned['infrastructure'] + cloud_people
+                             + owned['people'] + owned['retained'])),
+          mny(cloud_total - (ded['infrastructure'] + cloud_people
+                             + ded['people'] + ded['retained']))]),
     ]
     cmp_html = (
         '<table class="cmp"><thead><tr><th scope="col"></th>'
@@ -819,43 +975,36 @@ def build_cost(moves, T):
             (mny(T['year']), 'Saved a year'), (f'{T["pct"]:.0f}%', 'Off the bill')]))}
 
 {band('compare', 'The comparison, with the salary in it',
-      cmp_html
-      + f'<p class="callout"><span class="lbl">The people row</span> Both columns carry '
-        f'it, because both columns have it. A cloud invoice bills for machines, not for '
-        f'the person who upgrades the managed cluster, rotates the credentials, chases '
-        f'the bill and carries the pager &mdash; about '
-        f'{COSTS.PEOPLE["cloud_ops_hours_month"]} hours a month, or '
-        f'{mny(COSTS.cloud_people_month())}. Owning adds '
-        f'{COSTS.PEOPLE["owned_ops_hours_month"] - COSTS.PEOPLE["cloud_ops_hours_month"]} '
-        f'hours on top of that, not a whole extra person: the measured figure on a real '
-        f'two-site fleet larger than this one is fourteen engineer-hours a month, and '
-        f'this book books twenty because the people who measured it had done it '
-        f'before. That fourteen was measured and published by the company that '
-        f'publishes this book, so take it as corroboration rather than as proof; '
-        f'the twenty stands on an independent estimate of ten to twenty hours for '
-        f'a stack self-hosting its own database, cluster and cache, and this takes '
-        f'the top of it. Vendors selling managed clusters will tell you half an '
-        f'engineer to two &mdash; but their itemised effort is setup, which this '
-        f'book already prices once as the {T["days"]:.0f} person-days in the '
-        f'roadmap. A table that puts the salary on one side only is the reason '
-        f'repatriations get approved and then regretted, whichever side it leaves '
-        f'it off.</p>'
-      + f'<p class="callout"><span class="lbl">The row under it</span> '
-        f'{mny(T["retained"])} a month never comes home and was missing from this table '
-        f'until it was checked: the content network, outbound mail and edge scrubbing '
-        f'that Move 04 tells you to keep renting, plus the residue five later Moves '
-        f'leave behind &mdash; archived object storage, a registry, a queue, an off-site '
-        f'backup copy. All of it is inside the {mny(bill)} on the left, so a comparison '
-        f'that drops it from the right invents {mny(T["retained"])} a month of saving. '
-        f'It is the same error as leaving out the salary, in a smaller coat.</p>'
+      f'<p>Three ways to buy the same computers, with every column carrying its own '
+      f'people. The cloud column used to say the salary was already in the bill. It '
+      f'is not: an invoice bills for machines, and the person who upgrades the '
+      f'managed cluster and carries the pager is paid by you either way. Counting '
+      f'them on one side only is the error this whole page exists to avoid, and it '
+      f'does not stop being an error when it flatters the answer we prefer.</p>'
+      f'<p>Read down a column and it adds up. That is the only claim being made '
+      f'here: not that the number is right for you, but that the arithmetic is '
+      f'checkable and the assumptions are named.</p>'
+      ,
+      margin=mg_note('The people row',
+                     f'Both columns carry it, because both have it. A cloud invoice '
+                     f'bills for machines, not for whoever upgrades the managed '
+                     f'cluster and carries the pager &mdash; about '
+                     f'{COSTS.PEOPLE["cloud_ops_hours_month"]} hours a month, or '
+                     f'{mny(COSTS.cloud_people_month())}.')
+      + mg_note('Where the twenty hours came from',
+                f'An outside estimate puts the extra at ten to twenty hours a month; '
+                f'this takes the top of it. We make OneUptime and we made this move, '
+                f'and we measured our own larger fleet at fourteen &mdash; that is us '
+                f'showing our working, not an independent source.'),
+      full=cmp_html
       + f'<p class="cost-key"><span><i class="k-i"></i>Infrastructure</span> '
         f'<span><i class="k-p"></i>Salaried time</span> '
         f'<span><i class="k-k"></i>Still rented</span></p>'
-      + cost_bars([('Cloud now', bill, 0, 0),
-                   ('Own the machines', owned['infrastructure'], owned['people'],
-                    owned['retained']),
-                   ('Rent by the month', ded['infrastructure'], ded['people'],
-                    ded['retained'])]))}
+      + cost_bars([('Cloud now', bill, cloud_people, 0),
+                   ('Own the machines', owned['infrastructure'],
+                    cloud_people + owned['people'], owned['retained']),
+                   ('Rent by the month', ded['infrastructure'],
+                    cloud_people + ded['people'], ded['retained'])]))}
 
 {band('five-years', 'Five years, three ways',
       f'<p>A month is the wrong window for this decision. Owning is capital on day one '
@@ -865,15 +1014,16 @@ def build_cost(moves, T):
       f'and neither is what somebody signing the cheque is choosing between. So here is '
       f'the life of one generation of machines, with the salary counted on all three '
       f'sides and the capital on the line where it actually happens.</p>'
-      + fy_table(FY)
-      + f'<p class="callout"><span class="lbl">The residual</span> After sixty months the '
+      ,
+      margin=mg_note('The residual', 'After sixty months the '
       f'owned machines are five years old and still working &mdash; hardware of this class '
       f'is routinely run for seven or eight. What you hold is a fleet with years left in '
       f'it, counted here at a conservative fifteen per cent of what it cost. It is also '
       f'the whole of the difference between owning and renting at this size: strip the '
       f'residual out and the two columns are the same number. You do not own hardware to '
       f'save money against renting it. You own it when the fleet is big enough to carry '
-      f'the room, and to stop asking somebody else for permission.</p>'
+      f'the room, and to stop asking somebody else for permission.'),
+      full=fy_table(FY)
       + cost_bars([('Cloud', FY['rows'][0]['total'], 0, 0),
                    ('Rented metal', FY['rows'][1]['total'], 0, 0),
                    ('Colocation', FY['rows'][2]['total'], 0, 0)],
@@ -886,13 +1036,23 @@ def build_cost(moves, T):
       f'this page: these are line savings, taken before the salaried time and before '
       f'the whole cost of running your own site, both of which the comparison above '
       f'puts back in. The Now column of this table is the {mny(tn)} that stays on '
-      f'somebody else&rsquo;s invoice, and it is the third row up there.</p>' + perm)}
+      f'somebody else&rsquo;s invoice, and it is the third row up there.</p>',
+      margin=mg_note('Why the rows sum higher',
+                     'These are line savings, taken before the salaried time and '
+                     'before the whole cost of running your own site. The '
+                     'comparison above puts both back.'),
+      full=perm)}
 
 {band('replaces', 'What replaces what',
       f'<p>Find the row you are paying for, then read the Move. Where the last column '
       f'says keep paying, that is a conclusion rather than a gap: a content delivery '
       f'network, scrubbing capacity at the edge and outbound mail deliverability are '
-      f'businesses somebody else already runs better than you will.</p>' + eq)}
+      f'businesses somebody else already runs better than you will.</p>',
+      margin=mg_note('The three you keep',
+                     f'{mny(T["retained"])} a month of the after state, for ever. '
+                     f'Move 04 is the Move that says so, and it is the one that '
+                     f'stops this book being a sales pitch.'),
+      full=eq)}
 
 {band('onramp', 'Before you sign anything',
       f'<p>Almost nobody should sign a facility contract before they have run this '
@@ -1341,6 +1501,7 @@ def main():
         + parts_css() + rise_css(),
         encoding='utf-8')
     shutil.copy(HERE / 'web' / 'app.js', ASSETS / 'app.js')
+    write_logo()
     (ASSETS / 'moves-index.js').write_text(moves_index_js(moves), encoding='utf-8')
 
     by = {m['num']: m for m in moves}

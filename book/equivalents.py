@@ -7,7 +7,7 @@ content: a reader finds the row they are paying for and it points at the Move.
 The right-hand column is the point of the book. Where it says "keep paying",
 that is a conclusion, not a gap.
 
-Kept to the services a startup actually pays for. If your estate has a row that
+Kept to the services a company of this size actually pays for. If your estate has a row that
 is not here, it is either something you can delete or something the book would
 have to be longer to cover honestly, and the second is rarer than it looks.
 """

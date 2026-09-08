@@ -19,7 +19,7 @@ PARAS = [
     'A generation of engineers has now been trained to believe that owning a server is a '
     'kind of professional failure. It is not. It is a trade, and like every trade it has '
     'terms: you take on hardware, capacity and a pager, and in exchange you stop paying a '
-    'margin on every byte you move and every hour you idle. For a startup spending real '
+    'margin on every byte you move and every hour you idle. For a company spending real '
     'money on one cloud, that trade is usually worth making, and the arithmetic is not '
     'close.',
 

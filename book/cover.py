@@ -105,7 +105,7 @@ def back_panel_html(moves):
     effort = sum(RM.effort_days(m) for m in moves)
     return f"""
     <div class="inner">
-      <p class="bk-k">For a startup &nbsp;&middot;&nbsp; AWS, Google Cloud and Azure out</p>
+      <p class="bk-k">For a company &nbsp;&middot;&nbsp; AWS, Google Cloud and Azure out</p>
       <h2 class="bk-h d">Leaving is a method,<br><em>not a decision.</em></h2>
       <p class="bk-p">The reason leaving the cloud fails is rarely the technology. It is that it
       is attempted as one decision, executed as one project, and abandoned in the middle with two

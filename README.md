@@ -1,12 +1,12 @@
 # Back to Metal
 
-**How a startup leaves the cloud, in twenty moves**, by the makers of
+**How a company leaves the cloud, in twenty moves**, by the makers of
 [OneUptime](https://oneuptime.com), published three ways: a printable
 book, a reflowable EPUB, and a static website you can host anywhere.
 
 Most writing about leaving the cloud is either an opinion piece or a programme plan for a
 company with a platform team. This is neither. It is twenty jobs, in five stages, sized for a
-startup with two or three engineers and a cloud bill somewhere around $24,000 a month.
+company with two or three engineers and a cloud bill somewhere around $24,000 a month.
 
 📕 **[dist/Back-to-Metal.pdf](dist/Back-to-Metal.pdf)** &nbsp;·&nbsp;
 📖 **[dist/Back-to-Metal.epub](dist/Back-to-Metal.epub)** &nbsp;·&nbsp;
@@ -29,7 +29,7 @@ undone on a Wednesday, and you can stop after any of them and still be somewhere
 ## It is honest about the size of it
 
 The first edition of this book had 122 Moves. It was correct, and it was 975 person-days and
-four and a half years of elapsed time for three engineers, which is not a plan a startup can
+four and a half years of elapsed time for three engineers, which is not a plan a company can
 act on. This edition is the same argument at a size somebody can finish: the whole thing is
 around eighty person-days — the table at the foot of this file has the exact figure, computed
 from the Move files — and most of the calendar is waiting for hardware rather than working.

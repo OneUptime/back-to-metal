@@ -13,7 +13,7 @@ KDP's own printing-cost calculator before setting a price.
 import re
 
 TITLE = 'Back to Metal'
-SUBTITLE = 'How a startup leaves the cloud, in twenty moves'
+SUBTITLE = 'How a company leaves the cloud, in twenty moves'
 AUTHOR = 'Nawaz Dhandala'
 PUBLISHER = 'HackerBay'
 PUBLISHER_SITE = 'HackerBay.io'

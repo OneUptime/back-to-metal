@@ -77,25 +77,42 @@
   --s6:32px; --s7:48px; --s8:64px; --s9:96px;
 
   /* ---- type ---------------------------------------------------- */
-  /* Prose. A page somebody reads for twenty minutes, so the body is
-     a point larger than the instrument edition set it. */
-  --t-lede:21px; --t-body:17px; --t-sub:15px; --t-fine:13px;
-  /* Display: Archivo at the narrow width stop, the `.d` voice */
+  /* A REAL SCALE, five steps, each with one job. There used to be
+     --t-body 17, --t-item 17 and --t-item-lg 19 - three names within
+     two pixels of each other, which is not a hierarchy, it is three
+     ways of saying the same size. A census of the front page found
+     12px used 97 times, 15px 84 times and 17px 65 times, and then
+     nothing at all between 28px and the masthead. */
+  --t-open:clamp(24px,2.2vw,31px);  /* a page's opening statement */
+  --t-lede:21px;                    /* a stage's promise, a verdict */
+  --t-body:18px;                    /* running prose */
+  --t-sub:15px;                     /* a hook, a note */
+  --t-fine:13px;                    /* a margin note, a footnote */
+  /* Display: Archivo at the narrow width stops, the `.d` voice */
   --d-mast:clamp(46px,10.4vw,132px);
-  --d-page:clamp(30px,3.6vw,46px);
+  --d-page:clamp(32px,3.8vw,52px);
   --d-sect:clamp(21px,2.2vw,28px);
   --d-sub:18px;
-  /* Item titles: the one middle width stop */
-  --t-item:17px; --t-item-lg:19px;
-  /* Mono */
-  --m-fig:28px; --m-val:15px; --m-lab:12px;
+  /* Amounts. JetBrains Mono, always tabular. */
+  --m-tot:clamp(38px,4.4vw,56px);   /* the figure that IS the page. One. */
+  --m-fig:24px; --m-val:15px; --m-lab:11px;
+  /* WIDTH AS A REAL AXIS. Archivo's wdth is vendored 62-125 and was
+     being used at five ad-hoc stops. A row title at 92 beside a hook
+     at 100 is a different KIND of statement, which is hierarchy that
+     costs no size and no weight. */
+  --w-poster:68; --w-head:79; --w-title:92; --w-prose:100;
   /* Leading, tighter as size grows */
   --lh-d:1; --lh-lede:1.4; --lh-body:1.6; --lh-sub:1.6;
   /* Tracking: two for display, one for labels, and that is all */
   --tr-d:-.02em; --tr-lab:.08em;
   /* Measure in em, never ch: Archivo's average glyph is .45em but its
      zero is .56em, so `70ch` sets 88 characters and lies by a fifth. */
-  --measure:31em; --measure-sm:26em; --measure-lede:27em;
+  /* THE MEASURE IS THE LEFT TRACK OF THE LEDGER GRID, in px rather
+     than em, because it has to sum with the margin track to the
+     content box exactly: 544 + 96 + 416 = 1056 = --page - 2*--gut.
+     That is the whole repair. The section rule was never too long;
+     the column under it was too short. */
+  --measure:544px; --amt:416px; --measure-lede:27em;
 
   /* ---- layout -------------------------------------------------- */
   --gut:clamp(16px,4vw,32px);
@@ -407,6 +424,98 @@ img,svg{max-width:100%}
 .lbl{font:400 var(--m-lab)/1.3 var(--mono);letter-spacing:var(--tr-lab);
   text-transform:uppercase;color:var(--ink3);font-variant-numeric:tabular-nums}
 
+/* ================================================================
+   THE LEDGER GRID
+   ==================================================================
+   The one structural fact of this design, and the thing three
+   editions of paint could not fix.
+
+   Measured at 1440 before it existed: the content box is 1056px, and
+   every paragraph in it ended at 527px. Section rules, Stage rules and
+   Move rows ran the full 1056. So there were five hundred pixels of
+   dead column beside every paragraph on the site, with a two-pixel
+   white rule drawn straight across all of it - a rule whose whole job
+   is to measure the column, measuring twice what was under it. The
+   void was specific to prose: the twenty, the Move rows, the charts
+   and the tables already used the full width.
+
+   So there are two tracks. The ACCOUNT carries the argument - prose,
+   runbooks, lists. The AMOUNTS carry what the argument is about -
+   figures, the Stage key, cross-references, and the marginalia that
+   used to interrupt the prose. Between them a hairline, which is the
+   fold in the paper.
+
+   The tracks sum to the content box exactly, so `--page` does not
+   change and every full-width object keeps the width it already had.
+
+   A section with nothing to put in the margin says so - `.solo` - and
+   collapses to one column. A page of pure argument is allowed to be
+   one column; a ruled-off empty gutter is not.
+   ================================================================ */
+.led{display:grid;
+  grid-template-columns:[a] minmax(20rem,var(--measure))
+                        [g] var(--s9)
+                        [m] minmax(13rem,var(--amt)) [end];
+  align-items:start}
+.led>.acct{grid-column:a;min-width:0}
+.led>.amt{grid-column:m;min-width:0;padding-left:var(--s5);
+  border-left:1px solid color-mix(in srgb,var(--accent) 28%,transparent)}
+@supports not (background:color-mix(in srgb,red 50%,transparent)){
+  .led>.amt{border-left-color:var(--rule)}
+}
+/* The heading and its rule span both tracks, so the rule finally
+   measures the whole of what is under it. `.sect` has to be a CHILD of
+   the grid for this to fire. */
+.led>.sect{grid-column:a/end}
+/* Anything that has earned the full width breaks both tracks. */
+.led>.full{grid-column:a/end}
+.led.solo{grid-template-columns:minmax(0,1fr)}
+.led.solo>.acct,.led.solo>.sect,.led.solo>.full{grid-column:1}
+.led.solo>.amt{display:none}
+
+/* Prose keeps a measure in BOTH states. Without this the collapsed
+   layout sets sixty-eight-character lines across 1048px, which is
+   worse than the defect being repaired. */
+.acct>p,.acct>ul,.acct>ol,.acct>dl{max-width:var(--measure)}
+
+/* The margin is figures, so it is tabular and it is flush right. */
+.amt{font-variant-numeric:tabular-nums lining-nums}
+.amt>*{text-align:right}
+.amt>*+*{margin-top:var(--s5)}
+
+/* A cross-reference: one of the accent's two jobs, and it always
+   carries an underline as well as the colour. */
+.mg-x{display:inline-block;color:var(--accent);
+  font:400 var(--m-lab)/1.5 var(--mono);letter-spacing:var(--tr-lab);
+  text-transform:uppercase;text-decoration:none;
+  border-bottom:1px solid color-mix(in srgb,var(--accent) 45%,transparent)}
+.mg-x:hover,.mg-x:focus-visible{border-bottom-color:var(--accent)}
+
+/* The Stage key. Five colours shown together are five colours; shown
+   one at a time on a rule they are five greys. This is the answer to
+   that, and it belongs beside anything that uses Stage colour. */
+.key{list-style:none;margin:0;padding:0;text-align:left}
+.key li{display:flex;align-items:baseline;gap:var(--s3);padding:var(--s2) 0;
+  border-bottom:1px solid var(--rule2);font:400 var(--m-lab)/1.6 var(--mono);
+  letter-spacing:var(--tr-lab);text-transform:uppercase;color:var(--ink3)}
+.key i{flex:none;width:var(--s4);height:var(--s2);background:var(--c)}
+.key b{margin-left:auto;color:var(--ink2);font-weight:400}
+
+/* A margin note. The six callouts that used to interrupt the account
+   live here instead, which is what a margin is for. */
+.mg-note{text-align:left;font-size:var(--t-fine);line-height:1.55;
+  color:var(--ink3);padding-left:var(--s4);border-left:2px solid var(--rule)}
+.mg-note .lbl{display:block;margin-bottom:var(--s2);color:var(--ink2)}
+
+@media (max-width:1080px){
+  .led{grid-template-columns:minmax(0,1fr)}
+  .led>.acct,.led>.amt,.led>.sect,.led>.full{grid-column:1}
+  .led>.amt{padding-left:0;border-left:0;border-top:1px solid var(--rule);
+    padding-top:var(--s4);margin-top:var(--s6)}
+  .amt>*{text-align:left}
+  .amt .bal-l dd,.amt .bal-n{text-align:right}
+}
+
 /* ---------- the container ---------------------------------------- */
 /* The header rule and the footer rule run the full window; what is
    inside them is capped, and so is the one column of content. */
@@ -492,6 +601,44 @@ html.scrolled .wm{font-size:16px}
    COMMON FURNITURE
    ================================================================ */
 .hero{padding-bottom:var(--s2)}
+/* ---- the hero, on the grid --------------------------------------- */
+.hero.led{padding-block:var(--s8) var(--s7);align-items:end}
+.open{margin:var(--s6) 0 0;font:500 var(--t-open)/1.32 var(--fam);
+  font-variation-settings:'wdth' var(--w-prose);color:var(--ink);
+  max-width:20em;text-wrap:balance}
+.hero .sub{margin:var(--s5) 0 0;font-size:var(--t-sub);line-height:1.6;
+  color:var(--ink3);max-width:var(--measure-lede)}
+/* THE BALANCE. Read down as a subtraction, not across as four facts.
+   Figures flush right on a tabular grid, so the thousands separators
+   stand in a line and the eye can do the arithmetic itself. */
+.bal .lbl{display:block;text-align:left}
+.bal-l{margin:var(--s4) 0 0;display:grid;gap:0}
+.bal-l>div{display:flex;align-items:baseline;justify-content:space-between;
+  gap:var(--s5);padding:var(--s3) 0;border-bottom:1px solid var(--rule2)}
+.bal-l dt{margin:0;text-align:left;font-size:var(--t-fine);color:var(--ink2)}
+.bal-l dd{margin:0;font:400 var(--m-fig)/1 var(--mono);color:var(--ink)}
+/* A line you no longer pay is a line a ledger has SETTLED, and a ledger
+   settles a line by striking it. The strike is ink, never the accent:
+   a struck figure is a state of a quantity, and the accent is never a
+   quantity. */
+.bal-l .was{position:relative;color:var(--ink3)}
+.bal-l .was::after{content:'';position:absolute;left:-4%;right:-4%;top:52%;
+  height:1px;background:var(--ink4)}
+.bal-l .tot{border-bottom:0;border-top:2px solid var(--ink);margin-top:var(--s1)}
+.bal-l .tot dt{color:var(--ink);font-weight:600}
+/* The answer, and the only figure on the site at this size. */
+.bal-t{display:flex;align-items:baseline;justify-content:space-between;
+  gap:var(--s4);margin:var(--s6) 0 0;padding-top:var(--s3);
+  border-top:1px solid var(--accent)}
+.bal-t .lbl{text-align:left}
+.bal-n{font:500 var(--m-tot)/.9 var(--mono);color:var(--hot);letter-spacing:-.03em}
+.bal-y{margin:var(--s3) 0 0;font-size:var(--t-fine);line-height:1.5;
+  color:var(--ink3);text-align:right}
+@media (max-width:1080px){
+  .hero.led{padding-block:var(--s7) var(--s6)}
+  .bal-t{justify-content:flex-start}
+  .bal-y{text-align:left}
+}
 .band,.sec{margin-top:var(--s8)}
 /* :where() keeps this at the specificity of a bare `p`, so .lede,
    .note and .callout below override it without being restated. */
@@ -689,7 +836,7 @@ html.scrolled .wm{font-size:16px}
 .mv a:hover .mv-n{text-shadow:0 0 16px var(--c)}
 .mv-t{transition:transform var(--t-move) var(--e-out)}
 .mv a:hover .mv-t{transform:translateX(3px)}
-.mv-t{font-size:var(--t-item);line-height:1.3;font-variation-settings:'wdth' 92;
+.mv-t{font-size:var(--t-body);line-height:1.3;font-variation-settings:'wdth' 92;
   font-weight:600;color:var(--ink)}
 /* Hooks run to 171 characters and the rows have to stay a scannable
    height, so three lines is the clamp: it holds all but the longest
@@ -707,7 +854,7 @@ html.scrolled .wm{font-size:16px}
   border-top:1px solid var(--rule2);
   transition:background var(--t-quick) linear}
 .symp li:hover{background:linear-gradient(90deg,var(--fill),transparent 78%)}
-.symp-q{font-size:var(--t-item);line-height:1.35;color:var(--ink)}
+.symp-q{font-size:var(--t-body);line-height:1.35;color:var(--ink)}
 .symp-a{display:flex;gap:var(--s3);font-family:var(--mono);font-size:var(--m-val);
   font-variant-numeric:tabular-nums}
 .symp-a a{color:var(--accent);text-decoration:none;
@@ -898,7 +1045,7 @@ html.scrolled .wm{font-size:16px}
 .ck-box:checked::before,.kt-box:checked::before{transform:rotate(45deg) scale(1)}
 .ck-n{font:400 var(--m-val)/1.3 var(--mono);color:var(--c);
   font-variant-numeric:tabular-nums}
-.ck-t{font-size:var(--t-item);line-height:1.3;font-variation-settings:'wdth' 92;
+.ck-t{font-size:var(--t-body);line-height:1.3;font-variation-settings:'wdth' 92;
   font-weight:600;color:var(--ink);text-decoration:none}
 .ck-t:hover,.ck-t:focus-visible{text-decoration:underline;text-underline-offset:3px}
 /* Done is read off the checkbox, not off a class, so the strike is
@@ -921,7 +1068,7 @@ html.scrolled .wm{font-size:16px}
 .pt .n,.rules .n{font:400 var(--m-val)/1.55 var(--mono);color:var(--ink3);
   font-variant-numeric:tabular-nums;transition:color var(--t-quick) linear}
 .pt:hover .n,.rules>li:hover .n{color:var(--accent)}
-.pt h3,.rules h3{margin:0 0 var(--s2);font-size:var(--t-item-lg);line-height:1.3;
+.pt h3,.rules h3{margin:0 0 var(--s2);font-size:var(--t-body);line-height:1.3;
   font-variation-settings:'wdth' 92;font-weight:600}
 .pt p,.rules p{margin:0;font-size:var(--t-body);line-height:var(--lh-body);
   color:var(--ink2);max-width:var(--measure)}
@@ -951,6 +1098,31 @@ html.scrolled .wm{font-size:16px}
    rule, because they are the only list on the site whose job is to stop the
    reader rather than move them along, and a reader skimming for permission to
    proceed should have to look at them. */
+/* OUR OWN RECORD. Four figures, big, in a row - the one thing on this
+   site nobody else could write, so it is set like evidence rather than
+   like prose. The number leads; the sentence explains it. */
+.ours{list-style:none;margin:var(--s5) 0 0;padding:0;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));
+  gap:0 var(--s6);border-top:1px solid var(--rule)}
+.ours li{padding:var(--s4) var(--s4) var(--s4) 0}
+.ours b{display:block;font:400 var(--m-fig)/1 var(--mono);color:var(--ink);
+  letter-spacing:-.02em}
+.ours span{display:block;margin-top:var(--s2);font-size:var(--t-fine);
+  line-height:1.5;color:var(--ink3)}
+
+/* The test that would disprove the claim above it. It is set quieter
+   than the claim and marked in the accent, because it is an
+   instruction rather than an assertion - and because a claim with a
+   disproof attached is the difference between an engineering page and
+   an advertisement. */
+.chk{margin:var(--s3) 0 0;padding-left:var(--s4);
+  border-left:2px solid color-mix(in srgb,var(--accent) 40%,transparent);
+  font-size:var(--t-fine);line-height:1.55;color:var(--ink3)}
+@supports not (background:color-mix(in srgb,red 50%,transparent)){
+  .chk{border-left-color:var(--rule)}
+}
+.chk .lbl{display:block;margin-bottom:var(--s1);color:var(--accent)}
+
 .stay li{padding:var(--s3) 0 var(--s3) var(--s5);border-bottom:0;
   border-left:3px solid var(--warn);margin-top:var(--s2);
   background:linear-gradient(90deg,rgba(255,255,255,.03),transparent 40%)}
@@ -969,7 +1141,7 @@ html.scrolled .wm{font-size:16px}
   box-shadow:var(--bev),var(--lift)}
 .dl:hover .dl-t{color:var(--accent)}
 .dl-t{transition:color var(--t-quick) linear}
-.dl-t{display:block;font-size:var(--t-item-lg);font-variation-settings:'wdth' 92;
+.dl-t{display:block;font-size:var(--t-body);font-variation-settings:'wdth' 92;
   font-weight:600}
 .dl-m{display:block;margin-top:var(--s1);font:400 var(--m-lab)/1.5 var(--mono);
   letter-spacing:var(--tr-lab);text-transform:uppercase;color:var(--ink3)}
@@ -1055,7 +1227,7 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
 .clouds li:hover{background:linear-gradient(90deg,var(--fill),transparent 80%)}
 .clouds b{font:400 var(--m-lab)/1.6 var(--mono);letter-spacing:var(--tr-lab);
   text-transform:uppercase;color:var(--ink3)}
-.svc{font-size:var(--t-item);line-height:1.3;font-variation-settings:'wdth' 92;
+.svc{font-size:var(--t-body);line-height:1.3;font-variation-settings:'wdth' 92;
   font-weight:600;color:var(--ink)}
 .dif{font-size:var(--t-sub);line-height:var(--lh-sub);color:var(--ink2)}
 
@@ -1075,7 +1247,7 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
 
 .mf{margin-top:var(--s8);padding-top:var(--s4);border-top:2px solid var(--ink)}
 .ck.big{display:flex;align-items:center;gap:var(--s3);padding:var(--s4) 0;
-  border-top:0;font-size:var(--t-item)}
+  border-top:0;font-size:var(--t-body)}
 .pn{display:flex;gap:var(--s5);margin-top:var(--s4);padding-top:var(--s4);
   border-top:1px solid var(--rule2)}
 .pn a{display:flex;align-items:center;min-height:44px;max-width:46%;
@@ -1106,6 +1278,13 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
   font-size:var(--t-sub);color:var(--ink3);text-decoration:none;
   transition:color var(--t-quick) linear}
 .foot-nav a:hover{color:var(--ink)}
+/* The byline, with the mark. We made this book and we made this move, and
+   the footer is where a publisher signs its name. */
+.by{display:inline-flex;align-items:center;gap:var(--s4);margin:0 0 var(--s4);
+  text-decoration:none;color:var(--ink3);font-size:var(--t-sub)}
+.by img{display:block;height:32px;width:auto}
+.by span{border-bottom:1px solid transparent;transition:border-color var(--t-quick) linear}
+.by:hover span{border-bottom-color:var(--ink3)}
 .foot-note{margin:0 0 var(--s3);font-size:var(--t-sub);line-height:var(--lh-sub);
   color:var(--ink3);max-width:var(--measure)}
 .ver{font-family:var(--mono)}
@@ -1172,7 +1351,7 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
   .cmp thead,.eq thead{display:none}
   .cmp tr,.eq tr{padding:var(--s4) 0;border-bottom:1px solid var(--rule)}
   .cmp th,.cmp td,.eq td{border:0;padding:var(--s1) 0}
-  .cmp tbody th,.eq td:first-child{font-size:var(--t-item-lg)}
+  .cmp tbody th,.eq td:first-child{font-size:var(--t-body)}
   .cmp td::before,.eq td:not(:first-child)::before{content:attr(data-h);display:block;
     font:400 var(--m-lab)/1.5 var(--mono);letter-spacing:var(--tr-lab);
     text-transform:uppercase;color:var(--ink3)}

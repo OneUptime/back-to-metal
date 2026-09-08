@@ -5,6 +5,69 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [4.1.0] - 2026-09-08
+
+The overhaul the last three editions were painting over. 4.0.0 changed the
+colour and the content; this changes the shape.
+
+### Changed — the layout
+
+- **The ledger grid.** Measured at 1440 before it existed: the content box was
+  1056px and every paragraph in it ended at 527px, with a two-pixel rule drawn
+  straight across the rest — a rule whose whole job is to measure the column,
+  measuring twice what was under it. Five hundred pixels of dead column beside
+  every paragraph on the site, on every page, which is why three editions of
+  new paint kept looking like the old one. There are two tracks now: the
+  ACCOUNT carries the argument, the AMOUNTS carry what the argument is about —
+  figures, the stage key, cross-references, and the marginalia that used to
+  interrupt the prose. They sum to the content box exactly (544 + 96 + 416 =
+  1056), so `--page` does not change and every full-width object keeps the
+  width it had. A section with nothing for the margin says `.solo` and
+  collapses: a page of pure argument is allowed to be one column, a ruled-off
+  empty gutter is not. Verified at 1440, 1080 and 390 with no horizontal
+  scroll at any of them.
+- **The front page opens with the balance, not a stat strip.** Four equal
+  figures at one size in one colour, on a page whose argument is one figure —
+  three of them were context and the fourth was the claim. It is a ledger now,
+  read down as a subtraction: the bill struck through, the three lines that
+  replace it, the total, and the saving at the only type size on the site that
+  large. It adds up, because the parts are the rounded parts and the total is
+  their sum.
+- **A real type scale.** There were `--t-body` 17, `--t-item` 17 and
+  `--t-item-lg` 19 — three names within two pixels, which is not a hierarchy.
+  A census found 12px used 97 times, 15px 84 times, 17px 65 times, and nothing
+  at all between 28px and the masthead. Five prose steps now, four for
+  amounts, and Archivo's width axis used as a real third dimension: a row
+  title at `wdth 92` beside a hook at 100 is a different kind of statement,
+  which is hierarchy that costs neither size nor weight.
+
+### Changed — the argument
+
+- **The case for leaving leads with the stake**, not with a list. What the
+  saving is in things a company actually spends: two engineers, or a year of
+  runway, or the difference between raising again and not.
+- **We say what we did, in the first person.** 730 days at 99.993 per cent,
+  19 per cent lower latency on identical software, two hardware interventions
+  in twenty-four months, nobody hired. It is our own fleet and our own
+  measurement rather than an independent audit, and the section says so —
+  which is the point. It is the one thing on the site nobody else could write.
+- **Every claim carries the test that would disprove it.** A page that tells
+  the reader how to prove it wrong is not selling them anything, and this
+  audience believes a falsifiable claim and distrusts a confident one. Most of
+  the tests point at a Move.
+- **"Startup" is "company" throughout**, including the subtitle and the cover.
+  The book is sized for an estate, not for a funding stage.
+- **The mark is on it.** OneUptime's logo, vendored and recoloured for a dark
+  ground, in the footer where a publisher signs its name. Its green is
+  `#7ED957` — byte-identical to the accent this edition chose independently,
+  on contrast and collision grounds, before anybody looked at the logo.
+
+### Fixed
+
+- The comparison table stopped adding up the moment the cloud column gained
+  its people row: it printed $24,000 under a column whose visible rows came to
+  $29,491. Every column is the sum of its own rows again.
+
 ## [4.0.0] - 2026-09-08
 
 The arithmetic was wrong in the book's own favour's opposite direction, the

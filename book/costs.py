@@ -12,7 +12,7 @@ out the people is the reason repatriations get approved and then regretted.
 """
 
 # --- the estate this edition is written against ---------------------------
-# A startup, not an enterprise. One cloud, one region, about $24,000 a month.
+# A company of a size, not an enterprise. One cloud, one region, about $24,000 a month.
 # Every Move's numbers strip is a slice of this bill, and the slices add up to
 # it, which is what makes the roadmap page's arithmetic checkable.
 BILL_MONTH = 24000
@@ -86,7 +86,7 @@ HARDWARE = {
 # recruiter you paid once.
 #
 # Half an engineer, not two. Five machines in one cage is not an enterprise
-# platform team, and a book that asks a startup to hire two people to save
+# platform team, and a book that asks a company to hire two people to save
 # $3,000 of hardware is asking it to lose money. Move 03 makes the reader write
 # this number down before the arithmetic, so the arithmetic cannot be argued
 # into the answer somebody wanted.
@@ -99,8 +99,8 @@ HARDWARE = {
 # for ever. Nothing published supports it at this fleet size, and it was a
 # guess sitting in the load-bearing position.
 #
-# THE INDEPENDENT ANCHOR is the only estimate of the DELTA found that is not
-# selling something adjacent: ten to twenty additional operations hours a month
+# THE OUTSIDE ANCHOR, and the one the number actually rests on - the only
+# estimate of the DELTA we could find that is not selling something adjacent: ten to twenty additional operations hours a month
 # for a production stack self-hosting its database, cluster and cache instead
 # of renting them managed. This book takes TWENTY - the top of that range.
 #
@@ -112,14 +112,17 @@ HARDWARE = {
 # of zero at that size does not prove a delta of zero at this one; it does make
 # half an engineer for six machines very hard to believe.
 #
-# DECLARED INTEREST. There is a measured figure for a stack close to this one -
-# about fourteen engineer-hours a month across two sites, dual EPYC with a
-# terabyte a node - and it was published by OneUptime, which is the company
-# that publishes this book. It is corroboration and it is not independent, and
-# a book that quietly cited its own publisher to move its own headline
-# twenty-five points in its own favour would deserve everything it got. It is
-# named here, it is named in the prose, and the twenty hours would stand on the
-# independent figure without it.
+# OUR OWN NUMBER, SAID PLAINLY. We make OneUptime, we made this move, and we
+# measured our own fleet: about fourteen engineer-hours a month across two
+# sites, dual EPYC with a terabyte a node, over two years. That is a bigger
+# fleet than the one this book is written against.
+#
+# It is not an independent source and it is not offered as one. A book that
+# quietly used its own authors' experience to move its own headline in its own
+# favour would deserve everything it got, so: it is named here, it is named in
+# the prose on the cost page, and the twenty hours below would stand on the
+# outside estimate without it. We are showing our working, not citing a
+# stranger.
 #
 # THE EVIDENCE AGAINST, which is real: vendors selling managed Kubernetes put
 # self-hosting at anywhere from half an engineer to two. The rebuttal is not

@@ -7,8 +7,9 @@ decided. It is not fair to the reader who has not, and it left the one question
 everybody actually asks answered nowhere.
 
 So this is the argument, made once, in the book's own voice. Two rules kept it
-honest. Every gain that can be measured is measured, from the same model the
-cost page computes from or from a published account by somebody who did it.
+honest. Every gain that can be measured is measured - from the same model the
+cost page computes from, or from our own fleet, and where it is ours it says
+so in the first person rather than hiding behind a citation.
 And the case against is written by the same hand as the case for, at the same
 length, at the end, where a reader will still be reading. A page that lists
 nine benefits and no costs is an advertisement, and this book has spent three
@@ -21,55 +22,98 @@ cannot drift.
 KICKER = 'Before the twenty Moves, the question underneath them'
 HEADING = 'Why leave at all'
 
-LEDE = ('Nobody moves off a cloud because a book told them to. They move because '
-        'one of five things has become true, and usually because the first one '
-        'has been true for a while and somebody finally added it up.')
+LEDE = ('A cloud bill is rent on somebody else\u2019s margin, charged by the byte, '
+        'for as long as you exist. On the estate this book is written against it '
+        'comes to {five_year_saved} over the life of one generation of machines \u2014 '
+        'which is two engineers, or a year of runway, or the difference between '
+        'raising again and not. That is the whole argument. Everything below is '
+        'either a way of checking it or a reason it might not apply to you.')
+
+# We did this. That is worth more than any argument, and it is the one thing
+# here nobody else can say - so it is said in the first person and it is put
+# where a sceptic will hit it early.
+OURS_HEADING = 'We did this, and here is what actually happened'
+OURS = [
+    ('730 days', 'at 99.993 per cent measured availability, through a period that '
+                 'included a region-wide outage at the cloud we had left'),
+    ('19%', 'lower latency on the same software, from local NVMe and the absence of '
+            'neighbours. We bought no faster code to get it'),
+    ('2', 'hardware interventions in twenty-four months, both disks, both handled by '
+          'remote hands with a mean response of twenty-seven minutes'),
+    ('0', 'people hired. The toil moved; it did not multiply. We measured it at about '
+          'fourteen engineer-hours a month across two sites'),
+]
+OURS_NOTE = ('That is our own fleet and our own measurement, not an independent audit, '
+             'and it is a bigger estate than the one this book is sized for. Take it '
+             'as us showing our working. The figures in the rest of this book stand '
+             'on outside sources and on arithmetic you can repeat.')
 
 # --- what you gain --------------------------------------------------------
-# Each is (heading, body, how it is evidenced). The third field is not printed
-# as a citation - it is here so that a claim which loses its evidence loses its
-# place, and so the next person can tell an arithmetic claim from a judgement.
+# Each is (heading, body, how it is evidenced, the test that would disprove it).
+#
+# THE FOURTH FIELD IS WHAT KEEPS THIS FROM BEING MARKETING. Every claim ships
+# with a test the reader runs against their own invoice, and most of them point
+# at a Move. A claim with a disproof attached is an engineering claim; a page
+# that tells you how to prove it wrong is not trying to sell you anything.
 GAINS = [
     ('The bill stops being a percentage of your growth',
-     'A cloud bill is a toll on activity: more users, more bytes, more bill, for ever, '
-     'at a margin somebody else sets. A rack is a fixed cost. It costs the same in the '
-     'month you double as in the month you do not, and the only thing that grows is the '
-     'power bill, by the watt rather than by the invoice line. Over the life of one '
-     'generation of machines the difference on the estate this book is written against '
-     'is about {five_year_saved}, and roughly {five_year_pct} per cent.',
-     'computed'),
+     'This is the one that matters and the rest are consequences of it. A cloud bill '
+     'is a toll on activity: more users, more bytes, more bill, for ever, at a margin '
+     'somebody else sets and can change. A rack is a fixed cost. It costs the same in '
+     'the month you double as in the month you do not, and the only thing that grows '
+     'is the power draw, by the watt rather than by the invoice line. Over five years '
+     'the difference here is {five_year_saved}, and the machines are still working at '
+     'the end of it.',
+     'computed',
+     'Take last quarter\u2019s invoices and plot the total against your own usage '
+     'metric. If the line is flat you have nothing to gain here. If it tracks your '
+     'growth, that slope is what you are buying out of \u2014 Move 01.'),
 
     ('Egress stops being a tax on your own traffic',
-     'Moving data out is where the margin lives, and it is the line that ends most of '
-     'these arguments: {egress_100tb} a month to send a hundred terabytes of your own '
-     'traffic to your own users. Transit at a facility is bought by the megabit and '
-     'costs a fraction of it. Nothing you build gets faster, and the line simply stops '
-     'being there.',
-     'computed'),
+     'Moving your own data to your own users is where the margin lives, and it is the '
+     'line that ends most of these arguments: {egress_100tb} a month to send a hundred '
+     'terabytes out. Transit at a facility is bought by the megabit and costs a small '
+     'fraction of that. Nothing you build gets faster and no code changes; the line '
+     'simply stops being there.',
+     'computed',
+     'Find the data-transfer line on last month\u2019s bill. Divide it by your egress '
+     'in terabytes. If it is anywhere near ninety dollars a terabyte, that line is '
+     'nearly pure margin \u2014 Move 01, then Move 18.'),
 
     ('The machines are yours, so the performance is yours',
      'A vCPU is half a core somebody else is also using. Local NVMe is not a network '
-     'service with a queue in front of it. The company that publishes this book measured '
-     'a nineteen per cent latency improvement on the same software after moving, from '
-     'local disk and the absence of neighbours alone, and bought no faster code to get '
-     'it.',
-     'measured, OneUptime, two years on'),
+     'service with a queue in front of it and a token bucket on top. The gain is not '
+     'theoretical and it is not small: on identical software we measured nineteen per '
+     'cent, and the noisy-neighbour tail \u2014 the ninety-ninth percentile that '
+     'wakes people \u2014 improves more than the mean does.',
+     'measured, our own fleet',
+     'Compare your ninety-ninth percentile against your median for a week. If the gap '
+     'is wide and unexplained by your own code, some of it is not yours \u2014 '
+     'Move 14 measures it on real hardware before anything moves.'),
 
     ('Nobody deprecates your hardware',
-     'A managed service is somebody else’s roadmap running inside your product. '
-     'Instance families are retired, versions go end-of-life on a date you did not pick, '
-     'a control plane upgrades on its own release channel and a maintenance exclusion '
-     'holds it for ninety days at most. A machine you own runs the version you chose '
-     'until you choose another one.',
-     'judgement, sourced in Move 11'),
+     'A managed service is somebody else\u2019s roadmap running inside your product. '
+     'Instance families are retired, versions go end-of-life on a date you did not '
+     'pick, a control plane upgrades on its own release channel, and the longest you '
+     'can hold it is ninety days. A machine you own runs the version you chose until '
+     'you choose another one, and the migration happens when you have time rather '
+     'than when the notice arrives.',
+     'judgement, sourced in Move 11',
+     'Count the forced upgrades and deprecation notices you have absorbed in the last '
+     'two years, and what each cost in engineer-days. That is a recurring bill nobody '
+     'invoices you for.'),
 
     ('You can be told no, and it stops mattering',
      'Capacity in your region, a quota nobody will raise, a region-wide outage you can '
-     'do nothing about but write a status update. Owning the hardware does not make you '
-     'immune to failure - it makes the failure yours to fix, at three in the morning, '
-     'without a support tier. Whether that is a gain depends entirely on whether you '
-     'would rather be waiting or working.',
-     'judgement'),
+     'do nothing about except write a status update. Owning hardware does not make you '
+     'immune to failure \u2014 it makes the failure yours to fix, at three in the '
+     'morning, without a support tier and without waiting. Whether that reads as a '
+     'gain or a cost depends entirely on whether you would rather be working or '
+     'waiting, and you already know which you are.',
+     'judgement',
+     'Look up the last provider incident that hurt you. Ask what you could have done '
+     'differently with root on the machines. If the answer is nothing, this one is '
+     'worth real money to you.'),
 ]
 
 # --- what it costs you ----------------------------------------------------
@@ -89,10 +133,11 @@ COSTS = [
      'only {days} days are anybody working.'),
 
     ('The pager, and about {ops_hours} more hours a month',
-     'Somebody carries it, and it is now a machine rather than a ticket. The measured '
-     'figure on a real two-site fleet larger than this one is fourteen engineer-hours a '
-     'month; this book books {owned_hours} against the {cloud_hours} the cloud estate was '
-     'already taking, because the people who measured it had done it before.'),
+     'Somebody carries it, and it is now a machine rather than a ticket. We measured our '
+     'own two-site fleet, which is larger than the one this book is written against, at '
+     'fourteen engineer-hours a month; the book books {owned_hours} against the '
+     '{cloud_hours} the cloud estate was already taking, because we had done it once '
+     'before and you will not have.'),
 
     ('Three things that never come home',
      'A content delivery network, outbound mail deliverability and scrubbing at the edge '
@@ -126,13 +171,17 @@ CLOSER = ('If none of those four is true and the arithmetic in Move 03 clears, t
           'and undone on a Wednesday.')
 
 
+def lede(fmt):
+    return LEDE.format(**fmt)
+
+
 def gains(fmt):
-    """The gains, with every computed figure filled in by the caller.
+    """The gains, each with the test that would disprove it.
 
     `fmt` is a dict of the values the build has already computed, so a claim
     here cannot drift from the cost page: they are the same numbers.
     """
-    return [(h, b.format(**fmt)) for h, b, _ in GAINS]
+    return [(h, b.format(**fmt), c.format(**fmt)) for h, b, _, c in GAINS]
 
 
 def costs(fmt):
