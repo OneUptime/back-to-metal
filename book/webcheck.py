@@ -48,6 +48,47 @@ PHONE = {'width': 390, 'height': 844}
 # between and would let exactly the bug this file exists for through.
 STEP = 0.7
 
+# Contrast, in the browser rather than against the token table. Checking the
+# tokens proves the palette; checking the page proves what the palette actually
+# lands on, which is not the same thing - a colour is only ever correct against
+# the background it ends up over, and `--fill` on a hovered row is a background
+# the token table does not know about.
+#
+# `getClientRects().length` is the visibility test, not `display`. An element
+# inside a hidden ancestor keeps its own display value: the print block hides
+# `.cta`, and a `.btn` inside it still computes `inline-flex` and still reports
+# a 1:1 colour pair that nothing will ever print. That false positive cost a
+# real investigation once.
+CONTRAST = """(onWhite) => {
+  const lum = c => { const [r,g,b] = c.match(/\\d+(\\.\\d+)?/g).slice(0,3).map(Number);
+    const f = v => { v/=255; return v<=.03928 ? v/12.92 : Math.pow((v+.055)/1.055,2.4) };
+    return .2126*f(r)+.7152*f(g)+.0722*f(b) };
+  const bgOf = el => { let n = el;
+    while (n && n !== document.documentElement) {
+      const bg = getComputedStyle(n).backgroundColor;
+      if (bg && !/rgba\\(0, 0, 0, 0\\)|transparent/.test(bg)) return bg;
+      n = n.parentElement }
+    return getComputedStyle(document.documentElement).backgroundColor };
+  const bad = [];
+  for (const el of document.querySelectorAll('body *')) {
+    if (!el.getClientRects().length) continue;
+    if (el.closest('.vh')) continue;
+    if (![...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) continue;
+    const cs = getComputedStyle(el);
+    if (cs.color === 'rgba(0, 0, 0, 0)') continue;
+    const l1 = lum(cs.color);
+    const l2 = onWhite ? 1 : lum(bgOf(el));
+    const cr = (Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05);
+    const size = parseFloat(cs.fontSize);
+    const floor = (size >= 24 || (size >= 18.66 && +cs.fontWeight >= 700)) ? 3 : 4.5;
+    if (cr < floor) bad.push(
+      `${el.tagName.toLowerCase()}.${(el.className.baseVal ?? el.className).toString()
+        .trim().split(/\\s+/).join('.')} at ${cr.toFixed(2)}:1 ` +
+      `("${el.textContent.trim().slice(0,32)}")`);
+  }
+  return [...new Set(bad)];
+}"""
+
 STILL_HIDDEN = """(sel) => {
   if (!sel) return ['NO BTM_RISE_SEL: the corpus script did not load'];
   return [...document.querySelectorAll(sel)]
@@ -103,6 +144,20 @@ def main():
                                 f'page has been scrolled')
         if errors:
             problems += [f'console: {e}' for e in errors[:5]]
+
+        # ---- 1b. and nothing on any of them is below the floor -----------
+        # On screen, and again on paper, where the palette is a different one.
+        for rel in PAGES:
+            page.goto((SITE / rel).as_uri())
+            page.wait_for_timeout(1400)
+            walk(page)
+            for what in page.evaluate(CONTRAST, False)[:6]:
+                problems.append(f'{rel}: {what} on screen')
+            page.emulate_media(media='print')
+            page.wait_for_timeout(300)
+            for what in page.evaluate(CONTRAST, True)[:6]:
+                problems.append(f'{rel}: {what} in print')
+            page.emulate_media(media='screen')
         page.close()
 
         # ---- 2. the reveal is optional, three ways -----------------------
@@ -142,7 +197,8 @@ def main():
         for p in problems:
             print('  -', p)
         return 1
-    print(f'webcheck: {len(PAGES)} pages, nothing left hidden, no sideways scroll')
+    print(f'webcheck: {len(PAGES)} pages, nothing left hidden, nothing under '
+          f'contrast on screen or paper, no sideways scroll')
     return 0
 
 
