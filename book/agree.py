@@ -49,6 +49,7 @@ CHECKS = [
     ]),
     ('the headline percentage', [
         (SITE / 'index.html', rf'a year &middot; {PCT} per cent'),
+        (SITE / 'cost.html', rf'a year, or {PCT} per cent of everything you spend'),
         (README, rf'a year, {PCT} per cent'),
     ]),
     ('the cloud bill', [
@@ -62,6 +63,23 @@ CHECKS = [
     ('the year, in the printed book', [
         (BOOK, rf'What the difference buys.*?a month, or\s*{MONEY} a year'),
         (README, rf'Saving, with everything counted.*?&mdash; {MONEY} a year'),
+    ]),
+    # WHAT THE BILL BECOMES. This one is here because v6.1.1 shipped with the
+    # same quantity carrying two labels on one page: the cost page's hero
+    # called $22,776 "Owned, a month" while its own comparison table, four
+    # hundred pixels lower, put the owned column's total a month at $37,420.
+    # Both were right. They are different quantities - one is the bill line
+    # after the move with the extra ops time folded in, the other is the whole
+    # monthly cost with the base salary on top - and only the label was wrong.
+    # A reader checking the arithmetic on the page that boasts its arithmetic
+    # is checkable found two answers. So the delta figure is now named for what
+    # it is in all three artefacts, and named identically, which is a thing a
+    # regex can hold.
+    ('what the bill becomes', [
+        (SITE / 'index.html', rf'class="tot"><dt>What the bill becomes</dt>\s*<dd>{MONEY}'),
+        (SITE / 'cost.html',
+         rf'fig-n">{MONEY}</b><span class="lbl">What the bill becomes'),
+        (BOOK, rf'Those three are <b>{MONEY}</b> a month'),
     ]),
     ('person-days', [
         (SITE / 'index.html', rf'About {PCT} days of work'),

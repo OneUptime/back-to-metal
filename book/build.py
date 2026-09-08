@@ -565,7 +565,8 @@ def build(moves):
       scrubbing of Move 04, and the residue five later Moves leave behind. That salary line is
       the largest number in this column, the retained line is the one every other comparison
       forgets, and a table without either is the reason repatriations get approved and then
-      regretted. Total <b>{money(o['total'])}</b> a month.</p></div>
+      regretted. Those three are <b>{money(o['total'])}</b> a month: what the
+      {money(COSTS.BILL_MONTH)} line becomes, base salary unchanged on both sides.</p></div>
       <div class="pcard"><h4>Rented by the month</h4><p>The same class of machine from a
       dedicated-host provider is {money(d['infrastructure'])} &mdash; MORE than owning, not less,
       and it should be: over {rvo['months']} months you hand over {money(rvo['rent_total'])} for

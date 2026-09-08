@@ -511,7 +511,7 @@ def hero_index(T, first):
       <div><dt>The extra ops time</dt><dd>{mny(T['owned']['people'])}</dd></div>
       <div><dt>Still somebody else&rsquo;s invoice</dt>
         <dd>{mny(T['owned']['retained'])}</dd></div>
-      <div class="tot"><dt>Owned, a month</dt>
+      <div class="tot"><dt>What the bill becomes</dt>
         <dd>{mny(T['owned']['total'])}</dd></div>
     </dl>
     <p class="bal-t"><span class="lbl">Saved a month</span>
@@ -966,14 +966,17 @@ def build_cost(moves, T):
     body = f"""{bar(0, first, 'cost.html')}
 <main id="main" class="shell">
 {hero('What it costs',
-      f'{mny(bill)} a month becomes {mny(owned["total"])} with the salary counted. '
-      f'That is {mny(T["year"])} a year, or {T["pct"]:.0f} per cent of the bill.',
+      f'{mny(bill)} a month becomes {mny(owned["total"])}, the extra ops time already '
+      f'in it. That is {mny(T["year"])} a year, or {T["pct"]:.0f} per cent of everything '
+      f'you spend on it now, with {mny(T["cloud_people"])} of salary counted on both sides.',
       f'The reference build is {REFERENCE["nodes"]} machines and a spare on the shelf, '
       f'in one cage. Every figure below is a public list price observed while writing, '
       f'against a bill this size. Substitute your own and the shape does not change.',
       'page',
-      figs([(mny(bill), 'Cloud, a month'), (mny(owned['total']), 'Owned, a month'),
-            (mny(T['year']), 'Saved a year'), (f'{T["pct"]:.0f}%', 'Off the bill')]))}
+      figs([(mny(bill), 'Cloud, a month'),
+            (mny(owned['total']), 'What the bill becomes'),
+            (mny(T['year']), 'Saved a year'),
+            (f'{T["pct"]:.0f}%', 'Off what you pay now')]))}
 
 {band('compare', 'The comparison, with the salary in it',
       f'<p>Three ways to buy the same computers, with every column carrying its own '
@@ -1091,8 +1094,8 @@ def build_cost(moves, T):
 {foot(0)}"""
     (SITE / 'cost.html').write_text(shell(
         f'What it costs \u2014 {IMP.TITLE}', body, 0,
-        f'The arithmetic: {mny(bill)} a month on the cloud against {mny(owned["total"])} '
-        f'on machines you own, with the salary counted.'), encoding='utf-8')
+        f'The arithmetic: {mny(bill)} a month on the cloud becomes {mny(owned["total"])} '
+        f'on machines you own, with the salary counted on both sides.'), encoding='utf-8')
 
 
 # ------------------------------------------------------------- 3. the checklist

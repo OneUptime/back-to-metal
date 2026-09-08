@@ -5,6 +5,44 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [6.1.2] - 2026-09-08
+
+The cost page printed two different answers to "what does owning cost a month".
+
+### Fixed
+
+- **One quantity, two labels, one page.** The cost page's hero called $22,776
+  "Owned, a month". Four hundred pixels below it, that page's own comparison
+  table put the owned column's total a month at $37,420. Both figures were
+  correct and they are not the same quantity: $22,776 is what the $100,000
+  bill line becomes, carrying the *extra* ops time, while $37,420 is the whole
+  monthly cost with the base salary on top — the salary you pay either way, and
+  which the table deliberately counts on all three columns. Only the label was
+  wrong, on the page whose own prose says "the arithmetic is checkable".
+
+  The delta figure is now named for what it is — **what the bill becomes** — in
+  the hero, in the front page's ledger and in the printed interior, and the
+  word "Owned, a month" now appears once in the corpus, meaning the all-in
+  number.
+- **The headline percentage named the wrong denominator.** "67 per cent of the
+  bill" is not 67 per cent of the bill: against $100,000 the saving is 77 per
+  cent, and 67 is against the $114,644 you actually pay now, salary included.
+  The honest denominator is the all-in one — it is the one the comparison
+  defends — so the page says "of everything you spend on it now" and names the
+  $14,644 that sits on both sides.
+- **The cost page's meta description** carried the same claim into search
+  results and link previews.
+
+### Added
+
+- **`agree.py` checks the delta figure across all three artefacts**, and the
+  cost page joins the headline-percentage check. This is the fourth appearance
+  of the two-denominators bug and the first where the model was right and the
+  prose was wrong, which is a failure the previous checks could not see: they
+  compare a figure against the same figure elsewhere, and both of these were
+  internally consistent. Naming the quantity identically in every artefact is
+  what makes it something a regex can hold.
+
 ## [6.1.1] - 2026-09-08
 
 Eleven stale machine counts were live in 6.0.0 and 6.1.0.
