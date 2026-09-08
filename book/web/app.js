@@ -74,6 +74,15 @@
        again would be a lie the reader can check. */
     nextLink.hidden = !row;
     if (!row) return;
+    /* Unless it is the page you are standing on. The rule is the
+       lowest-numbered Move nobody has ticked, which is right everywhere
+       except here: a reader on Move 01 with nothing ticked is the commonest
+       state on the site, and the header was offering them a link to
+       themselves - and on Move 16 it offered to send them backwards to 01.
+       The build renders the book's OWN next Move into this element on every
+       Move page, which is the right answer whenever the computed one is
+       where the reader already is, so it is left exactly as it arrived. */
+    if (location.pathname.split('/').pop() === row[1] + '.html') return;
     nextLink.setAttribute('href',
       nextLink.getAttribute('href').replace(/[^/]*$/, row[1] + '.html'));
     $('.next-n', nextLink).textContent = row[0];
