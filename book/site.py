@@ -56,6 +56,14 @@ GH_URL = f'https://{IMP.REPO}'
 DEFAULT_CREW = 2
 CREWS = (1, 2, 3)
 
+# The width of the full-bleed track, in the same units the drawings are authored
+# in: `--page` minus two gutters, and the number style.css computes its ledger
+# tracks from (544 + 96 + 416). The roadmap used to be authored at 1180 and set
+# to width:100%, so it scaled to 0.895 in this track and its own axis labels
+# rendered at 8.95px - under --t-fine, the smallest size the type scale admits.
+# roadmap.py keeps its 1180 default, so the printed drawing is untouched.
+SITE_TRACK = 1056
+
 esc = lambda s: html.escape(str(s), quote=False)
 attr = lambda s: html.escape(str(s), quote=True)
 b64 = lambda p: base64.b64encode(Path(p).read_bytes()).decode()
@@ -103,13 +111,20 @@ def fonts_css():
 def parts_css():
     """The five Stage colours, as attribute rules rather than inline hexes.
 
-    `parse.LAYERS` is the single source, and it carries two hexes a Stage: the
-    one chosen to sit on paper and the one that lifts off a near-black screen.
-    The screen is what the site is, so `dark` is what `:root` gets; `color` is
-    correct only on paper and appears only inside the print block. Inlining the
-    paper hex into a `style="--c:#1F4E79"` on every coloured element is what the
-    site used to do, and it painted Stage signals at 2.2:1 to 3.6:1 on a dark
-    ground - below the floor for a graphic, let alone a numeral."""
+    `parse.LAYERS` is the single source and carries three hexes a Stage:
+    `color` for paper, `dark` for a near-black ground, `light` for this one.
+    The screen is light now, so the screen takes `light` - and there is no
+    print block, because the two grounds are near enough that a second palette
+    would be two sets of numbers to keep at contrast rather than one.
+
+    DO NOT point the screen at `color`. Measured on #FBF9F4 the paper set
+    clears AA, but paper Buy sits CIEDE2000 6.16 from the money colour and
+    paper Decide 12.67 from paper Build - both of the collisions 6.0.0
+    removed. That is what the `light` key is for.
+
+    Inlining a hex into a `style="--c:#1F4E79"` on every coloured element is
+    what the site used to do, and it painted Stage signals at 2.2:1 to 3.6:1
+    on a ground they were never chosen for."""
     def block(key):
         return '\n'.join(f'[data-part={LAYERS[k]["key"]}]{{--c:{LAYERS[k][key]}}}'
                           for k in ORDER)
@@ -117,10 +132,11 @@ def parts_css():
     def spectrum(key):
         """All five Stages at once, as hard-edged bands across one gradient.
 
-        The header wears it along its bottom edge on every page, and it is
-        the only place on the site where all five appear together - which is
-        what lets a reader read a Stage colour as one of a set rather than as
-        an arbitrary hue on a rule. Hard stops, not a blend: these are five
+        The header wears it along its bottom edge and the footer along its
+        top, so a page is a spread with the book's colours on both edges. It
+        is the only place on the site where all five appear together - which
+        is what lets a reader read a Stage colour as one of a set rather than
+        as an arbitrary hue on a rule. Hard stops, not a blend: these are five
         categories and a gradient between them would imply a scale."""
         n = len(ORDER)
         stops = []
@@ -132,11 +148,10 @@ def parts_css():
 
     return (
         '\n/* The five Stages, written by site.py out of parse.LAYERS. The screen\n'
-        '   is dark, so the screen takes the `dark` hex; paper takes the other. */\n'
-        + block('dark') + '\n'
-        + ':root{' + spectrum('dark') + '}\n'
-        + '@media print{\n' + block('color') + '\n'
-        + ':root{' + spectrum('color') + '}\n}\n')
+        '   is paper-coloured, so it takes the `light` hex, and paper takes the\n'
+        '   same one - one ground, one palette, one set of numbers to keep. */\n'
+        + block('light') + '\n'
+        + ':root{' + spectrum('light') + '}\n')
 
 
 # ------------------------------------------------------------- the reveal list
@@ -188,12 +203,55 @@ def rise_css():
 # a nav that fits on one line of a phone does not need a disclosure to hide in.
 NAV = [
     ('index.html', 'The guide'),
-    ('index.html#why', 'Why leave'),
     ('cost.html', 'What it costs'),
     ('checklist.html', 'Your checklist'),
     ('start.html', 'Before you start'),
     ('about.html', 'About'),
 ]
+
+# FIVE, AND IT HAS TO BE FIVE. A sixth entry - an in-page anchor to the case
+# for leaving - was the difference between a header on one row and a header on
+# two: the bar is capped at 1056px and its children needed 1114, so it wrapped
+# at every desktop width from 1280 to 1920 and put the `next` link bottom left,
+# under the wordmark, with its own divider rule hanging off nothing. The anchor
+# is not a page and it lives in the footer, which is where the second tier goes.
+
+# The footer's page columns. NAV is what the site IS; this is the site GROUPED,
+# and the grouping is the two questions the pages answer - is this worth doing,
+# and how do I start. The three front-page section anchors live here and only
+# here: index.html is twelve screens tall, and #plan, #where and #how-long are
+# reachable from nothing else on the site. The assert makes a NAV entry nobody
+# placed a build error rather than a link the footer quietly drops.
+FOOT_PAGES = [
+    ('Is it worth it', [('index.html#why',      'Why leave'),
+                        ('cost.html',           'What it costs'),
+                        ('index.html#how-long', 'How long it takes')]),
+    ('The plan',       [('index.html',          'The whole guide'),
+                        ('index.html#plan',     'The whole plan'),
+                        ('index.html#where',    'Start where it hurts')]),
+    ('Doing it',       [('checklist.html',      'Your checklist'),
+                        ('start.html',          'Before you start'),
+                        ('about.html',          'About')]),
+]
+_placed = {h for _, rows in FOOT_PAGES for h, _ in rows}
+assert _placed >= {h for h, _ in NAV}, \
+    'FOOT_PAGES must place every NAV entry: ' + str({h for h, _ in NAV} - _placed)
+
+
+def theme(var):
+    """One token, read off the line the browser will read.
+
+    `<meta name="theme-color">` lives in the head and cannot reference a custom
+    property, so this is the one place on the site where a colour has to leave
+    the stylesheet. It leaves by being READ rather than by being typed a second
+    time: the head used to carry `#0C0F11` as a literal, which is how a mobile
+    browser ends up painting a near-black band over a paper page and why the
+    first thing a phone reader sees is the one part of the design that did not
+    get the memo."""
+    css = (HERE / 'web' / 'style.css').read_text(encoding='utf-8')
+    m = re.search(rf'--{var}:\s*(#[0-9A-Fa-f]{{3,8}})', css)
+    assert m, f'style.css no longer defines --{var}'
+    return m.group(1)
 
 
 def shell(title, body, depth=0, desc=''):
@@ -221,9 +279,12 @@ def shell(title, body, depth=0, desc=''):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(title)}</title>
 <meta name="description" content="{attr(desc)}">
-<meta name="theme-color" content="#0C0F11">
+<meta name="theme-color" content="{theme('bg')}">
 <link rel="stylesheet" href="{up}assets/style.css{v}">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0E10'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
+<!-- The favicon is DELIBERATELY the inverse of the page: a dark tile stands out
+     in a light tab strip, and a paper-coloured one would disappear into it. The
+     hex is the dark edition's ground, kept on purpose - do not "fix" it. -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230C0F11'/%3E%3Crect x='2' y='3' width='12' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='6.7' width='8' height='2.6' fill='%23fff'/%3E%3Crect x='2' y='10.4' width='4.5' height='2.6' fill='%23fff'/%3E%3C/svg%3E">
 <script>var d=document.documentElement;d.className='js rise';
 window.BTM_RISE_T=setTimeout(function(){{d.classList.remove('rise')}},2000)</script>
 </head>
@@ -260,42 +321,77 @@ def bar(depth, first, active=''):
 
 
 def foot(depth=0):
+    """The colophon: a directory, a sign-off and a licence strip, on the full
+    page rather than stacked in the account measure.
+
+    It is built out of objects the reader has already met higher up - the ruled
+    link column is the shelf from the kit list, the labelled strip along the
+    foot is the colophon from the about page - because a footer that invents
+    its own layout is the part of a document that most looks like it was added
+    last.
+
+    Four things have to survive any change here. Every page and every
+    front-page section is reachable from the bottom of every page. Both
+    editions are downloadable and say so in mono, rather than presenting as a
+    seventh page the way `PDF` did in a flat run of nine identical links. The
+    safety page is linked as an instruction and not as one entry in a list.
+    And the OneUptime interest is declared beside the byline that creates it -
+    see imprint.DISCLOSURE and AGENTS.md; the two travel together."""
     up = '../' * depth
-    links = [f'<a href="{up}{h}">{esc(t)}</a>' for h, t in NAV]
+
+    def row(href, text, tag='', dl=False):
+        t = f'<span class="ftag">{esc(tag)}</span>' if tag else ''
+        return (f'<li><a href="{href}"{" download" if dl else ""}>'
+                f'<span class="ftxt">{esc(text)}</span>{t}</a></li>')
+
+    def col(head, rows):
+        return (f'<div class="fcol"><h2 class="lbl">{esc(head)}</h2>'
+                f'<ul>{"".join(rows)}</ul></div>')
+
+    cols = [col(h, [row(up + p_, txt) for p_, txt in rows]) for h, rows in FOOT_PAGES]
+    book = []
     if PDF_SRC.exists():
-        links.append(f'<a href="{up}{PDF_NAME}" download>PDF</a>')
+        book.append(row(up + PDF_NAME, 'The print interior', 'PDF', dl=True))
     if EPUB_SRC.exists():
-        links.append(f'<a href="{up}{EPUB_NAME}" download>EPUB</a>')
-    links.append(f'<a href="{GH_URL}">Source</a>')
+        book.append(row(up + EPUB_NAME, 'The Kindle edition', 'EPUB', dl=True))
+    book.append(row(GH_URL, 'The Moves and the typesetter', 'GITHUB'))
+    cols.append(col('Take it with you', book))
+
     return (
         f'<footer class="foot"><div class="foot-in">'
-        f'<nav class="foot-nav" aria-label="Every page">{"".join(links)}</nav>'
-        f'<p class="foot-note">Every Move states its cutover in minutes of user-visible '
-        f'downtime, its risk as blast radius, and how long the thing it replaces must stay '
-        f'warm before you turn it off. The schedule is computed from the Moves&rsquo; own '
-        f'effort figures and the dependency graph rather than asserted, and every price is a '
-        f'public list rate observed while writing. '
-        f'<a href="{up}start.html">Read the safety page</a> before running anything.</p>'
+        f'<nav class="foot-dir" aria-label="Everything on this site">'
+        f'{"".join(cols)}</nav>'
+        f'<div class="foot-say">'
+        f'<p class="foot-note">Every Move states its cutover in minutes of '
+        f'user-visible downtime, its risk as blast radius, and how long the thing '
+        f'it replaces must stay warm before you turn it off. The schedule is '
+        f'computed from the Moves&rsquo; own effort figures and the dependency '
+        f'graph rather than asserted, and every price is a public list rate '
+        f'observed while writing.</p>'
+        f'<p class="foot-go"><a href="{up}start.html">Read the safety page before '
+        f'running anything</a></p></div>'
+        f'<div class="foot-imp">'
         f'<a class="by" href="https://{IMP.ONEUPTIME_SITE}">'
         f'<img src="{up}assets/oneuptime.svg" alt="OneUptime" width="160" height="32">'
         f'<span>{esc(IMP.BYLINE)}</span></a>'
-        f'<p class="foot-note">'
-        f'<a href="https://{IMP.ONEUPTIME_SITE}">{IMP.ONEUPTIME_SITE}</a> is an open-source '
-        f'platform for uptime, incidents, on-call and status pages. It is recommended in '
-        f'Stage 5, and the interest is declared on the '
-        f'<a href="{up}about.html">about page</a>.</p>'
-        f'<p class="foot-note">Open source: the Moves and the typesetter that builds this '
-        f'are <a href="{GH_URL}">on GitHub</a> &mdash; software MIT, text CC BY 4.0. '
-        f'<span class="ver">v{VERSION}</span></p>'
-        f'</div></footer>')
+        f'<p class="foot-fine">'
+        f'<a href="https://{IMP.ONEUPTIME_SITE}">{IMP.ONEUPTIME_SITE}</a> is an '
+        f'open-source platform for uptime, incidents, on-call and status pages. '
+        f'It is recommended in Stage 5, and the interest is declared on the '
+        f'<a href="{up}about.html">about page</a>.</p></div>'
+        f'<dl class="colo foot-colo">'
+        f'<div><dt class="lbl">Software</dt><dd>MIT</dd></div>'
+        f'<div><dt class="lbl">Text</dt><dd>CC BY 4.0</dd></div>'
+        f'<div><dt class="lbl">Version</dt><dd>v{VERSION}</dd></div>'
+        f'</dl></div></footer>')
 
 
-# The wordmark's dark ink, and what it becomes on a near-black page.
-LOGO_INK, LOGO_ON_DARK = '#121212', '#E9EDEF'
+# The ink the vendored mark ships in, which is what a paper page wants.
+LOGO_INK = '#121212'
 
 
 def write_logo():
-    """OneUptime's own mark, vendored and recoloured for a dark ground.
+    """OneUptime's own mark, vendored and copied through unchanged.
 
     It is a file rather than inline markup because it is twenty kilobytes of
     traced paths and there are twenty-five pages: inlined it would cost half a
@@ -303,14 +399,19 @@ def write_logo():
     once and cached. Same origin, so the rule about making no external request
     still holds - the site drops onto a static host and works from file://.
 
-    Only the wordmark is recoloured. The mark itself is already #7ED957, which
-    is - with no arrangement between them - the exact hex this edition's accent
-    was chosen as, on contrast and collision grounds, before anybody looked at
-    the logo.
+    The dark edition recoloured the wordmark to #E9EDEF so it would read on a
+    near-black ground. On this one that measures 1.18:1 and the publisher's own
+    name is a blank in the footer of all twenty-five pages - and nothing would
+    have caught it, because the mark is an <img> and the contrast gate only
+    walks text. Nothing is recoloured now.
+
+    The mark's green is not touched either. It is 1.67:1 here and it will look
+    pale, but a brand mark is exempt from the text rule and repainting somebody
+    else's mark to suit your page is the wrong repair.
     """
     svg = (HERE / 'web' / 'oneuptime.svg').read_text(encoding='utf-8')
-    (ASSETS / 'oneuptime.svg').write_text(
-        svg.replace(LOGO_INK, LOGO_ON_DARK), encoding='utf-8')
+    assert LOGO_INK in svg, 'the vendored mark no longer carries the ink we check'
+    (ASSETS / 'oneuptime.svg').write_text(svg, encoding='utf-8')
 
 
 def moves_index_js(moves):
@@ -672,6 +773,20 @@ def build_index(moves, T):
     # can be undone should not print a nought and make the reader wonder.
     oneway_line = (f', and {T["oneway"]} of them cannot be undone'
                    if T['oneway'] else ', and every one of them can be undone')
+    # THE LIST IS NOT PROSE, so it does not live in the account. Twenty rows of
+    # number, title, hook and three mono facts is a datasheet - the same class of
+    # object as the twenty and the roadmap, and both of those already take the
+    # full track. Set in the 544px account under a 1056px rule it was half a
+    # page wide, and its own hook column resolved to LITERALLY ZERO pixels at
+    # every desktop width: one of the three facts the site's primary navigation
+    # carries was invisible, while its three clamped empty lines still set the
+    # height of all twenty rows.
+    #
+    # The strip goes first. It is the one-screen picture of what the list says at
+    # length, and it used to render three thousand pixels BELOW the detail it
+    # introduces, with its own colour key another three thousand above that.
+    plan_full = twenty(moves) + f'<ol class="stages">{"".join(blocks)}</ol>'
+
     crews = ', '.join(
         f'{w} engineer{"" if w == 1 else "s"} about {T["crew_weeks"][w]:.0f} weeks'
         for w in CREWS if w in T['crew_weeks'])
@@ -679,6 +794,28 @@ def build_index(moves, T):
     body = f"""{bar(0, first, 'index.html')}
 <main id="main" class="shell">
 {hero_index(T, first)}
+
+{band('plan', 'The whole plan, on one page',
+      f'<p>{len(T["stages"])} stages, run in order, and every dependency points at a '
+      f'lower number. '
+      f'{T["zero"]} of the {T["n"]} Moves are invisible to a user; the whole programme '
+      f'costs {T["cutover"]} minutes of downtime between them{oneway_line}.</p>',
+      margin=stage_key(moves)
+      + mg_note('The shape of it',
+                f'The heavy days are in the middle, not at the start. Stage 4 '
+                f'carries the state, and it is the only stage that costs a user '
+                f'anything: {T["cutover"]} minutes, once.'),
+      full=plan_full)}
+
+{band('where', 'Start where it hurts',
+      f'<p>Nobody sits down at nine in the morning thinking in stages. Find the line '
+      f'that sounds like your week and go straight to the Move.</p>',
+      margin=mg_note('If none of these is you',
+                     f'That is an answer too. Move 03 gives you permission to do the '
+                     f'arithmetic and stop, and stopping after three Moves costs a '
+                     f'week against a programme abandoned in month five with two '
+                     f'estates billing.'),
+      full=f'<ul class="symp">{symps}</ul>')}
 
 {band('why', WHY.HEADING, why_section(T),
       margin=f'<p class="lbl">What is at stake</p>'
@@ -693,29 +830,6 @@ def build_index(moves, T):
                 'Four reasons to stay exactly where you are are at the foot of '
                 'this section. A page with nine benefits and no costs is an '
                 'advertisement.'))}
-
-{band('plan', 'The whole plan, on one page',
-      f'<p>{len(T["stages"])} stages, run in order, and every dependency points at a '
-      f'lower number. '
-      f'{T["zero"]} of the {T["n"]} Moves are invisible to a user; the whole programme '
-      f'costs {T["cutover"]} minutes of downtime between them{oneway_line}.</p>'
-      f'<ol class="stages">{"".join(blocks)}</ol>',
-      margin=stage_key(moves)
-      + mg_note('The shape of it',
-                f'The heavy days are in the middle, not at the start. Stage 4 '
-                f'carries the state, and it is the only stage that costs a user '
-                f'anything: {T["cutover"]} minutes, once.'),
-      full=twenty(moves))}
-
-{band('where', 'Start where it hurts',
-      f'<p>Nobody sits down at nine in the morning thinking in stages. Find the line '
-      f'that sounds like your week and go straight to the Move.</p>'
-      f'<ul class="symp">{symps}</ul>',
-      margin=mg_note('If none of these is you',
-                     f'That is an answer too. Move 03 gives you permission to do the '
-                     f'arithmetic and stop, and stopping after three Moves costs a '
-                     f'week against a programme abandoned in month five with two '
-                     f'estates billing.'))}
 
 {band('how-long',
       'How long it takes',
@@ -738,7 +852,7 @@ def build_index(moves, T):
                 'The gap is not labour. It is the circuit order, the hardware lead '
                 'time and the thirty-day windows a Move sits through before the '
                 'next may start, and nobody is working during any of it.'),
-      full=RM.svg(moves, DEFAULT_CREW, href=lambda m: 'm/' + page(m))
+      full=RM.svg(moves, DEFAULT_CREW, w=SITE_TRACK, href=lambda m: 'm/' + page(m))
       + f'<p class="note">One bar per Move, drawn from each Move&rsquo;s own effort '
         f'figure and the dependency graph rather than from a plan somebody typed. The '
         f'outlined bars are the critical path.</p>')}
@@ -999,14 +1113,12 @@ def build_cost(moves, T):
                 'Every first-hand account says the difference is nought &mdash; '
                 'the same people, before and after. The only estimate that is '
                 'not nought is an outside one at ten to twenty hours, and this '
-                'takes twenty. The book is declining the most favourable '
-                'reading of its own evidence, not reporting that a rack is '
-                'harder work than an invoice.')
-      + mg_note('Where the twenty hours came from',
-                f'An outside estimate puts the extra at ten to twenty hours a month; '
-                f'this takes the top of it. We make OneUptime and we made this move, '
-                f'and we measured our own larger fleet at fourteen &mdash; that is us '
-                f'showing our working, not an independent source.'),
+                'takes the top of it. We make OneUptime and we made this move, '
+                'and we measured our own larger fleet at fourteen &mdash; that '
+                'is us showing our working, not an independent source. The book '
+                'is declining the most favourable reading of its own evidence, '
+                'not reporting that a rack is harder work than an invoice.')
+      ,
       full=cmp_html
       + f'<p class="cost-key"><span><i class="k-i"></i>Infrastructure</span> '
         f'<span><i class="k-p"></i>Salaried time</span> '
@@ -1055,10 +1167,15 @@ def build_cost(moves, T):
       f'the whole cost of running your own site, both of which the comparison above '
       f'puts back in. The Now column of this table is the {mny(tn)} that stays on '
       f'somebody else&rsquo;s invoice, and it is the third row up there.</p>',
-      margin=mg_note('Why the rows sum higher',
-                     'These are line savings, taken before the salaried time and '
-                     'before the whole cost of running your own site. The '
-                     'comparison above puts both back.'),
+      margin=f'<p class="lbl">The Now column</p><dl class="bal-l">'
+             f'<div><dt>Still somebody else&rsquo;s invoice</dt>'
+             f'<dd>{mny(tn)}</dd></div>'
+             f'<div class="tot"><dt>Line savings, added up</dt>'
+             f'<dd>{mny(tw - tn)}</dd></div></dl>'
+             + mg_note('Where it goes next',
+                       f'That {mny(tn)} is the third row of the comparison above, '
+                       f'and it is the one line this book tells you to keep '
+                       f'paying for ever.'),
       full=perm)}
 
 {band('replaces', 'What replaces what',
@@ -1089,7 +1206,16 @@ def build_cost(moves, T):
       f'of three others disagree by a factor of two or three on the same specification, '
       f'which is wide enough to decide the question on its own. The number above is the '
       f'last one observed and it is not a quotation. Get a quote before you let this '
-      f'column decide anything &mdash; Move 07 step 6 is where to do it.</p>')}
+      f'column decide anything &mdash; Move 07 step 6 is where to do it.</p>',
+      margin=f'<p class="lbl">Under a desk</p><dl class="bal-l">'
+      f'<div><dt>Machines</dt><dd>{HOMELAB["nodes"]}</dd></div>'
+      f'<div><dt>Cores each</dt><dd>{HOMELAB["cores_per_node"]}</dd></div>'
+      f'<div><dt>Once</dt><dd>{mny(COSTS.homelab_capex())}</dd></div>'
+      f'<div class="tot"><dt>A month, in power</dt>'
+      f'<dd>{mny(COSTS.homelab_month())}</dd></div></dl>'
+      + mg_note('What it cannot teach you',
+                'The cage. One power feed, one switch, no cross-connect, and '
+                'nobody else in the room at two in the morning.'))}
 </main>
 {foot(0)}"""
     (SITE / 'cost.html').write_text(shell(
@@ -1123,13 +1249,21 @@ def build_checklist(moves, T):
             f'<span class="ck-f"><i>{esc(m["figures"][4])}</i><i>{esc(m["risk"])}</i>'
             f'<i>{downtime(m)}</i><i>{esc(back_out(m))}</i></span></label>'
             for m in rows)
+        # The four figures are the only quantitative content on this page and
+        # they were unlabelled: nothing said the third value was downtime or the
+        # fourth reversibility. One heading row a Stage, on the same four tracks
+        # the rows use, so the columns are named where they are read.
+        head = ('<div class="ck-hd" aria-hidden="true">'
+                '<span></span><span></span><span></span>'
+                '<span class="ck-f lbl"><i>Effort</i><i>Risk</i><i>Downtime</i>'
+                '<i>Back out</i></span></div>')
         blocks.append(
             f'<section class="stage" data-part="{info["key"]}">'
             f'<div class="stage-head"><span class="lbl">{esc(info["roman"])}</span>'
             f'<h2 class="d">{esc(info["label"])}</h2>'
             f'<p class="stage-do">{esc(info["doing"])}</p>'
             f'<p class="stage-done"><span class="lbl">Done when</span> '
-            f'{esc(info["done"])}</p></div>{cks}</section>')
+            f'{esc(info["done"])}</p></div>{head}{cks}</section>')
 
     # The summary is rendered correct for nothing ticked and updated in place
     # afterwards. Every number in it is one the build already computed, so the
@@ -1220,13 +1354,21 @@ def build_start(moves, T):
 
 {band('safety', 'How to get back',
       f'<p>{esc(rb_intro(T["oneway"]))}</p>'
-      f'<ol class="pts">{pts}</ol>'
-      f'<p class="note">{esc(RB_DISC)}</p>')}
+      f'<ol class="pts">{pts}</ol>',
+      margin=mg_note('What this page is not', esc(RB_DISC))
+      + f'<p class="mg-x-w"><a class="mg-x" href="checklist.html">'
+        f'Your checklist &rarr;</a></p>')}
 
 {band('rules', 'The rules',
       f'<p>{len(RULES)} of them: the spine of the argument, and what survived being '
       f'rewritten for a company with two engineers rather than twenty.</p>'
-      f'<ol class="rules">{rules}</ol>')}
+      f'<ol class="rules">{rules}</ol>',
+      margin=mg_note('They are not advice',
+                     'Every one of them is enforced somewhere in the build or '
+                     'stated as a precondition in a runbook. A rule nobody '
+                     'checks is a preference.')
+      + f'<p class="mg-x-w"><a class="mg-x" href="index.html#plan">'
+        f'The whole plan &rarr;</a></p>')}
 
 {band('kit', 'What to buy',
       f'<p>Every Move is written against one cluster, so a runbook can name a real '
@@ -1246,7 +1388,18 @@ def build_start(moves, T):
       f'electricity. What it cannot teach you is the cage: one power feed, one switch, '
       f'no cross-connect.</p>'
       f'<ul class="onramp">'
-      + ''.join(f'<li>{esc(k)}</li>' for k in HOMELAB_KIT) + '</ul>')}
+      + ''.join(f'<li>{esc(k)}</li>' for k in HOMELAB_KIT) + '</ul>',
+      margin=f'<p class="lbl">The reference build</p><dl class="bal-l">'
+      f'<div><dt>Nodes</dt><dd>{REFERENCE["nodes"]}</dd></div>'
+      f'<div><dt>On the shelf</dt><dd>{REFERENCE["spares"]}</dd></div>'
+      f'<div><dt>Cores a node</dt><dd>{REFERENCE["cores_per_node"]}</dd></div>'
+      f'<div><dt>GB a node</dt><dd>{REFERENCE["ram_gb_per_node"]}</dd></div>'
+      f'<div class="tot"><dt>Uplink</dt>'
+      f'<dd>{REFERENCE["uplink_gbps"]} GbE</dd></div></dl>'
+      + mg_note('Scale the numbers, not the redundancy',
+                'A spare on the shelf and a second of everything that carries '
+                'state are what the runbooks assume. Halve those and the '
+                'rollbacks stop working.'))}
 </main>
 {foot(0)}"""
     (SITE / 'start.html').write_text(shell(
@@ -1279,14 +1432,15 @@ def build_about(moves, T):
             f'edition</b><span class="dl-m">EPUB &middot; reflowable &middot; '
             f'{T["n"]} Moves</span></a>')
 
+    # Version, text and software are in the footer of this and every other
+    # page now, so the about page states what only it can: the shape of the
+    # book. Printing the same three facts twice on one screen is the thing
+    # this repository's fourth gate exists to catch.
     colophon = ''.join(f'<div><dt class="lbl">{esc(k)}</dt><dd>{v}</dd></div>'
                        for k, v in [
-                           ('Version', f'v{VERSION}'),
                            ('Moves', T['n']),
                            ('Stages', len(T['stages'])),
-                           ('Interior', f'{pp} pages' if pp else 'PDF'),
-                           ('Text', 'CC BY 4.0'),
-                           ('Software', 'MIT')])
+                           ('Interior', f'{pp} pages' if pp else 'PDF')])
 
     body = f"""{bar(0, first, 'about.html')}
 <main id="main" class="shell">
@@ -1294,15 +1448,22 @@ def build_about(moves, T):
       'A handbook, not an argument. The argument has been had.',
       esc(MISSION.KICKER))}
 
-<section class="band" id="why">
-<div class="prose">{''.join(
+<section class="band led" id="why">
+<div class="acct prose">{''.join(
     f'<p>{p}</p>' for p in MISSION.paras(f'<a href="{GH_URL}">{IMP.REPO}</a>', T['n']))}</div>
+<aside class="amt">{mg_note('The interest, declared',
+  'The author founded OneUptime, which Stage 5 recommends. That is stated on '
+  'the copyright page, in the colophon, in the Kindle edition and further down '
+  'this page.')}</aside>
 </section>
 
 {band('download', 'Take it with you',
       f'<p>The same {T["n"]} Moves, typeset. The print interior is the one to read on '
       f'paper beside a rack; the Kindle edition reflows.</p>'
-      f'<div class="dls">{"".join(dls)}</div>'
+      f'<div class="dls">{"".join(dls)}</div>',
+      margin=mg_note('Both editions are the same Moves',
+                     'One markdown source, three renderers. Nothing is written '
+                     'for the web and cut for print, or the other way round.')
       if dls else
       '<p>The print interior and the Kindle edition are built by <code>make '
       'artefacts</code> and are not in this copy of the site.</p>')}
@@ -1320,16 +1481,25 @@ def build_about(moves, T):
       f'issue on its own. <a href="{GH_URL}/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> '
       f'has the shape a Move has to satisfy.</p>'
       f'<p class="actions"><a class="btn" href="{GH_URL}">View the repository</a> '
-      f'<a class="btn ghost" href="{GH_URL}/blob/main/CONTRIBUTING.md">Add a Move</a></p>')}
+      f'<a class="btn ghost" href="{GH_URL}/blob/main/CONTRIBUTING.md">Add a Move</a></p>',
+      margin=mg_note('The two gates',
+                     'One checks the shape of every Move, including that nothing '
+                     'which moves persistent state ships without saying how the '
+                     'state comes back. The other checks the content. Both must '
+                     'report nothing before anything is published.')
+      + f'<p class="mg-x-w"><a class="mg-x" '
+        f'href="{GH_URL}/blob/main/CONTRIBUTING.md">How to add a Move &rarr;</a></p>')}
 
 {band('disclosure', 'Disclosure',
       f'<p class="callout">{esc(IMP.DISCLOSURE)}</p>')}
 
 {band('licence', 'Two licences',
       f'<p>{esc(IMP.LICENCE)}</p>'
-      f'<dl class="colo">{colophon}</dl>'
-      f'<p class="note">{esc(IMP.TYPE_NOTE)} Written by {esc(IMP.AUTHOR)} and published '
-      f'by {esc(IMP.PUBLISHER)}. {esc(IMP.DISCLAIMER)}</p>')}
+      f'<dl class="colo">{colophon}</dl>',
+      margin=mg_note('Set in two families',
+                     f'{esc(IMP.TYPE_NOTE)} Written by {esc(IMP.AUTHOR)} and '
+                     f'published by {esc(IMP.PUBLISHER)}. '
+                     f'{esc(IMP.DISCLAIMER)}'))}
 </main>
 {foot(0)}"""
     (SITE / 'about.html').write_text(shell(
@@ -1367,11 +1537,19 @@ def build_move(m, prev, nxt, by, moves, T):
     notes = ''.join(f'<div><dt>{inline(t)}</dt><dd>{inline(b)}</dd></div>'
                     for t, b in m['notes'])
 
-    labels = ['Was', 'Now', 'Saved', 'Cutover', 'Effort', 'Wait']
+    # THREE, not six. The Move contract makes the strip six cells and forces
+    # the cutover cell to equal the meta line exactly, so Cutover, Effort and
+    # Wait were byte-identical to three of the six facts at the top of this
+    # same page - the same figures printed twice on one screen, against the
+    # rule that a figure belongs on the page whose question it answers and
+    # nowhere else. What is left is the trade: what the line was, what it is,
+    # and the difference. The parse contract is untouched; this is a display
+    # choice, and the other three are still on the page, in the vitals.
+    labels = ['Was', 'Now', 'Saved']
     nums = ('<table class="nums"><thead><tr>'
             + ''.join(f'<th scope="col">{l}</th>' for l in labels)
             + '</tr></thead><tbody><tr>'
-            + ''.join(f'<td>{esc(v)}</td>' for v in m['figures'])
+            + ''.join(f'<td>{esc(v)}</td>' for v in m['figures'][:3])
             + '</tr></tbody></table>')
 
     # Six facts, always six, in a fixed order. A cell whose answer is an em dash
@@ -1393,51 +1571,67 @@ def build_move(m, prev, nxt, by, moves, T):
             f'<a href="{page(p)}" aria-label="Move {p["num"]} &middot; '
             f'{attr(p["title"])}">{p["num"]}</a>' for p in items) + '</p>')
 
-    pn = ''.join(x for x in [
-        (f'<a class="prev" rel="prev" href="{page(prev)}">{prev["num"]} &middot; '
-         f'{esc(prev["title"])}</a>') if prev else '',
-        (f'<a class="nxt" rel="next" href="{page(nxt)}">{nxt["num"]} &middot; '
-         f'{esc(nxt["title"])}</a>') if nxt else ''])
+    # A slot each, labelled, with the Move number in mono. It was two
+    # unlabelled captions at opposite ends of a thousand pixels, and on Move 01
+    # the only survivor was thrown to the right-hand edge with the left half of
+    # the row empty. This is the only way forward for somebody working the book
+    # in order.
+    def pnl(cls, rel, mv, label):
+        return (f'<a class="{cls}" rel="{rel}" href="{page(mv)}">'
+                f'<span class="lbl">{label}</span>'
+                f'<b>{mv["num"]}</b><span class="pt-t">{esc(mv["title"])}</span></a>')
 
-    body = f"""{bar(1, moves[0])}
+    pn = ((pnl('prev', 'prev', prev, 'Previous') if prev else '<span></span>')
+          + (pnl('nxt', 'next', nxt, 'Next') if nxt else ''))
+
+    # THE HEADER POINTS FORWARD. bar() renders the lowest-numbered Move as the
+    # `next` link, which is right on every other page and wrong here: on Move 01
+    # with nothing ticked - the state of every first-time reader - it pointed at
+    # the page it was sitting on. The book's own next Move is the correct
+    # no-script answer, and app.js substitutes a later one when there is one.
+    body = f"""{bar(1, nxt or m)}
 <main id="main" class="shell">
 <article class="move" data-part="{c['key']}">
   <header class="mh">
     <p class="lbl">{esc(c['roman'])} &middot; {esc(c['label'])} &middot; Move {m['num']} of {T['n']}</p>
     <h1 class="d page">{esc(m['title'])}</h1>
     <p class="hook">{inline(m['hook'])}</p>
-    <dl class="facts">{facts}</dl>
-    {deplinks(dep_needs(m['num'], by), 'Needs', 'needs')}
   </header>
 
-  <section class="sec"><h2 class="d sect">The runbook</h2>
-    <ol class="steps" data-n="{m['num']}">{steps}</ol></section>
+  <section class="sec led"><h2 class="d sect">The runbook</h2>
+    <div class="acct"><ol class="steps" data-n="{m['num']}">{steps}</ol></div>
+    <aside class="amt vitals" aria-label="This Move at a glance">
+      <dl class="facts">{facts}</dl>
+      {deplinks(dep_needs(m['num'], by), 'Needs', 'needs')}
+    </aside></section>
 
-  <section class="sec"><h2 class="d sect">Before you start</h2>
-    <div class="pre">{pre}</div></section>
+  <section class="sec led"><h2 class="d sect">Before you start</h2>
+    <div class="full"><div class="pre">{pre}</div></div></section>
 
-  <section class="sec"><h2 class="d sect">What you are leaving</h2>
-    <ul class="clouds">{clouds}</ul></section>
+  <section class="sec led"><h2 class="d sect">What you are leaving</h2>
+    <div class="full"><ul class="clouds">{clouds}</ul></div></section>
 
-  <section class="sec"><h2 class="d sect">Why this works</h2>
-    <p>{inline(m['why'])}</p></section>
+  <section class="sec led"><h2 class="d sect">Why this works</h2>
+    <div class="acct"><p>{inline(m['why'])}</p></div>
+    <aside class="amt">{deplinks(dep_unlocks(m['num'], by), 'Unlocks', 'unlocks')}</aside>
+  </section>
 
-  <section class="sec"><h2 class="d sect">Operator&rsquo;s notes</h2>
-    <dl class="notes">{notes}</dl></section>
+  <section class="sec led"><h2 class="d sect">Operator&rsquo;s notes</h2>
+    <div class="full"><dl class="notes">{notes}</dl></div></section>
 
-  <section class="sec warn"><h2 class="d sect">Rollback</h2>
-    <p>{inline(m['rollback'])}</p></section>
+  <section class="sec led warn"><h2 class="d sect">Rollback</h2>
+    <div class="acct"><p>{inline(m['rollback'])}</p></div>
+    <aside class="amt">{mg_note('Back out', esc(back_out(m)))}</aside></section>
 
-  <section class="sec"><h2 class="d sect">The numbers</h2>
-    {nums}
+  <section class="sec led"><h2 class="d sect">The numbers</h2>
+    <div class="full">{nums}
     <p class="turnoff"><span class="lbl">What you can turn off</span>
-      {inline(m['turnoff'])}</p></section>
+      {inline(m['turnoff'])}</p></div></section>
 
   <footer class="mf">
     <label class="ck big"><input type="checkbox" class="ck-box" data-n="{m['num']}">
       Mark Move {m['num']} as done</label>
     <nav class="pn" aria-label="Moves">{pn}</nav>
-    {deplinks(dep_unlocks(m['num'], by), 'Unlocks', 'unlocks')}
   </footer>
 </article>
 </main>

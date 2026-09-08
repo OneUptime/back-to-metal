@@ -277,7 +277,13 @@ def svg(moves, workers=2, w=1180, week=WEEK, href=None):
                 bw = max(it['f'] - it['s'], 0.35) * px
                 # The critical path is outlined rather than recoloured: it is a
                 # property of a Move, not a different kind of Move.
-                edge = ' stroke="var(--ink)" stroke-width="1.4"' if it['n'] in cp else ''
+                #
+                # --on-c, not --ink: the token that already means "what reads on
+                # top of a Stage fill", so the outline moves with the Stage
+                # palette instead of being right for one ground. Against the
+                # website's light Stage set an --ink outline measured 2.08:1 on
+                # four of the five, and it is an SVG stroke, so nothing checks it.
+                edge = ' stroke="var(--on-c)" stroke-width="1.4"' if it['n'] in cp else ''
                 label = ''
                 if bw > 17:
                     label = (f'<text x="{x0 + 3.5:.1f}" y="{ly + 9.4:.1f}" '

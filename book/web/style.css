@@ -11,25 +11,36 @@
    cards, nothing centred. A panel is a rule and some space. Every
    number is monospaced; prose is a grotesque.
 
-   Three rules changed in this edition, and each is written down here
-   because a rule broken silently is just an inconsistency:
+   THE GROUND IS PAPER. This edition is light, and it is light because
+   the artefact is a book: the same twenty Moves are typeset for print
+   and for Kindle, and a reader may well have one of those open beside
+   this. #FBF9F4 is white with a memory of paper - L* 98, b* +2.6 -
+   and the five Stage colours on it are the five Stage colours in the
+   printed interior, moved only as far as a screen demands. The site
+   used to be a near-black instrument panel. It read well and it read
+   like a different product from the book it is the website of.
 
-   1. There is depth. The page has a ground, an atmosphere above it and
-      a machined lip on anything that lifts off it - one inset hairline
-      of white at 5 per cent, never a drop shadow used as decoration.
-      A near-black page with no depth is not restraint, it is flatness,
-      and it made every one of these pages read as the same page.
+   Three rules govern the rest, and each is written down here because a
+   rule broken silently is just an inconsistency:
+
+   1. Depth is a hairline, not a shadow. There is exactly one shadow on
+      this site - under the sticky header, which is the one element
+      that genuinely floats over the page - and there is no glow at
+      all. Everything else that lifts is a rule and some space. On a
+      near-black ground depth had to be manufactured; on paper the
+      ground already has a floor, and a drop shadow on it is the thing
+      AGENTS.md means when it says no boxes.
    2. Colour does two jobs, not one. It still marks a Stage. It also
       marks MONEY - `--hot` on anything that is a figure you are paying
       or saving - because the argument of this book is arithmetic and
       the arithmetic deserves to be findable.
 
       Two rules keep the second job from colliding with the first, and
-      they are structural rather than chromatic because the problem is:
-      under the commonest colour deficiency the accent and `--hot` sit
-      at almost the same luminance, and no choice of hue fixes that
-      while blue is off the table and five of the reserved colours are
-      warm. So:
+      they are structural rather than chromatic because a light ground
+      is structurally poorer in range than a dark one: AA on near-white
+      caps a 15px signal at about L* 47, so eight signals have to live
+      inside twenty-two points of lightness where the dark sheet had
+      thirty-four. Hue and chroma carry what luminance cannot. So:
 
         THE ACCENT IS NEVER A QUANTITY. It is interaction and
         structure - a link, a focus ring, a rule, the fill of a
@@ -41,7 +52,7 @@
       tabular column; every accent carries a shape - an underline, a
       1px rule, a 2px edge. Colour is the second signal in both cases,
       never the only one. And the accent is never a surface larger
-      than 3px unless the reader turned it on: at 11:1 it shouts.
+      than 3px unless the reader turned it on.
    3. Things move. Every animation is enhancement over a page already
       rendered correct and complete: see MOTION below for the failsafe
       that guarantees it, and note that all of it is inside a
@@ -62,9 +73,11 @@
 *,*::before,*::after{box-sizing:border-box}
 
 :root{
-  /* One theme. This also gives form controls, scrollbars and the
-     canvas behind the page their dark defaults for free. */
-  color-scheme:dark;
+  /* One theme, and it is light. This also gives form controls, the
+     scrollbar, the focus-ring default and the canvas outside the
+     document box - the rubber band past the last page - their light
+     values for free, which is most of what a theme flip is. */
+  color-scheme:light;
 
   /* ---- families ------------------------------------------------ */
   --fam:'Archivo',Helvetica,Arial,sans-serif;
@@ -118,6 +131,9 @@
   --anchor:76px;                    /* a hash lands clear of the sticky bar */
   --num:44px;                       /* the ordinal gutter, everywhere */
   --tick:22px;                      /* a checkbox */
+  --mark:32px;                      /* the OneUptime mark, height and <img> */
+  --fcol:240px;                     /* one column of the footer directory */
+  --hook-min:16em;                  /* a Move row's hook, below which it goes */
   --seg:6px;                        /* one segment of the progress bar */
   --next-w:22em;                    /* the header's next title, truncated */
   --chart:700px;                    /* the cost chart, at its own scale */
@@ -125,62 +141,85 @@
   --eq-min:820px;                   /* what-replaces-what, likewise */
 
   /* ---- ink ----------------------------------------------------- */
-  /* The site is dark, and only dark. It used to follow the reader's
-     system setting and carry two palettes; one theme is one set of
-     numbers to keep at contrast, and the printed book is where the
-     light version of this design lives. The print block at the foot
-     of this file puts paper back for anybody who hits Ctrl-P.
+  /* One theme, and it is paper. It used to follow the reader's system
+     setting and carry two palettes; one theme is one set of numbers to
+     keep at contrast, and this is the set.
 
-     The ground went down from #14181A to #0C0F11 in this edition, for
-     one reason: with no depth in the page the old value had to serve
-     as both the paper and the shadow, so it was neither. A darker
-     ground gives the raised surfaces somewhere to be raised FROM, and
-     it buys every ink and every Stage colour about a point and a half
-     of contrast on the way past.
+     THE GROUND IS #FBF9F4, not #FFFFFF. Measured, it is L* 97.95 with
+     b* +2.6 - two and a half points of yellow, which is under a just
+     noticeable difference from the printed sheet and is the whole of
+     the difference between a page and a light box.
 
-     Every text value below is 4.5:1 or better against both --bg and
-     --fill, which is the pair that actually occurs: --fill is what a
-     hovered row is, and ink checked against the page but not against
-     the hover state is ink that fails exactly when it is pointed at. */
-  --ink:#E9EDEF; --ink2:#B8BFC5; --ink3:#99A2A9; --ink4:#818B92;
-  --bg:#0C0F11; --fill:#161C21; --rule:#39434A; --rule2:#1E252A;
-  /* NOT BLUE, and not only because it was asked for. The old #79C8F2 sat a
-     CIE distance of 12 from Stage 3's Build blue - about the point at which
-     two colours stop being distinguishable - so the site had six colours
-     doing five jobs and two of them were the same colour. This green is 50
-     from its nearest neighbour and 125 degrees of hue from where it was. */
-  --accent:#7ED957; --warn:#FF7B93; --on-c:#0C0F11;
+     EVERY TEXT VALUE BELOW IS 4.5:1 OR BETTER AGAINST THREE GROUNDS,
+     not one. --bg is the page. --fill is what a hovered row is, and
+     ink checked against the page but not against the hover state is
+     ink that fails exactly when it is pointed at. And #FFFFFF is
+     paper: webcheck.py re-runs the whole contrast probe under print
+     emulation against white, so a value that clears the screen and
+     not the sheet fails the gate on the second pass.
+
+     --fill IS A FLOOR, NOT A PREFERENCE. Stage 2's bronze measures
+     4.76:1 against it. Darken --fill to make a hovered row more
+     obvious and Buy is the first thing that fails; if the recess ever
+     reads too faint, buy it back with the hairline instead. */
+  --ink:#141210; --ink2:#3B372F; --ink3:#5E574A; --ink4:#6A6764;
+  --bg:#FBF9F4; --fill:#F2EFE6; --rule:#BFB8A6; --rule2:#DED8C8;
+  /* --ink4 IS TEXT, and the temptation is to read it as a border and
+     lighten it to the 3:1 a boundary needs. It sets `.tw b` - the 11px
+     ordinal under every one of the twenty bars on the front page - and
+     every struck-through done row on the checklist, in the runbook and
+     on the kit list. It needs 4.5:1. It is also separated from --ink3
+     by CHROMA rather than lightness (2.2 against 8.6), because the AA
+     ceiling on a light ground leaves the two of them about five L*
+     points apart and no more: a finished row reads as neutral grey
+     beside a live warm caption. */
+
+  /* The sticky header, which is the ground at 84 per cent over
+     whatever is scrolling under it. Written out rather than mixed:
+     .bar used to carry this as a literal and was therefore the one
+     surface in the file that did not follow :root at all. */
+  --bar:rgba(251,249,244,.84);
+
+  /* VIOLET, and the reason is not contrast. On a light ground the
+     number that decides whether a link is findable is its distance
+     from the ink it is embedded in, not its contrast with the page - a
+     very dark green at 11:1 is not a link, it is bolder ink. This sits
+     CIEDE2000 35.0 from --ink, which is more than twice what a darker
+     accent manages, and no Stage owns the hue. */
+  --accent:#5A2FB0; --warn:#B71F66; --on-c:#FFFFFF;
   /* Money. The one thing on this site that is neither prose nor a
-     Stage, and the thing every reader came for. Pale butter gold
-     rather than the amber it was: at #F0B45F it sat a CIE distance of
-     9.8 from Stage 2's Buy - close enough to be the same colour - in
-     tables that are nothing but money and Stage numerals. */
-  --hot:#FFD980;
+     Stage, and the thing every reader came for. A ledger green, which
+     is what a settled column has been written in for four hundred
+     years, and 35.2 from Stage 2's bronze - the money-and-Buy
+     collision this palette exists to keep fixed. */
+  --hot:#046B3E;
+  /* --on-c is what reads on top of a Stage fill: the 9px numerals
+     inside a roadmap bar, the tick in a box somebody ticked, the
+     critical-path outline. It inverts with the Stage set, so on a
+     light ground it is white - 5.47:1 at worst, on Buy. */
 
   /* ---- depth ----------------------------------------------------- */
-  /* One lip and one lift, used everywhere or not at all. The lip is
-     the machined top edge of anything that has risen off the ground -
-     a single hairline of white at 5.5 per cent, which is what a
-     bevelled aluminium edge does to a ceiling light. The lift is the
-     shadow under it, kept dark and kept tight: a shadow with any
-     spread reads as a web page, and a shadow with none reads as a
-     panel someone screwed to a rack. */
-  --lip:inset 0 1px 0 rgba(255,255,255,.055);
-  --lift:0 18px 40px -28px rgba(0,0,0,.95);
-  /* The lip's other half. A machined part under one overhead light has
-     a lit top edge AND a dark bottom edge, and having both is the
-     difference between a surface and a line drawn along the top of
-     one. `--bev-in` is the same face pressed IN: the light flips, and
-     that single inversion is the whole affordance of a control that
-     has been operated. */
-  --bev:inset 0 1px 0 rgba(255,255,255,.075),inset 0 -1px 0 rgba(0,0,0,.45);
-  --bev-in:inset 0 1px 0 rgba(0,0,0,.45),inset 0 -1px 0 rgba(255,255,255,.075);
-  /* The one blurred value in this file, and it is light being EMITTED
-     rather than an object being elevated. No offset, no spread: an
-     indicator glows around itself or it is a drop shadow wearing a
-     different name. The colour comes from the call site and is always
-     the lit thing's own. */
-  --glow:0 0 7px -1px;
+  /* THERE IS ONE SHADOW ON THIS SITE and it is under the sticky header,
+     which is the one element that genuinely floats over the page.
+     Everything that used to lift - a button on hover, a download card -
+     is a rule and some space, which is what AGENTS.md asks for and what
+     the print block has always done.
+
+     The four values below are what a raised face is made of when the
+     light is above it and the ground is pale: a lit top edge, a shaded
+     bottom edge, and the same face with the light flipped for a control
+     that has been operated. They are kept because .btn's surface is
+     --ink and a near-black face has a top and a bottom on any ground. */
+  --lip:inset 0 1px 0 #FFFFFF;
+  --lift:0 14px 30px -22px rgba(20,18,16,.30);
+  --bev:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(20,18,16,.14);
+  --bev-in:inset 0 1px 0 rgba(20,18,16,.14),inset 0 -1px 0 rgba(255,255,255,.9);
+  /* Nothing glows. Emitted light is a dark-ground idea: a coloured halo
+     around a small dark square on paper is ink bleed, not an indicator
+     that went on. The token stays so the call sites keep compiling, and
+     it stays at nought. A ticked box is a square filled in its Stage
+     colour with a white tick in it, which is already two signals. */
+  --glow:0 0 0;
 
   /* ---- motion ---------------------------------------------------- */
   /* Two curves. `--e-out` is for things ARRIVING - fast off the mark
@@ -214,34 +253,39 @@ body{margin:0;background:transparent;color:var(--ink);
 
 /* ================================================================
    THE SURFACE
-   Two fixed layers behind everything, both inert: no hit testing, no
+   One fixed layer behind everything, inert: no hit testing, no
    scrolling, nothing to read. The ground colour is on `html` rather
-   than on `body` so these can sit at z-index -1 and still be seen -
-   a body background would paint over them.
+   than on `body` so it can sit at z-index -1 and still be seen - a
+   body background would paint over it.
 
-   The first is atmosphere: one cool bloom above the masthead, and a
-   hairline grid that is the substrate the whole design is set on.
-   The grid is masked away below the first screenful, because a grid
-   that runs the length of a Move page is graph paper and a reader is
-   not plotting anything - it is there to say the page has a floor,
-   and once that is said it should stop talking.
+   It is a hairline grid, and that is all it is. The grid is the
+   substrate the design is set on, and it is masked away below the
+   first screenful because a grid that runs the length of a Move page
+   is graph paper and a reader is not plotting anything: it is there to
+   say the page has a floor, and once that is said it should stop
+   talking.
 
-   The second is grain. A near-black page at these gradient angles
-   bands on an 8-bit display, and the fix for banding is noise: three
-   octaves of it at three per cent, which is invisible as texture and
-   completely effective as dither.
+   The ink is at 2.8 per cent, which composites to about 1.06:1. It was
+   at 4.5 and that is the weight of --fill - i.e. a grid as strong as a
+   hovered row, which is a texture competing with a state.
+
+   TWO LAYERS WENT WHEN THE GROUND DID. There were two coloured blooms
+   above the masthead, keyed by hand to the accent and to a money
+   colour two editions old - decorative colour fills, which is the one
+   thing AGENTS.md says colour may never be, and stale the moment
+   either token moved. And there was a full-viewport sheet of noise,
+   whose entire stated reason was that a near-black page at those
+   gradient angles bands on an 8-bit display. Remove the near-black
+   page and the gradients and it is a paint on every scroll to apply
+   one and a half per cent of grain to paper.
    ================================================================ */
-body::before,body::after{content:'';position:fixed;inset:0;z-index:-1;
-  pointer-events:none}
-body::before{
+body::before{content:'';position:fixed;inset:0;z-index:-1;
+  pointer-events:none;
   background:
-    radial-gradient(1120px 560px at 50% -12%,rgba(126,217,87,.075),transparent 72%),
-    radial-gradient(760px 420px at 88% 4%,rgba(240,180,95,.045),transparent 70%),
-    linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px) 0 -1px/100% 84px,
-    linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px) -1px 0/84px 100%;
+    linear-gradient(rgba(20,18,16,.028) 1px,transparent 1px) 0 -1px/100% 84px,
+    linear-gradient(90deg,rgba(20,18,16,.028) 1px,transparent 1px) -1px 0/84px 100%;
   -webkit-mask-image:linear-gradient(#000,#000 24vh,transparent 86vh);
   mask-image:linear-gradient(#000,#000 24vh,transparent 86vh)}
-body::after{opacity:.032;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
 
 /* ================================================================
    MOTION
@@ -387,16 +431,23 @@ body::after{opacity:.032;background-image:url("data:image/svg+xml,%3Csvg xmlns='
    as legible as the ink beside it - and the colour is declared first
    and overridden inside @supports, so a browser that cannot clip a
    background to text gets a blue word rather than an invisible one. */
-.mast em{font-style:normal;color:#E7ECEF}
+.mast em{font-style:normal;color:#2B343B}
 @supports ((background-clip:text) or (-webkit-background-clip:text)){
   .mast em{color:transparent;
     /* ACHROMATIC. It was a five-stop blue, which made the largest object
        on the site - up to 132px of it - Cloud Blue, on a book about
        leaving the cloud. Brushed steel says the same thing about
        material without saying the wrong thing about the subject, and it
-       leaves the accent free to mean interaction. Darkest stop 6.5:1. */
-    background-image:linear-gradient(100deg,#9AA3A8 0%,#E7ECEF 24%,#FFFFFF 42%,
-      #B8C0C5 58%,#E7ECEF 78%,#8E979C 100%);
+       leaves the accent free to mean interaction.
+
+       RE-CUT DARK for the paper ground: the same steel, lit from the
+       other side. LIGHTEST stop 7.95:1, darkest 17.5, and the fallback
+       above it is 12.0 - which matters more here than anywhere else in
+       the file, because inside this @supports the computed colour is
+       `transparent` and webcheck.py skips exactly that, so an
+       invisible masthead would pass the gate. */
+    background-image:linear-gradient(100deg,#1E262C 0%,#454F57 24%,#0F151A 42%,
+      #3A444C 58%,#242D34 78%,#151C21 100%);
     background-size:280% 100%;background-position:100% 0;
     -webkit-background-clip:text;background-clip:text}
   @media (prefers-reduced-motion:no-preference){
@@ -459,8 +510,13 @@ img,svg{max-width:100%}
                         [m] minmax(13rem,var(--amt)) [end];
   align-items:start}
 .led>.acct{grid-column:a;min-width:0}
+/* The fold. 55 per cent rather than the 28 it was: the accent is a
+   dark colour now, and a dark colour mixed toward a pale ground gets
+   paler, where a bright one mixed toward a dark ground stayed bright.
+   At 28 this composited to a lilac hairline at 1.6:1. No gate measures
+   a border, so this is checked by hand or not at all. */
 .led>.amt{grid-column:m;min-width:0;padding-left:var(--s5);
-  border-left:1px solid color-mix(in srgb,var(--accent) 28%,transparent)}
+  border-left:1px solid color-mix(in srgb,var(--accent) 55%,transparent)}
 @supports not (background:color-mix(in srgb,red 50%,transparent)){
   .led>.amt{border-left-color:var(--rule)}
 }
@@ -474,10 +530,22 @@ img,svg{max-width:100%}
 .led.solo>.acct,.led.solo>.sect,.led.solo>.full{grid-column:1}
 .led.solo>.amt{display:none}
 
-/* Prose keeps a measure in BOTH states. Without this the collapsed
-   layout sets sixty-eight-character lines across 1048px, which is
-   worse than the defect being repaired. */
-.acct>p,.acct>ul,.acct>ol,.acct>dl{max-width:var(--measure)}
+/* ONLY PROSE KEEPS A MEASURE. Without this the collapsed layout sets
+   sixty-eight-character lines across 1048px, which is worse than the
+   defect being repaired.
+
+   Lists are NOT prose and used to be on this rule. A list here is a
+   table with the rules taken out - twenty Moves and their figures, ten
+   symptoms and their Move numbers, eight safety points, a colophon -
+   and pinning one to a reading measure is what put a 544px column
+   under a 1056px rule on four of the five pages, including at
+   901-1080px where the grid has already collapsed to one wide column.
+   Anything that is genuinely running text carries its own measure
+   already: .prose, .note, .sub, .pt p, .rules p, .stage-done. */
+.acct>p{max-width:var(--measure)}
+/* Two strips that were written to run the full width and were caught
+   by the old rule for being a <dl> and a <ul>. */
+.acct>.colo,.acct>.tools{max-width:none}
 
 /* The margin is figures, so it is tabular and it is flush right. */
 .amt{font-variant-numeric:tabular-nums lining-nums}
@@ -489,7 +557,7 @@ img,svg{max-width:100%}
 .mg-x{display:inline-block;color:var(--accent);
   font:400 var(--m-lab)/1.5 var(--mono);letter-spacing:var(--tr-lab);
   text-transform:uppercase;text-decoration:none;
-  border-bottom:1px solid color-mix(in srgb,var(--accent) 45%,transparent)}
+  border-bottom:1px solid color-mix(in srgb,var(--accent) 70%,transparent)}
 .mg-x:hover,.mg-x:focus-visible{border-bottom-color:var(--accent)}
 
 /* The Stage key. Five colours shown together are five colours; shown
@@ -504,8 +572,12 @@ img,svg{max-width:100%}
 
 /* A margin note. The six callouts that used to interrupt the account
    live here instead, which is what a margin is for. */
+/* The column's own fold rule is the fold. This used to draw a second
+   vertical rule 24px inside it, so two parallel lines ran the whole
+   margin; a note in the stack gets a hairline ABOVE it instead, which
+   is a rule and some space. */
 .mg-note{text-align:left;font-size:var(--t-fine);line-height:1.55;
-  color:var(--ink3);padding-left:var(--s4);border-left:2px solid var(--rule)}
+  color:var(--ink3);padding-top:var(--s3);border-top:1px solid var(--rule2)}
 .mg-note .lbl{display:block;margin-bottom:var(--s2);color:var(--ink2)}
 
 @media (max-width:1080px){
@@ -515,6 +587,14 @@ img,svg{max-width:100%}
     padding-top:var(--s4);margin-top:var(--s6)}
   .amt>*{text-align:left}
   .amt .bal-l dd,.amt .bal-n{text-align:right}
+  /* The footer collapses on the same number. A footer with a
+     breakpoint of its own is a second layout system. */
+  .foot-in{grid-template-columns:minmax(0,1fr)}
+  .foot-say,.foot-imp,.foot-dir,.foot-colo{grid-column:1}
+  .foot-imp{padding-left:0;border-left:0;padding-top:var(--s5);
+    border-top:1px solid var(--rule)}
+  /* The roadmap's own labels, which scale with the drawing. */
+  .rm-wk,.rm-axis,.rm-part,.rm-partn{font-size:13px}
 }
 
 /* ---------- the container ---------------------------------------- */
@@ -544,10 +624,12 @@ img,svg{max-width:100%}
    ================================================================ */
 .bar{position:sticky;top:0;z-index:40;border-bottom:1px solid var(--rule);
   isolation:isolate;
-  /* --bg at 84 per cent, written out: a blur needs something to blur
-     and color-mix on a custom property is not worth the round trip
-     for a value that is a constant in this file. */
-  background:rgba(12,15,17,.84);
+  /* The ground at 84 per cent - a blur needs something to blur. It is
+     a token now and not a literal: this was the one surface in the
+     file that did not follow :root, so it survived a theme change as a
+     near-black slab with light ink still inside it. It is also the one
+     the contrast gate would have read as opaque, and passed. */
+  background:var(--bar);
   -webkit-backdrop-filter:blur(16px) saturate(150%);
   backdrop-filter:blur(16px) saturate(150%);
   transition:border-color var(--t-move) linear}
@@ -563,7 +645,7 @@ html.scrolled .bar{border-bottom-color:var(--ink);box-shadow:var(--lift)}
    than as an arbitrary hue on a rule. Written by site.py out of
    parse.LAYERS, like every other Stage colour here. */
 .bar::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;
-  background:var(--spectrum);opacity:.9}
+  background:var(--spectrum)}
 .bar-in{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3) var(--s5);
   padding-block:var(--s4);transition:padding var(--t-move) var(--e-in-out)}
 html.scrolled .bar-in{padding-block:var(--s2)}
@@ -661,14 +743,14 @@ html.scrolled .wm{font-size:16px}
   padding:var(--s3) var(--s4) var(--s3) var(--s5);
   border-left:3px solid var(--ink);font-size:var(--t-body);
   line-height:var(--lh-body);color:var(--ink2);max-width:var(--measure);
-  background:linear-gradient(90deg,rgba(255,255,255,.035),transparent 38%)}
+  background:linear-gradient(90deg,var(--fill),transparent 38%)}
 .callout .lbl{display:block;margin-bottom:var(--s2);color:var(--ink)}
 .prose{max-width:var(--measure-lede)}
 .prose p{margin:0 0 var(--s5);font-size:var(--t-lede);line-height:var(--lh-lede);
   color:var(--ink2)}
 .prose b{color:var(--ink);font-weight:700}
 :where(.prose,.callout,.note,.band>p,.sec>p,.pt p,.rules p,.stage-done,.foot-note,
-  .dl-m) a{color:var(--accent);text-underline-offset:2px}
+  .foot-fine,.dl-m) a{color:var(--accent);text-underline-offset:2px}
 
 /* Two buttons, and both of them fill rather than swap. A button that
    changes colour on hover has two states; a button whose fill sweeps
@@ -683,7 +765,7 @@ html.scrolled .wm{font-size:16px}
   color:var(--bg);box-shadow:var(--bev);
   transition:color var(--t-quick) linear,box-shadow var(--t-move) var(--e-out),
              transform var(--t-move) var(--e-out)}
-.btn:hover{transform:translateY(-1px);box-shadow:var(--bev),var(--lift)}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--bev)}
 /* Pressed is the same face with the light the other way up. */
 .btn:active{transform:translateY(0);box-shadow:var(--bev-in);
   transition-duration:60ms}
@@ -750,19 +832,27 @@ html.scrolled .wm{font-size:16px}
 /* A Stage starts here: one space of air, so five groups of four read
    as five groups of four without a label saying so. */
 .tw.first{margin-left:var(--s4)}
+/* NO OPACITY. It was .55, which on a near-black ground dims a light
+   colour and on paper bleaches a dark one - twenty pale ghosts where
+   the front page's main navigation should be, and no gate catches it
+   because a bar is a fill and not text. The fade is in the gradient
+   instead, mixed toward the ground rather than toward transparency, so
+   the bar has the same weight on screen and on paper: the print block
+   already forced opacity:1 and the two used to disagree. */
 .tw i{align-self:end;display:block;
   /* A floor of 14 per cent, so the shortest Move is still a bar and
      still a target, and 86 per cent of the box for the difference. */
   height:calc(14% + var(--h,0) * 86%);
-  background:linear-gradient(var(--c),color-mix(in srgb,var(--c) 55%,transparent));
-  border-top:2px solid var(--c);opacity:.55;transform-origin:50% 100%;
-  transition:opacity var(--t-move) var(--e-out),
-             filter var(--t-move) var(--e-out)}
+  background:linear-gradient(var(--c),color-mix(in srgb,var(--c) 62%,var(--bg)));
+  border-top:2px solid var(--c);transform-origin:50% 100%;
+  transition:background var(--t-move) var(--e-out)}
 .tw b{padding-top:var(--s2);border-top:1px solid var(--rule);text-align:center;
   font:400 var(--m-lab)/1.4 var(--mono);color:var(--ink4);
   font-variant-numeric:tabular-nums;
   transition:color var(--t-quick) linear,border-color var(--t-quick) linear}
-.tw:hover i,.tw:focus-visible i{opacity:1;filter:drop-shadow(0 0 12px var(--c))}
+/* The fade filling in IS the hover, and it is a real state change.
+   The glow it replaces was emitted light and did nothing over paper. */
+.tw:hover i,.tw:focus-visible i{background:var(--c)}
 .tw:hover b,.tw:focus-visible b{color:var(--c);border-top-color:var(--c)}
 .twenty-k{margin:var(--s3) 0 0;font:400 var(--m-lab)/1.6 var(--mono);
   letter-spacing:var(--tr-lab);text-transform:uppercase;color:var(--ink3)}
@@ -779,7 +869,7 @@ html.scrolled .wm{font-size:16px}
    is a rule that points somewhere, which is what a Stage heading is
    doing; a flat bar is a divider, which is not the same job. */
 .stage{margin-top:var(--s7);padding-top:var(--s4);border-top:3px solid var(--c);
-  border-image:linear-gradient(90deg,var(--c),color-mix(in srgb,var(--c) 12%,transparent)) 1}
+  border-image:linear-gradient(90deg,var(--c),color-mix(in srgb,var(--c) 40%,transparent)) 1}
 @supports not (background:color-mix(in srgb,red 50%,transparent)){
   .stage{border-image:none}
 }
@@ -818,7 +908,8 @@ html.scrolled .wm{font-size:16px}
 .stages,.mv{list-style:none;margin:0;padding:0}
 .mv>li{border-top:1px solid var(--rule2);position:relative}
 .mv a{display:grid;
-  grid-template-columns:var(--num) minmax(9em,15em) minmax(0,1fr) max-content;
+  grid-template-columns:var(--num) minmax(9em,15em)
+                        minmax(var(--hook-min),1fr) max-content;
   gap:0 var(--s5);align-items:baseline;padding:var(--s4) 0;text-decoration:none;
   transition:background var(--t-move) var(--e-out)}
 /* Hovering a row lights a 2px marker in the Stage colour down its
@@ -833,8 +924,7 @@ html.scrolled .wm{font-size:16px}
   background:linear-gradient(90deg,var(--fill),transparent 72%)}
 .mv a:hover .mv-t{text-decoration:underline;text-underline-offset:3px}
 .mv-n{font:400 var(--m-val)/1.3 var(--mono);color:var(--c);
-  font-variant-numeric:tabular-nums;transition:text-shadow var(--t-move) linear}
-.mv a:hover .mv-n{text-shadow:0 0 16px var(--c)}
+  font-variant-numeric:tabular-nums}
 .mv-t{transition:transform var(--t-move) var(--e-out)}
 .mv a:hover .mv-t{transform:translateX(3px)}
 .mv-t{font-size:var(--t-body);line-height:1.3;font-variation-settings:'wdth' 92;
@@ -844,13 +934,21 @@ html.scrolled .wm{font-size:16px}
    two, and the Move page carries every hook in full. */
 .mv-h{font-size:var(--t-sub);line-height:var(--lh-sub);color:var(--ink3);
   display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
-.mv-f,.ck-f{display:flex;flex-wrap:wrap;gap:0 var(--s4);
-  font:400 var(--m-lab)/1.6 var(--mono);color:var(--ink3);
+.mv-f,.ck-f{font:400 var(--m-lab)/1.6 var(--mono);color:var(--ink3);
   font-variant-numeric:tabular-nums}
+.mv-f{display:flex;flex-wrap:wrap;gap:0 var(--s4)}
+/* FOUR FIGURES, FOUR COLUMNS. As a flex row inside a per-row grid each
+   strip sized itself, so down twenty rows the effort figure started at
+   fourteen different positions, the risk at eight and the downtime at
+   five - the only quantitative content on the checklist, and none of
+   it comparable down the list, which is the one thing a checklist is
+   read down for. */
+.ck-f{display:grid;grid-template-columns:4.5em 4.5em 7em minmax(0,1fr);
+  gap:0 var(--s3);text-align:right}
 .mv-f i,.ck-f i{font-style:normal;white-space:nowrap}
 
 .symp{list-style:none;margin:0;padding:0}
-.symp li{display:grid;grid-template-columns:minmax(0,1fr) max-content;
+.symp li{display:grid;grid-template-columns:minmax(0,var(--measure)) max-content;
   gap:0 var(--s5);align-items:baseline;padding:var(--s3) var(--s3) var(--s3) 0;
   border-top:1px solid var(--rule2);
   transition:background var(--t-quick) linear}
@@ -880,7 +978,18 @@ html.scrolled .wm{font-size:16px}
 /* ================================================================
    WHAT IT COSTS
    ================================================================ */
+/* MONEY IS FLUSH RIGHT, because tabular numerals only line up when the
+   figures share an edge. Left-flush, the units digit of $9,935,
+   $18,305, $9,180 and $37,420 sat at four different positions in one
+   column, under a paragraph whose claim is "read down a column and it
+   adds up". `.perm-v` on the same page was already right-aligned, so
+   the cost page shipped two opposite conventions for money. */
 .cmp td{font-family:var(--mono);color:var(--ink);font-variant-numeric:tabular-nums}
+.cmp td,.cmp thead th:not(:first-child),
+.fy td,.fy thead th:not(:first-child){text-align:right}
+/* The last column's right edge is the section rule's right edge. */
+.cmp td:last-child,.cmp thead th:last-child,
+.perm td:last-child,.perm th:last-child{padding-right:0}
 .cmp tbody th,.perm tfoot th{font:600 var(--t-sub)/1.45 var(--fam);letter-spacing:0;
   text-transform:none;color:var(--ink);border-bottom:1px solid var(--rule2)}
 .cmp .tot th,.cmp .tot td{border-top:2px solid var(--ink)}
@@ -895,29 +1004,43 @@ html.scrolled .wm{font-size:16px}
 .cmp .people th,.cmp .people td{border-bottom:1px solid var(--rule2)}
 .cmp .kept th,.cmp .kept td{border-bottom:1px solid var(--rule)}
 
-/* The chart used to take its two tones from the ink scale, on the rule
-   that colour meant a Stage and nothing else. That rule now has a
-   second job - colour also means money - and this is the chart the
-   whole book argues from, so it gets it: the metal is `--accent` and
-   the salaried time is `--hot`, which is the distinction the page is
-   trying to make and which two greys were making very quietly.
+/* EVERY SEGMENT OF THIS CHART IS MONEY, so every segment is the money
+   colour or the ink scale, and none of them is the accent.
 
-   Both are above 10:1 against the page and 3.9:1 against each other,
-   and the shared edge of a stacked bar is still drawn as a rule in the
+   It used to paint the metal in `--accent`, on the reasoning that the
+   chart the whole book argues from had earned a colour. It had; it had
+   earned the MONEY colour. The accent is interaction and structure and
+   is never a quantity, and it is never a surface larger than 3px
+   unless the reader turned it on - both of which a five-hundred-pixel
+   bar is. That contradiction was quiet while the accent was a green
+   beside a gold; with a violet accent on paper it is the loudest thing
+   on the page.
+
+   So the bar is one quantity in three parts and reads as one: your
+   metal at full strength, your people at 45 per cent of it, and what
+   stays on somebody else's invoice in the ink scale, because that last
+   one is not your money and the page's whole argument is which of the
+   three you control. The shared edge is still drawn as a rule in the
    ground colour rather than left to the eye. */
 .cost{display:block;max-width:var(--chart);margin-top:var(--s5);overflow:visible}
 .cost text{font-family:var(--mono)}
 .cost-l{font-size:11px;fill:var(--ink3);letter-spacing:.06em;
   text-transform:uppercase}
 .cost-v{font-size:14px;fill:var(--ink);font-variant-numeric:tabular-nums}
+/* THE SEAM IS THE GROUND, so the chart has to sit directly on the page.
+   An SVG stroke straddles its path, so a panel or a tint behind .cost
+   would put a halo of the old ground down the middle of every bar. */
 .cost-i,.cost-p{stroke:var(--bg);stroke-width:1.5}
 /* The pair, as one object. `vector-effect` keeps the 1.5px rule
    between the segments at 1.5px while the group is part-way through
    its scale, instead of squeezing it to nothing and back. */
 .cost-bar{transform-box:fill-box;transform-origin:0 50%}
 .cost-bar rect{vector-effect:non-scaling-stroke}
-.cost-i{fill:var(--accent)}
-.cost-p{fill:var(--hot)}
+.cost-i{fill:var(--hot)}
+.cost-p{fill:color-mix(in srgb,var(--hot) 45%,var(--bg))}
+@supports not (background:color-mix(in srgb,red 50%,transparent)){
+  .cost-p{fill:#8CB9A2}
+}
 /* The third segment: what stays on somebody else's invoice however this
    goes. It is neither metal nor salary, so it is neither of their
    colours - it is the ink scale, which is what this site uses for a
@@ -944,9 +1067,12 @@ html.scrolled .wm{font-size:16px}
 .cost-key span{display:inline-flex;align-items:center;gap:var(--s2);
   white-space:nowrap}
 .k-i,.k-p,.k-k{flex:none;display:inline-block;width:var(--s4);height:var(--s2)}
-.k-i{background:var(--accent)}
-.k-p{background:var(--hot)}
+.k-i{background:var(--hot)}
+.k-p{background:color-mix(in srgb,var(--hot) 45%,var(--bg))}
 .k-k{background:var(--ink3)}
+@supports not (background:color-mix(in srgb,red 50%,transparent)){
+  .k-p{background:#8CB9A2}
+}
 
 .perm-n{width:var(--num)}
 .perm-n a{font-family:var(--mono);color:var(--c);text-decoration:none;
@@ -1000,10 +1126,17 @@ html.scrolled .wm{font-size:16px}
 .ck-t,.ck-n{transition:color var(--t-move) linear,
   text-decoration-color var(--t-move) linear}
 
+/* The facts land on the ledger's own fold - the same 416px column the
+   margin uses on every other page - rather than on a `max-content`
+   track that each row sizes for itself. */
 .ck{position:relative;display:grid;
-  grid-template-columns:var(--tick) var(--num) minmax(0,1fr) max-content;
+  grid-template-columns:var(--tick) var(--num) minmax(0,1fr) var(--amt);
   gap:0 var(--s3);align-items:center;padding:var(--s3) 0;min-height:44px;
   cursor:pointer;border-top:1px solid var(--rule2)}
+/* And the columns are named once a Stage, because "3 days · High ·
+   no downtime · Immediately" says nothing about which is which. */
+.ck-hd{display:grid;gap:0 var(--s3);padding-bottom:var(--s2);
+  grid-template-columns:var(--tick) var(--num) minmax(0,1fr) var(--amt)}
 .ck:hover,.ck:focus-within{background:linear-gradient(90deg,var(--fill),transparent 72%)}
 /* The same marker the front page's Move rows use, so a row is a row
    wherever the reader meets it. */
@@ -1117,7 +1250,7 @@ html.scrolled .wm{font-size:16px}
    disproof attached is the difference between an engineering page and
    an advertisement. */
 .chk{margin:var(--s3) 0 0;padding-left:var(--s4);
-  border-left:2px solid color-mix(in srgb,var(--accent) 40%,transparent);
+  border-left:2px solid color-mix(in srgb,var(--accent) 60%,transparent);
   font-size:var(--t-fine);line-height:1.55;color:var(--ink3)}
 @supports not (background:color-mix(in srgb,red 50%,transparent)){
   .chk{border-left-color:var(--rule)}
@@ -1126,26 +1259,41 @@ html.scrolled .wm{font-size:16px}
 
 .stay li{padding:var(--s3) 0 var(--s3) var(--s5);border-bottom:0;
   border-left:3px solid var(--warn);margin-top:var(--s2);
-  background:linear-gradient(90deg,rgba(255,255,255,.03),transparent 40%)}
+  background:linear-gradient(90deg,var(--fill),transparent 40%)}
 
 /* ================================================================
    ABOUT
    ================================================================ */
 .dls{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));
   gap:0 var(--s6);margin-top:var(--s5)}
-.dl{display:block;padding:var(--s4);text-decoration:none;
-  border-top:2px solid var(--ink);background:var(--fill);box-shadow:var(--bev);
-  transition:transform var(--t-move) var(--e-out),
-             box-shadow var(--t-move) var(--e-out),
-             border-color var(--t-quick) linear}
-.dl:hover{transform:translateY(-2px);border-top-color:var(--accent);
-  box-shadow:var(--bev),var(--lift)}
+/* A rule and some space. It was a tinted panel with a bevel and a
+   drop shadow, which is three of the things AGENTS.md rules out, and
+   the print block has always had the right answer: the 2px --ink rule
+   along its top IS the panel, and the colour change is the hover. */
+.dl{display:block;padding:var(--s4) var(--s4) var(--s4) 0;text-decoration:none;
+  border-top:2px solid var(--ink);
+  transition:border-color var(--t-quick) linear}
+.dl:hover{border-top-color:var(--accent)}
 .dl:hover .dl-t{color:var(--accent)}
 .dl-t{transition:color var(--t-quick) linear}
 .dl-t{display:block;font-size:var(--t-body);font-variation-settings:'wdth' 92;
   font-weight:600}
 .dl-m{display:block;margin-top:var(--s1);font:400 var(--m-lab)/1.5 var(--mono);
   letter-spacing:var(--tr-lab);text-transform:uppercase;color:var(--ink3)}
+
+/* THE VITALS STAY BESIDE THE STEPS. A reader half way through a
+   cutover window should not have to scroll a thousand pixels back up
+   to re-read how long the window is or whether they can still back
+   out. The facts strip used to sit in the page header and leave the
+   screen at step three. */
+.amt.vitals{position:sticky;top:calc(var(--anchor) + var(--s4))}
+.amt>.facts{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:0}
+.amt .facts dd{justify-content:flex-end}
+/* The divider goes BETWEEN the two columns and nowhere else. `div+div`
+   is every cell but the first, which in a two-column grid draws a rule
+   down the left edge of the panel on every second row. */
+.amt>.facts>div:nth-child(odd)::before{display:none}
+@media (max-width:1080px){.amt.vitals{position:static}}
 
 /* The colophon and a Move's six facts are the same small grid. */
 .colo,.facts{display:grid;
@@ -1199,9 +1347,8 @@ html.scrolled .wm{font-size:16px}
   padding-bottom:var(--s6)}
 .sn{font:400 var(--m-val)/1.6 var(--mono);color:var(--c);
   font-variant-numeric:tabular-nums}
-html.js .sn{cursor:pointer;transition:color var(--t-quick) linear,
-  text-shadow var(--t-quick) linear}
-html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
+html.js .sn{cursor:pointer;transition:color var(--t-quick) linear}
+html.js .sn:hover{color:var(--ink)}
 .steps>li>div{transition:border-color var(--t-move) var(--e-out),
   color var(--t-move) linear}
 .steps>li>div{margin-left:-1px;padding-left:var(--s5);
@@ -1222,7 +1369,8 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
   font-size:var(--t-sub);line-height:var(--lh-sub);color:var(--ink2)}
 
 .clouds{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
-.clouds li{display:grid;grid-template-columns:7em 13em minmax(0,1fr);gap:0 var(--s5);
+.clouds li{display:grid;grid-template-columns:7em minmax(13em,24em) minmax(0,1fr);
+  gap:0 var(--s5);
   align-items:baseline;padding:var(--s3) 0;border-bottom:1px solid var(--rule2);
   transition:background var(--t-quick) linear}
 .clouds li:hover{background:linear-gradient(90deg,var(--fill),transparent 80%)}
@@ -1232,16 +1380,30 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
   font-weight:600;color:var(--ink)}
 .dif{font-size:var(--t-sub);line-height:var(--lh-sub);color:var(--ink2)}
 
-.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));
-  gap:0 var(--s6);margin:0;border-top:1px solid var(--rule)}
+/* TWO COLUMNS, NOT auto-fit. The Move contract makes four labels
+   mandatory, and 18 of the 20 Moves carry exactly four - so an
+   auto-fit that resolved to three columns left "Leftovers" alone on a
+   second row with its hairline running a third of the width and
+   stopping, in a design whose thesis is that a rule measures what is
+   under it. Four items are a 2x2 and both rules run the full width. */
+.notes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:0 var(--s7);margin:0;border-top:1px solid var(--rule)}
 .notes>div{padding:var(--s4) var(--s5) var(--s4) 0;
   border-bottom:1px solid var(--rule2)}
 .notes dt{margin-bottom:var(--s1);font:400 var(--m-lab)/1.3 var(--mono);
   letter-spacing:var(--tr-lab);text-transform:uppercase;color:var(--c)}
 .notes dd{margin:0;font-size:var(--t-sub);line-height:var(--lh-sub);color:var(--ink2)}
 
-.nums td{font-family:var(--mono);color:var(--ink);white-space:nowrap;
-  font-variant-numeric:tabular-nums}
+/* Three figures, set like the figure strips everywhere else, because
+   after the repeats came out this is the trade and nothing else: what
+   the line was, what it is, and the difference. The first two are
+   currency in a labelled tabular column with a $ in them, which is
+   what earns them the money colour. */
+.nums{table-layout:fixed;border-top:1px solid var(--rule);
+  border-bottom:2px solid var(--ink)}
+.nums td{font-family:var(--mono);font-size:var(--m-fig);color:var(--ink);
+  white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.nums td:nth-child(-n+2){color:var(--hot)}
 .turnoff{margin:var(--s5) 0 0;font-size:var(--t-sub);line-height:var(--lh-sub);
   color:var(--ink3);max-width:var(--measure)}
 .turnoff .lbl{display:block;margin-bottom:var(--s1);color:var(--c)}
@@ -1249,19 +1411,39 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
 .mf{margin-top:var(--s8);padding-top:var(--s4);border-top:2px solid var(--ink)}
 .ck.big{display:flex;align-items:center;gap:var(--s3);padding:var(--s4) 0;
   border-top:0;font-size:var(--t-body)}
-.pn{display:flex;gap:var(--s5);margin-top:var(--s4);padding-top:var(--s4);
-  border-top:1px solid var(--rule2)}
-.pn a{display:flex;align-items:center;min-height:44px;max-width:46%;
-  font-size:var(--t-sub);line-height:1.4;color:var(--ink2);text-decoration:none}
-.pn a:hover{color:var(--ink)}
-/* Move 01 has no previous and Move 20 no next, so the next link takes
-   the right-hand edge by margin rather than by a second grid column. */
-.nxt{margin-left:auto;text-align:right}
+/* TWO SLOTS, and a missing end leaves its slot rather than throwing
+   the survivor across the page. This is the only way forward for
+   somebody working the book in order, and it was two unlabelled 15px
+   captions at opposite ends of 1056px with eight hundred pixels of
+   nothing between them. */
+.pn{display:grid;grid-template-columns:1fr 1fr;gap:var(--s5);
+  margin-top:var(--s4);padding-top:var(--s4);border-top:2px solid var(--c)}
+.pn a{display:block;min-height:44px;
+  font-size:var(--t-body);line-height:1.35;color:var(--ink);text-decoration:none}
+.pn a .lbl{display:block;margin-bottom:var(--s1)}
+.pn a b{font:400 var(--m-val)/1.3 var(--mono);color:var(--c);margin-right:var(--s2);
+  font-variant-numeric:tabular-nums}
+.pn a:hover .pt-t{text-decoration:underline;text-underline-offset:3px}
+.nxt{text-align:right}
 
 /* ================================================================
    THE FOOTER
-   Below the header the second tier has to live somewhere, so the
-   footer carries every destination in full.
+   ==================================================================
+   The colophon: a directory, a sign-off and a licence strip, on the
+   full page and on the ledger's own tracks, so the last row of the
+   document is built like every row above it.
+
+   It was a flat run of nine identical links and then three grey
+   paragraphs stacked in the account measure, with seven hundred pixels
+   of empty column down the right of it. Nothing grouped the links, so
+   a page, a download and an external repository were the same fifteen
+   pixels of the same grey, and the only thing saying otherwise was a
+   `download` attribute nobody can see.
+
+   It invents no new object. The ruled link column is `.shelf`; the
+   labelled strip along the foot is `.colo`. A footer that invents its
+   own layout is the part of a document that most looks like it was
+   added last.
    ================================================================ */
 /* The header wears the five Stages along its bottom edge; the footer
    wears them along its top. Between the two of them the page is a
@@ -1270,25 +1452,62 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
 .foot{margin-top:var(--s9);border-top:4px solid transparent;
   border-image:var(--spectrum) 1}
 @supports not (border-image:linear-gradient(90deg,red,blue) 1){
-  .foot{border-top:4px solid var(--ink)}
+  /* --rule, not --ink: a 4px near-black slab across a paper page is a
+     heavier object than the band it stands in for. */
+  .foot{border-top:4px solid var(--rule)}
 }
-.foot-in{padding-top:var(--s5);padding-bottom:var(--s8)}
-.foot-nav{display:flex;flex-wrap:wrap;gap:0 var(--s5);padding-bottom:var(--s3);
-  margin-bottom:var(--s5);border-bottom:1px solid var(--rule2)}
-.foot-nav a{display:inline-flex;align-items:center;min-height:44px;
-  font-size:var(--t-sub);color:var(--ink3);text-decoration:none;
+.foot-in{display:grid;align-items:start;row-gap:var(--s7);
+  grid-template-columns:[a] minmax(0,var(--measure))
+                        [g] var(--s9)
+                        [m] minmax(0,var(--amt)) [end];
+  padding-top:var(--s6);padding-bottom:var(--s8)}
+.foot-dir,.foot-colo{grid-column:a/end}
+.foot-say{grid-column:a}
+.foot-imp{grid-column:m;padding-left:var(--s5);border-left:1px solid var(--rule)}
+
+/* ---- the directory ---------------------------------------------- */
+.foot-dir{display:grid;gap:0 var(--s6);
+  grid-template-columns:repeat(auto-fit,minmax(min(var(--fcol),100%),1fr))}
+.fcol>.lbl{display:block;padding-bottom:var(--s2);
+  border-bottom:1px solid var(--rule)}
+.fcol ul{list-style:none;margin:0;padding:0}
+.fcol li{border-bottom:1px solid var(--rule2)}
+.fcol a{display:flex;align-items:center;gap:var(--s3);min-height:44px;
+  font-size:var(--t-sub);color:var(--ink2);text-decoration:none;
   transition:color var(--t-quick) linear}
-.foot-nav a:hover{color:var(--ink)}
-/* The byline, with the mark. We made this book and we made this move, and
-   the footer is where a publisher signs its name. */
-.by{display:inline-flex;align-items:center;gap:var(--s4);margin:0 0 var(--s4);
-  text-decoration:none;color:var(--ink3);font-size:var(--t-sub)}
-.by img{display:block;height:32px;width:auto}
-.by span{border-bottom:1px solid transparent;transition:border-color var(--t-quick) linear}
-.by:hover span{border-bottom-color:var(--ink3)}
-.foot-note{margin:0 0 var(--s3);font-size:var(--t-sub);line-height:var(--lh-sub);
+.fcol a:hover,.fcol a:focus-visible{color:var(--ink)}
+.ftxt{min-width:0}
+/* A format is an identifier, so it is mono, and it lands on the end of
+   the rule rather than inside the sentence. "PDF" read as a seventh
+   page for two editions. */
+.ftag{flex:none;margin-left:auto;white-space:nowrap;
+  font:400 var(--m-lab)/1 var(--mono);letter-spacing:var(--tr-lab);
+  color:var(--ink3)}
+.fcol a:hover .ftag{color:var(--ink2)}
+
+/* ---- the sign-off ----------------------------------------------- */
+.foot-note{margin:0;font-size:var(--t-sub);line-height:var(--lh-sub);
   color:var(--ink3);max-width:var(--measure)}
-.ver{font-family:var(--mono)}
+/* The one link in the footer that is an instruction rather than a
+   destination, so it gets a line of its own. */
+.foot-go{margin:var(--s4) 0 0;font-size:var(--t-sub)}
+.foot-go a{color:var(--accent);text-decoration:none;
+  border-bottom:1px solid color-mix(in srgb,var(--accent) 70%,transparent)}
+.foot-go a:hover,.foot-go a:focus-visible{border-bottom-color:var(--accent)}
+@supports not (background:color-mix(in srgb,red 50%,transparent)){
+  .foot-go a{border-bottom-color:var(--rule)}
+}
+/* The byline, with the mark. We made this book and we made this move,
+   and the footer is where a publisher signs its name. */
+.by{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s4);
+  margin:0 0 var(--s4);text-decoration:none;color:var(--ink2);
+  font-size:var(--t-sub)}
+.by img{display:block;height:var(--mark);width:auto}
+.by span{border-bottom:1px solid transparent;
+  transition:border-color var(--t-quick) linear}
+.by:hover span{border-bottom-color:var(--ink3)}
+.foot-fine{margin:0;font-size:var(--t-fine);line-height:1.55;color:var(--ink3)}
+.foot-colo{margin-top:0}
 
 /* ================================================================
    RESPONSIVE - two breakpoints, not seven
@@ -1316,14 +1535,18 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
   .clouds li{grid-template-columns:minmax(0,1fr);gap:2px}
   .clouds b{margin-top:var(--s2)}
   .perm{display:block;overflow-x:auto}
-  .rm-wk,.rm-axis,.rm-part,.rm-partn{font-size:13px}
+  .ck-f{grid-template-columns:minmax(0,1fr)}
+  .notes{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:640px){
   .next-t{display:none}
   .cta .btn,.actions .btn{flex:1 1 auto}
   .ck{grid-template-columns:var(--tick) var(--num) minmax(0,1fr);
     gap:var(--s1) var(--s3)}
-  .ck-f{grid-column:2/-1}
+  .ck-f{grid-column:2/-1;display:flex;flex-wrap:wrap;gap:0 var(--s4);
+    text-align:left}
+  .ck-hd{display:none}
+  .pn{grid-template-columns:minmax(0,1fr)}
   /* The runbook gutter rotates: 44px back into the measure, taking it
      from about thirty characters to about forty-four. */
   .steps>li{grid-template-columns:minmax(0,1fr)}
@@ -1347,6 +1570,7 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
      anything else on it. */
   .cost-s{font-size:19px}
   .cmp,.eq{min-width:0}
+  .cmp td,.eq td{text-align:left}
   .cmp,.cmp tbody,.cmp tr,.cmp th,.cmp td,
   .eq,.eq tbody,.eq tr,.eq td{display:block;width:auto}
   .cmp thead,.eq thead{display:none}
@@ -1378,11 +1602,19 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
 
 /* ================================================================
    PRINT
-   The tokens are redeclared rather than the body patched. The screen
-   is dark and paper is not: without this a reader hitting Ctrl-P got
-   #B2B8BC prose on white, or a printer asked to flood every page.
-   The Stage colours are put back to their paper hexes by site.py,
-   which writes a matching print block out of parse.LAYERS.
+   The screen is paper now, so this block is no longer a second
+   palette. What is left is what is genuinely about a SHEET and not
+   about a light ground: four surface tokens, the depth switched off,
+   the chrome that has nothing to do on paper, and the break rules.
+
+   Everything else went, and it went because it had become a duplicate:
+   an ink scale identical to the screen's, an accent, a warn and a hot
+   the screen already sets. Two of those were a real fault rather than
+   a redundancy - the paper --hot was byte-identical to Stage 2's
+   printed hex and the paper --warn to Stage 4's, so on a Stage 4 Move
+   page the ROLLBACK heading printed in the colour of the Stage 4
+   furniture around it, which is precisely the collision parse.py says
+   it fixed. Deleting the lines fixed it.
    ================================================================ */
 @media print{
   /* Nothing on paper has been scrolled to, so nothing on paper may be
@@ -1394,51 +1626,35 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
   /* Not a blanket clip-path reset: `.vh` IS a clip-path, and clearing
      it would print every screen-reader label on the page. */
   .mast,.rm{clip-path:none!important}
-  :root{
-    color-scheme:light;
-    --ink:#000; --ink2:#1A1A1A; --ink3:#3A3A3A; --ink4:#5A5A5A;
-    --bg:#fff; --fill:#fff; --rule:#666; --rule2:#BBB;
-    /* The accent inked. #7ED957 is 1.6:1 on white; this is the same
-       colour at 6.5:1, which is what the screen green means on paper. */
-    --accent:#2E6B18; --warn:#A32E1F; --on-c:#fff;
-    /* --hot had no paper value and inherited the screen's #F0B45F,
-       which is 1.84:1 on white. Every figure the money colour is for -
-       the saved column, the saved total, the delta on the chart, the
-       legend swatch - printed at that. The screen ochre reads as gold
-       on near-black and as highlighter on paper, so paper gets the
-       darker one, at 5.9:1. */
-    --hot:#8A6112;
-    /* Depth is a screen idea. On paper a bevel is a grey smear and a
-       glow is nothing at all, so both are switched off at the token
-       rather than unpicked at forty call sites. */
+  /* A hover tint on paper is a smudge, and a laser printer loses a
+     hairline that a screen holds, so the two rules gain weight. */
+  :root{--fill:#fff; --rule:#666; --rule2:#BBB;
     --lip:none; --lift:none; --bev:none; --bev-in:none; --glow:0 0 0;}
-  /* The two fixed atmosphere layers would each flood every sheet, and
-     a scroll rule is meaningless on paper. */
-  body::before,body::after,.rail{display:none}
+  /* The fixed grid would flood every sheet, and a scroll rule is
+     meaningless on paper. */
+  body::before,.rail{display:none}
   .bar,.foot,.skip,.cta,.actions,.prog-bar{display:none}
   .bar::after{display:none}
   /* The twenty is a picture of the book and it prints well, so it
-     stays - but flat, at a fixed height, and with the ink put back. */
+     stays - but flat, and at a fixed height. */
   .twenty{break-inside:avoid}
   .tw{grid-template-rows:52px auto}
   /* Backgrounds are dropped by default in print, so the bars came out as
      twenty hairlines under a caption describing a chart. The outline
      carries the height whether or not the printer is told to ink it. */
-  .tw i{opacity:1;background:var(--c);filter:none;border:1px solid var(--c);
+  .tw i{background:var(--c);border:1px solid var(--c);
     -webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .tw b{color:#3A3A3A}
   .twenty-k{margin-top:var(--s4)}
   /* The masthead's metal is a gradient clipped to the glyphs, and on
-     paper that clips to whatever the print engine feels like - the
-     word came out at about 1.9:1 on white. Paper gets the ink. */
-  .mast em{color:var(--accent);background:none;-webkit-text-fill-color:currentColor}
-  .dl{background:none;box-shadow:none;transform:none}
-  .callout{background:none}
-  .ck-box,.kt-box{border-color:#666}
+     paper that clips to whatever the print engine feels like. Paper
+     gets the ink. */
+  .mast em{color:var(--ink);background:none;-webkit-text-fill-color:currentColor}
+  .callout,.stay li{background:none}
   #how-long,.tablewrap,.perm,.nums{overflow:visible}
   .rm,.eq{min-width:0}
   .steps>li,.mv>li,.ck,.pt,.rules>li,.pre-g,.notes>div,.symp li,
-  .shelf li,.dl{break-inside:avoid}
+  .shelf li,.dl,.fcol li{break-inside:avoid}
   h1,h2,h3,.sect,.stage-head,.mh{break-after:avoid}
-  a[href^="http"]::after{content:' (' attr(href) ')';font-size:11px;color:#3A3A3A}
+  a[href^="http"]::after{content:' (' attr(href) ')';font-size:11px;
+    color:var(--ink3)}
 }
