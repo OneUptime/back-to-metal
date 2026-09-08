@@ -41,7 +41,7 @@ Then staging goes, and it goes before anything a customer touches. This is the s
 - **Swap:** A plain registry over the same object store drops the database and cache Harbor needs, and with them projects, quotas and scanning.
 - **Do it faster:** Do the cache in an afternoon and leave the registry of record a fortnight; most of the benefit arrives with the first half.
 - **Watch out:** The registry has to run for the cluster to start, and the cluster for the registry to serve. Power the rack down and up once, deliberately, before an outage asks it.
-- **Watch out:** Staging that still talks to production data stores has not moved, it has been relocated. Point it at its own copies before step seven, or the first thing your new cluster does is write to the database Move 16 has not migrated yet.
+- **Watch out:** Staging that still talks to production data stores has not moved, it has been relocated. Point it at its own copies before step seven.
 - **Leftovers:** The cloud registry bills storage and egress until its images go, a Move 20 decision, and hosted runner minutes continue for anything still routed at them.
 
 ## Rollback

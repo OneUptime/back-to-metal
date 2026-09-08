@@ -5,6 +5,39 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [4.1.1] - 2026-09-08
+
+The printed interior had content hanging off three pages, and the check that
+should have stopped it was printing a warning and building the book anyway.
+
+### Fixed
+
+- **`render.py` reported overflowing pages and did not fail on them.** It
+  computed the list, printed it, and wrote the PDF regardless — so 4.0.0 and
+  4.1.0 both shipped a cost page with **165px of the five-year table hanging
+  off the bottom**, and the only evidence was a line of output nobody read. A
+  check that reports and does not gate is a check that has already failed. It
+  raises now, and `make book` stops.
+- **Three pages were running off**, all of them introduced by the last two
+  releases: the cost page (165px), the new case-for-leaving page (50px) and
+  Move 13's setup page (6px). The five-year comparison now has a page of its
+  own, the case for leaving is a two-page spread with the costs facing the
+  gains, and Move 13's operator note is shorter. Zero overflowing pages, and
+  the body-to-footer slack is back to a healthy 4.5mm minimum from 0.
+- **The case for leaving is in the printed book at all**, which it was not.
+  4.0.0 added it to the website and stopped there, so the question the book
+  now answers on its front page went unanswered in the artefact people pay
+  for. It is a spread: the five gains with their disproofs on the recto, the
+  four costs and the four reasons to stay on the verso — so a reader has to
+  turn past the costs to reach the Moves.
+
+### Changed
+
+- **The paperback is printable.** At 72 pages the interior clears KDP's
+  72–600 standard-colour band, which it missed by four at 68. It now needs
+  only a list price: $11.13 or more to clear the margin. The hardcover is
+  three pages short of its own 75-page minimum. `PUBLISHING.md` carries both.
+
 ## [4.1.0] - 2026-09-08
 
 The overhaul the last three editions were painting over. 4.0.0 changed the

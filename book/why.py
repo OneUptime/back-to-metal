@@ -43,10 +43,9 @@ OURS = [
     ('0', 'people hired. The toil moved; it did not multiply. We measured it at about '
           'fourteen engineer-hours a month across two sites'),
 ]
-OURS_NOTE = ('That is our own fleet and our own measurement, not an independent audit, '
-             'and it is a bigger estate than the one this book is sized for. Take it '
-             'as us showing our working. The figures in the rest of this book stand '
-             'on outside sources and on arithmetic you can repeat.')
+OURS_NOTE = ('Our own fleet and our own measurement, not an independent audit, and a '
+             'bigger estate than this book is sized for. The rest of the figures here '
+             'stand on outside sources and on arithmetic you can repeat.')
 
 # --- what you gain --------------------------------------------------------
 # Each is (heading, body, how it is evidenced, the test that would disprove it).

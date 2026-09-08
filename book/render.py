@@ -162,6 +162,17 @@ async def main(write_pdf=True):
         print(f"pages: {len(over)} | overflowing: {len(bad)}")
         for o in bad:
             print(f"  p{o['i']:>3} spill {o['spill']:>7}px  scroll {o['scroll']:>4}  {o['label']}")
+        # AND IT FAILS, which it did not until 4.1.1. This block computed the
+        # list of pages whose content runs past the text area, printed it, and
+        # then wrote the PDF anyway - so two editions shipped a cost page with
+        # 165px of the five-year table hanging off the bottom, and the only
+        # evidence was a line of output nobody was reading. A check that
+        # reports and does not gate is a check that has already failed.
+        if bad:
+            print(f'  CONTENT RUNS OFF {len(bad)} page(s) - the interior is not '
+                  f'printable until they fit.')
+            await b.close()
+            raise SystemExit(1)
         print('closest to the edge:')
         for o in sorted(over, key=lambda o: -o['spill'])[:5]:
             print(f"  p{o['i']:>3} spill {o['spill']:>8}px  {o['label']}")
@@ -182,6 +193,8 @@ async def main(write_pdf=True):
         gaps = sorted(await pg.evaluate(GAPS))
         print('body-to-footer slack mm | min', gaps[0], '| median', gaps[len(gaps) // 2],
               '| max', gaps[-1])
+
+
 
         if write_pdf:
             OUT.parent.mkdir(exist_ok=True)

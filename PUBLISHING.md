@@ -4,37 +4,31 @@ What has been filed, and where. This file and `book/imprint.py` have to go on ag
 other and with the records at Bowker and KDP, so change them together — and by hand, never from a
 build.
 
-## Blocked: the interior is too short to print
+## The paperback is printable. The hardcover is three pages short.
 
-`make pricing` fails, and it is not a pricing problem. KDP will not manufacture
-outside its page-count bands whatever the arithmetic says, and at **68 pages**
-this interior is outside two of the three:
+The interior reached **72 pages** in 4.1.1 — the case for leaving became a
+two-page spread and the five-year comparison took a page of its own — which
+clears KDP's standard-colour paperback band exactly:
 
 | Edition | KDP band | This book | |
 |---|---|---|---|
-| Paperback, standard colour | 72–600 pages | 68 | **4 pages short** |
-| Paperback, premium colour | 42–828 pages | 68 | fine, at $6.44 a copy against $3.73 |
-| Hardcover, premium colour | 75–550 pages | 68 | **7 pages short** |
+| Paperback, standard colour | 72–600 pages | 72 | **printable** |
+| Hardcover, premium colour | 75–550 pages | 72 | **3 pages short** |
 
-So there are three ways forward and they are not equivalent:
+So the paperback needs only a list price. At 72 pages the unit cost is $3.89
+and it needs **$11.13 or more** to clear the 25 per cent margin `pricing.py`
+enforces; `imprint.LIST_USD['paperback']` is where it goes.
 
-1. **Grow the interior past 75 pages.** Fixes both editions at once and keeps
-   standard colour, which is the cheapest ink this book can use ($3.73 a copy
-   against $6.44). Seven pages is not a lot on a 20-Move book.
-2. **Switch the paperback to premium colour.** Printable today at 68 pages, but
-   it costs $2.71 more a copy and **ink is locked permanently once a title is
-   published** — it cannot be moved to standard colour later. It also does
-   nothing for the hardcover, which stays impossible.
-3. **Paperback only, premium colour, no hardback.** The narrowest option.
+The hardcover needs three more pages, and then the KDP Cover Calculator run
+for 8.25 × 11, hardcover case laminate, premium colour on white, with the
+sheet, panel, spine, turn-in and hinge pasted into `HC` in `book/cover.py`.
+Until then `cover.py` will not guess a jacket, and `pricing.py` says so rather
+than inventing a number.
 
-Until one of these is chosen there is no paperback and no hardcover to submit,
-which is also why `cover.py` has no jacket to draw: there is no book to wrap.
-The Kindle edition is unaffected — EPUB has no page count.
-
-Rates read from KDP's own tables on 2026-09-07: hardcover premium colour, large
-trim, $5.65 fixed + $0.080 a page; paperback standard colour $1.00 + $0.0402;
-paperback premium colour $1.00 + $0.0800. Large trim is anything over 6.12in
-wide or 9in tall, which 8.25 x 11 is.
+Rates read from KDP's own tables on 2026-09-07: hardcover premium colour,
+large trim, $5.65 fixed + $0.080 a page; paperback standard colour $1.00 +
+$0.0402; paperback premium colour $1.00 + $0.0800. Large trim is anything over
+6.12in wide or 9in tall, which 8.25 × 11 is.
 
 ## Status
 
@@ -44,7 +38,7 @@ wide or 9in tall, which 8.25 x 11 is.
 | Trim | 8.25 x 11 in, bleed on three edges |
 | Interior ink | standard colour (paperback), premium colour (hardcover — KDP offers no alternative) |
 | ISBNs | **not yet allocated or registered** |
-| Print editions | **blocked — 68 pages is under KDP's minimum, see above** |
+| Print editions | paperback printable at 72pp; hardcover 3 pages short |
 | Amazon ASINs | **not yet published** |
 | EPUB identifier | `urn:uuid:f021e81e-4b5f-4ecc-bc23-402193edac60` — minted once, never to change |
 

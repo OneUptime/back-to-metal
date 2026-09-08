@@ -28,6 +28,7 @@ import costs as COSTS
 import imprint as IMP
 import mission as MISSION
 import roadmap as RM
+import why as WHY
 
 ROOT = Path(__file__).resolve().parent.parent
 HERE = Path(__file__).resolve().parent
@@ -205,11 +206,13 @@ def build(moves):
     # any other number - the pagination assertion at the foot of this function
     # caught it, which is what that assertion is for.
     #
-    # Twelve fixed pages: half title, why-this-exists, title, copyright,
-    # foreword, the reference build, the on-ramp, the ten rules, the rollback
-    # page, the cost page, and the two equivalence pages. Then a contents page
-    # per stage, then the symptom index, then a blank verso if the total is odd.
-    FRONT_FIXED = 12 + len(parts) + sym_pages
+    # Fifteen fixed pages: half title, why-this-exists, title, copyright,
+    # foreword, WHY LEAVE AT ALL and its facing page of costs, the reference
+    # build, the on-ramp, the ten rules, the rollback page, the cost page, the
+    # five-year comparison, and the two equivalence pages.
+    # Then a contents page per stage, then the symptom index, then a blank
+    # verso if the total is odd.
+    FRONT_FIXED = 15 + len(parts) + sym_pages
     FRONT = FRONT_FIXED + (FRONT_FIXED % 2)
 
     pageno, _p = {}, FRONT
@@ -345,6 +348,77 @@ def build(moves):
     n_items = sum(len(i) for _, i in SHELVES) + len(KIT)
     R = REFERENCE
     n_nodes = R['nodes']
+    # WHY LEAVE AT ALL. The book had no such page for four editions, on the
+    # ground that the argument had been had. That was fair to a reader who had
+    # already decided and unfair to the one who had not, and it left the
+    # question everybody actually asks answered nowhere in the printed book
+    # while the website answered it on its front page.
+    #
+    # Every figure interpolates the same dict the website's section uses, so
+    # the two cannot drift; and the four reasons NOT to do this are on the
+    # page, at the same length, because a page of nine benefits and no costs
+    # is an advertisement and this book has spent four editions refusing.
+    # Computed here rather than reused from the cost page below, because this
+    # page comes BEFORE it: the reader is asked why before being shown the
+    # arithmetic, which is the right order. Same functions, so same figures.
+    _m = lambda v: f'${v:,.0f}'
+    _ret = sum(x['now'] for x in moves
+               if x['was'] is not None and x['now'] is not None)
+    _fy = COSTS.five_year(REFERENCE['nodes'], REFERENCE['spares'], _ret)
+    _own = _fy['rows'][2]
+    wf = {
+        'five_year_saved': _m(_own['saved']),
+        'five_year_pct': f"{_own['pct']:.0f}",
+        'egress_100tb': _m(COSTS.egress_month(100)),
+        'capex': _m(_own['capex']),
+        'weeks': f"{RM.schedule(moves, 2)['weeks']:.0f}",
+        'days': f"{sum(RM.effort_days(m) for m in moves):.0f}",
+        'ops_hours': (COSTS.PEOPLE['owned_ops_hours_month']
+                      - COSTS.PEOPLE['cloud_ops_hours_month']),
+        'owned_hours': COSTS.PEOPLE['owned_ops_hours_month'],
+        'cloud_hours': COSTS.PEOPLE['cloud_ops_hours_month'],
+        'retained': _m(_ret),
+    }
+    ours = ''.join(f'<div class="ourm"><b>{esc(n)}</b><span>{esc(t)}</span></div>'
+                   for n, t in WHY.OURS)
+    gains = ''.join(
+        f'<div class="kitem"><div class="kn">{i + 1}</div><div><b>{esc(h)}</b>{esc(b)}'
+        f'<span class="chkp"><i>Check it</i> {esc(c)}</span></div></div>'
+        for i, (h, b, c) in enumerate(WHY.gains(wf)))
+    stay = ''.join(f'<li>{esc(x)}</li>' for x in WHY.STAY)
+    costs = ''.join(
+        f'<div class="kitem"><div class="kn">{i + 1}</div><div>'
+        f'<b>{esc(h)}</b>{esc(b)}</div></div>'
+        for i, (h, b) in enumerate(WHY.costs(wf)))
+
+    # TWO PAGES, and it is a spread rather than an overflow. One page held the
+    # lede, our own record, five gains, four costs and four reasons not to,
+    # and ran 236px past the trim - the case FOR on the recto and the case
+    # AGAINST on the verso is the better shape anyway, because a reader who
+    # turns the page has to turn it past the costs to get to the Moves.
+    pages.append(page('', '#14655A', f"""
+    <div class="pkicker">{esc(WHY.KICKER)}</div>
+    <h2 class="ptitle d">Why Leave At All</h2>
+    <div class="fw"><p class="lede">{esc(WHY.lede(wf))}</p></div>
+    <div class="hrule" style="margin:4.5mm 0 3.5mm"></div>
+    <div class="pkicker" style="margin-bottom:2.5mm">{esc(WHY.OURS_HEADING)}</div>
+    <div class="ourg">{ours}</div>
+    <p class="legend-note" style="margin:2.5mm 0 4mm">{esc(WHY.OURS_NOTE)}</p>
+    <div class="keylist">{gains}</div>""", 'WHY LEAVE AT ALL'))
+
+    pages.append(page('', '#A32E1F', f"""
+    <div class="pkicker">The other half of the same page</div>
+    <h2 class="ptitle d">{esc(WHY.COSTS_HEADING)}</h2>
+    <div class="fw"><p class="lede">{esc(WHY.COSTS_LEDE)}</p></div>
+    <div class="hrule" style="margin:4.5mm 0 4mm"></div>
+    <div class="keylist">{costs}</div>
+    <div class="kitwrap">
+      <div class="hrule" style="margin:0 0 4mm"></div>
+      <div class="pkicker" style="margin-bottom:2.5mm">{esc(WHY.STAY_HEADING)}</div>
+      <ul class="stayl">{stay}</ul>
+      <p class="legend-note" style="margin:3mm 0 0">{esc(WHY.CLOSER)}</p>
+    </div>""", 'AND WHAT IT COSTS YOU'))
+
     pages.append(page('', '#6B5344', f"""
     <div class="pkicker">Before you start &nbsp;·&nbsp; {n_items} things</div>
     <h2 class="ptitle d">The Reference Build</h2>
@@ -519,6 +593,25 @@ def build(moves):
     </div>
     <div class="kitwrap">
       <div class="hrule" style="margin:0 0 4.5mm"></div>
+      <div class="hrule" style="margin:0 0 4.5mm"></div>
+      <p class="legend-note" style="margin:0">Every AWS figure is a public list price for
+      us-east-1 observed while writing, before any Savings Plan, private pricing agreement or
+      credit. Every hardware figure is a mid-market street price for the specification opposite.
+      Both will drift. The comparison is a method you can repeat against your own invoice, not a
+      quotation - and if your effective rate is half of list, halve the left-hand column and read
+      the conclusion again.</p>
+    </div>""", 'WHAT IT ACTUALLY COSTS'))
+
+
+    pages.append(page('', '#8A6112', f"""
+    <div class="pkicker">The same decision, over the life of the machines</div>
+    <h2 class="ptitle d">Five Years,<br>Three Ways</h2>
+    <p class="pintro">A month is the wrong window for a capital decision. Owning is capital on
+    day one and cheap running afterwards; renting is no capital and dearer running; the cloud is
+    no capital and dearest running. Compared a month at a time the capital either vanishes into
+    an amortisation line or sits there looking like the whole story, and neither is what somebody
+    signing the cheque is choosing between.</p>
+    <div class="hrule" style="margin:5mm 0"></div>
       <div class="pkicker" style="margin-bottom:3mm">The same computers, three ways, over
       {fy['months'] // 12} years</div>
       <table class="fivey">
@@ -533,21 +626,12 @@ def build(moves):
                       else money(r['saved']) + ' (' + f"{r['pct']:.0f}" + '%)') + '</td></tr>'
           for r in fy['rows'])}</tbody>
       </table>
-      <p class="legend-note" style="margin:3mm 0 4mm">A month is the wrong window for a
-      capital decision. Owning is capital on day one and cheap running afterwards; renting is
-      no capital and dearer running. Over five years the two land within
-      {money(abs(fy['rows'][1]['total'] - fy['rows'][2]['total']))} of each other, and the whole
-      of that difference is the residual: machines of this class run seven or eight years, so
-      after sixty months you still hold a working fleet, counted here at a conservative fifteen
-      per cent of what it cost.</p>
-      <div class="hrule" style="margin:0 0 4.5mm"></div>
-      <p class="legend-note" style="margin:0">Every AWS figure is a public list price for
-      us-east-1 observed while writing, before any Savings Plan, private pricing agreement or
-      credit. Every hardware figure is a mid-market street price for the specification opposite.
-      Both will drift. The comparison is a method you can repeat against your own invoice, not a
-      quotation - and if your effective rate is half of list, halve the left-hand column and read
-      the conclusion again.</p>
-    </div>""", 'WHAT IT ACTUALLY COSTS'))
+    <p class="legend-note" style="margin:4mm 0 0">Over five years the two metal columns land
+    within {money(abs(fy['rows'][1]['total'] - fy['rows'][2]['total']))} of each other, and the
+    whole of that difference is the residual: machines of this class run seven or eight years, so
+    after sixty months you still hold a working fleet, counted here at a conservative fifteen per
+    cent of what it cost. You do not own hardware to beat renting it. You own it when the fleet
+    is big enough to carry the room.</p>""", 'FIVE YEARS, THREE WAYS'))
 
     # ---------- the equivalence table, two pages
     def eq_page(rows, roman, kicker, intro, folio):
