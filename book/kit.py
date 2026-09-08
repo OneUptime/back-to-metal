@@ -3,19 +3,21 @@ rules the whole book rests on.
 
 Shared by the printed book's front matter and the website, so a change here
 lands in both. The specification is a worked reference point sized for a
-company - roughly what one spending $10,000 a month on a single cloud actually
+company - roughly what one spending $100,000 a month on a single cloud actually
 needs - and not a shopping list to copy blindly.
 """
 
 # The reference cluster the Moves are written against. One site, five nodes and
 # a spare on the shelf.
 #
-# Three, because it is the smallest control plane with a quorum. Four, because
-# the fourth is not in the rack: it is burned in, configured and unplugged, and
-# it costs less than three weeks of degraded capacity during your first quarter
-# on your own hardware. At a larger bill this becomes five and a spare, and the
-# arithmetic on the cost page follows the numbers here rather than the other
-# way round.
+# Sixteen, because that is what the bill buys and a little over: at this size
+# losing a node costs six per cent of the fleet rather than a third, which is
+# the difference between a degraded afternoon and a shrug. Two on the shelf and
+# not in the rack, burned in, configured identically and unplugged, because the
+# replacement path you left behind was an API call and the one ahead is a
+# return authorisation and three weeks. At a tenth of the bill this is three
+# and a spare, and the arithmetic on the cost page follows the numbers here
+# rather than the other way round.
 #
 # One site. An earlier edition of this book specified two, and two sites is the
 # single most common reason a repatriation runs out of energy: double the
@@ -23,13 +25,13 @@ needs - and not a shopping list to copy blindly.
 # One site with proven off-site backups is the honest answer at this size.
 REFERENCE = {
     'sites': 1,
-    # THREE, not five. Five was sized against a $24,000 estate; this edition is
-    # written against $10,000, which is roughly half the compute, and three is
-    # the smallest number that is still a control plane with a quorum. Losing
-    # one of three leaves two carrying a load they were sized for, because the
-    # fourth machine is on the shelf and can be in the rack the same afternoon.
-    'nodes': 3,
-    'spares': 1,
+    # SIXTEEN, and two on the shelf. This edition is written against $100,000 a
+    # month, whose container-compute line alone is about 420 physical cores;
+    # sixteen nodes give 512, which is that plus the headroom to lose one and
+    # not notice. Two spares rather than one, because at eighteen machines the
+    # arithmetic of failure says you will use one.
+    'nodes': 16,
+    'spares': 2,
     'cores_per_node': 32,
     'ram_gb_per_node': 256,
     'nvme_tb_per_node': 15.36,
@@ -77,7 +79,7 @@ SHELVES = [
         'Two 25 GbE switches, stacked or in a link-aggregation pair',
         'Two uplinks a node, one to each switch',
         'A separate 1 GbE management switch, not reachable from the internet',
-        'A quarter rack in a carrier-neutral facility, A and B power',
+        'A full rack in a carrier-neutral facility, A and B power',
         'Facility transit for go-live, and a second upstream ordered alongside it',
         'An out-of-band line that works when the main path does not',
     ]),

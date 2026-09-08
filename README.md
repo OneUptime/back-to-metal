@@ -6,7 +6,7 @@ book, a reflowable EPUB, and a static website you can host anywhere.
 
 Most writing about leaving the cloud is either an opinion piece or a programme plan for a
 company with a platform team. This is neither. It is twenty jobs, in five stages, sized for a
-company with two or three engineers and a cloud bill somewhere around $10,000 a month.
+company whose platform is two or three engineers' work and whose cloud bill is somewhere around $100,000 a month.
 
 📕 **[dist/Back-to-Metal.pdf](dist/Back-to-Metal.pdf)** &nbsp;·&nbsp;
 📖 **[dist/Back-to-Metal.epub](dist/Back-to-Metal.epub)** &nbsp;·&nbsp;
@@ -160,8 +160,8 @@ give credit.
 | Cannot be undone | 0 |
 | Risk | 3 low, 7 medium, 10 high |
 | Dependencies | 31, every one pointing backwards |
-| Line savings across the Moves | $7,573 a month, before the salary and the cage |
-| Saving, with everything counted | $4,967 a month &mdash; $59,604 a year, 36 per cent of a $13,661 bill with the salary on both sides |
+| Line savings across the Moves | $89,420 a month, before the salary and the cage |
+| Saving, with everything counted | $77,224 a month &mdash; $926,688 a year, 67 per cent of a $114,644 bill with the salary on both sides |
 
 Every Move names the real service on AWS, Google Cloud and Azure, and the one thing that differs on each.
 
@@ -179,7 +179,7 @@ Every Move names the real service on AWS, Google Cloud and Azure, and the one th
 | # | Move | Leaving | Risk | Cutover | Back out for |
 |---|---|---|---|---|---|
 | 05 | [From rented vCPUs to cores you own](moves/05-from-rented-vcpus-to-cores-you-own.md) | The vCPU as a unit of purchase | Medium | 0 min | Until the order is signed |
-| 06 | [Three machines, and the one on the shelf](moves/06-three-machines-and-the-one-on-the-shelf.md) | Elastic node capacity and cluster autoscaling | High | 0 min | Until the order is signed |
+| 06 | [Sixteen machines, and the two on the shelf](moves/06-sixteen-machines-and-the-two-on-the-shelf.md) | Elastic node capacity and cluster autoscaling | High | 0 min | Until the order is signed |
 | 07 | [A cage, not a data centre](moves/07-a-cage-not-a-data-centre.md) | The region-and-zone abstraction | High | 0 min | Until the contract is signed |
 | 08 | [The order, and the weeks you cannot compress](moves/08-the-order-and-the-weeks-you-cannot-compress.md) | Provider-assigned addresses and managed transit | Medium | 0 min | Until the order is signed |
 

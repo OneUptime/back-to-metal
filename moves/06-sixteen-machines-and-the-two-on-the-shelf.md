@@ -1,8 +1,8 @@
-# 06 · Three machines, and the one on the shelf
+# 06 · Sixteen machines, and the two on the shelf
 
 **Layer:** Buy · **Leaving:** Elastic node capacity and cluster autoscaling · **Risk:** High · **Cutover:** 0 min · **Reversible:** Until the order is signed
 
-> Three nodes are a quorum, and losing one costs a third of the capacity. The fourth is bought with them and never plugged in, because iron does not autoscale
+> Sixteen nodes, so losing one costs six per cent and not a third. Two are bought with them and never plugged in, because iron does not autoscale
 
 ## Leaving from
 - **AWS:** EC2 Auto Scaling groups — the fleet ceiling is a per-region vCPU quota, raised by support ticket.
@@ -10,9 +10,9 @@
 - **Azure:** Virtual Machine Scale Sets — the platform fault domain count is fixed at creation and cannot be edited.
 
 ## Why this works
-Three is the smallest fleet that is a cluster at all, and at this size the book is honest that it is the floor rather than the comfortable answer. Three nodes give a control plane its quorum; lose one and a third of the capacity goes with it, and the two survivors carry a load you have to have sized them for deliberately. That is the trade a $10,000 estate makes: at twice the bill you buy five and a dead machine costs twenty per cent instead of thirty-three. Size the workload so two can hold it, or accept that a failure is a degraded afternoon rather than a shrug.
+Fleet size is the quietest thing the bill decides. Three nodes are a quorum and nothing more: lose one and a third of the capacity goes with it. Sixteen and a dead machine costs six per cent, which is the difference between an incident and a note in the channel — and it is why a repatriation at this size is a far easier argument than the same one at a tenth of the bill. Buy the headroom the arithmetic already bought you: 512 cores against the four hundred or so the estate actually needs.
 
-The fourth machine is what makes that survivable, and it is not in the rack. It is built, burned in, configured identically and then unplugged, because the replacement path you left behind was an API call and the one ahead is a return authorisation and three weeks. Those weeks cost more than the machine that prevents them, and at three nodes they cost more again.
+The two on the shelf are what make it survivable, and they are not in the rack. They are built, burned in, configured identically and then unplugged, because the replacement path you left behind was an API call and the one ahead is a return authorisation and three weeks. Two rather than one at eighteen machines, because the arithmetic of failure says you will use one of them, and the second is what stops the first becoming an emergency.
 
 ## Before you start
 

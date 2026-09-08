@@ -47,7 +47,7 @@ Nothing here serves users, so backing out is removing the gateway objects and th
 
 | Was | Now | Saved | Cutover | Effort | Wait |
 |---|---|---|---|---|---|
-| $290/mo | $40/mo | 86% | 0 min | 4 days | — |
+| $2,400/mo | $320/mo | 87% | 0 min | 4 days | — |
 
 ## What you can turn off
 Nothing yet. The managed balancer, its listener rules and its certificate service switch off in Move 18, where the $780 line stops.

@@ -5,6 +5,67 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [6.0.0] - 2026-09-08
+
+The reference estate is $100,000 a month, and the palette was re-spaced on the
+axis that was actually wrong.
+
+### Changed — the estate
+
+- **`BILL_MONTH` is $100,000**, and this is the edition where the book's own
+  thesis stops being an assertion. The facility is a fixed cost, so it is the
+  thing that makes a small repatriation marginal and a large one obvious:
+
+  | | 4 machines, quarter rack | 18 machines, full rack |
+  |---|---|---|
+  | Facility | $1,400/mo | $4,500/mo |
+  | Per machine | $350 | $250 |
+
+  At $10,000 the room was most of the reason to hesitate and Move 03's rule
+  stopped clearing at about $9,000. At $100,000 it is a rounding error.
+- **The reference build is 16 nodes and 2 spares** — 512 cores, 4 TB — against
+  the roughly 420 physical cores the container-compute line alone buys. Move 06
+  is retitled and its argument inverts honestly: losing one of sixteen costs
+  six per cent rather than a third, which is why a repatriation at this size is
+  a far easier argument than the same one at a tenth of the bill.
+- **A full rack**, 10 kW committed, two cross-connects, a 5 Gbps transit commit
+  and a switch pair with the ports for eighteen machines.
+- **New headline: $77,224 a month, $926,688 a year, 67 per cent** of the loaded
+  bill and 81 per cent of the infrastructure line. Over five years, $4.67M —
+  and **colocation now beats rented metal** ($2.21M against $2.30M), the first
+  time in this book that owning wins outright rather than drawing.
+- **The positioning follows the bill.** A company spending $100,000 a month is
+  not "a company with two or three engineers"; it is one whose *platform* is
+  two or three engineers' work, and the front page says that instead.
+- All eleven Move figures re-derived line by line, not multiplied: a control
+  plane is $73 a cluster and you now run three, not thirty; the load balancer
+  and the database grow but keep their shape; egress and storage scale with
+  traffic and data.
+
+### Fixed — the palette
+
+- **Two colours were the same colour, and both had been shipping.** Stage 4's
+  `#F0917A` sat a CIE distance of **6.8** from `--warn` — about 10 is where two
+  colours stop being distinguishable — so on a Stage 4 Move page the
+  **ROLLBACK heading, the one thing on the page whose job is to stop
+  somebody**, was painted the same colour as the furniture around it. Stage 2's
+  `#E0A63F` sat **9.8** from `--hot`, the money colour, in tables that are
+  nothing but money and Stage numerals. The closest pair is now **24.9**.
+- **The palette read flat because it was flat.** 4.0.0 pulled the five Stages
+  apart by hue and left them all at the same brightness: eight colours spanning
+  **L\* 70 to 81**, an eleven-point range. Eight hues at one lightness give the
+  eye a single axis and give a colour-blind reader almost nothing. They now
+  span **L\* 54 to 88**, so the set reads as a set even in greyscale.
+- Every value still clears **4.9:1** against both the page and the hover fill,
+  which is the pair that actually occurs.
+
+### Notes
+
+- `agree.py`, added under [Unreleased] in the last cycle, earned its keep on
+  its first outing: it caught a prose edit in this release breaking one of its
+  own anchors, which is the "a headline that has quietly stopped being printed
+  is as interesting as one that disagrees" case it was built for.
+
 ### Added
 
 - **A fourth gate, `book/agree.py` and `make agree`.** The same figures are

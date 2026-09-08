@@ -2,7 +2,7 @@
 
 **Layer:** Buy · **Leaving:** The vCPU as a unit of purchase · **Risk:** Medium · **Cutover:** 0 min · **Reversible:** Until the order is signed
 
-> Two vCPUs is one physical core, and the second thread is worth about a quarter of the first — the gap between three machines and six.
+> Two vCPUs is one physical core, and the second thread is worth about a quarter of the first — the gap between sixteen machines and thirty.
 
 ## Leaving from
 - **AWS:** EC2 instance types — a vCPU is one SMT thread on the x86 families but a whole physical core on Graviton, labelled the same.

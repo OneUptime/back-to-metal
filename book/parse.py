@@ -28,33 +28,42 @@ MOVES = ROOT / 'moves'
 # I" without anybody having to hold a system diagram in their head. `doing` is
 # the whole instruction, `stage` is the number, and `done` is how you know you
 # have finished it.
-# The `dark` hexes were respaced in 4.0.0. They were chosen one at a time
-# against a near-black ground and, seen together in the header's spectrum bar
-# and on the front page's twenty, they read as five greys rather than as five
-# colours - which is the whole job of a Stage colour. Each is now further from
-# its neighbours and from the accent: the nearest pair in the whole palette is
-# Run against the accent at a CIE distance of 50, where about 10 is the point
-# two colours stop being mistakable. Every one is still 7.3:1 or better against
-# both the page and the hover fill.
+# The `dark` hexes were respaced again in 6.0.0, on the axis that was actually
+# wrong. 4.0.0 pulled them apart by HUE and left them all at the same
+# brightness: eight colours spanning L* 70 to 81, an eleven-point range, which
+# is why the palette read as flat however many hues were in it, and why it gave
+# a colour-blind reader almost nothing to work with. They now span L* 54 to 88,
+# so the set reads as a set even in greyscale.
+#
+# It also fixed two collisions that had been shipping. Stage 4's old #F0917A
+# sat a CIE distance of 6.8 from --warn, which is well inside the point at
+# which two colours are the same colour - so on a Stage 4 Move page the
+# ROLLBACK heading, the one thing on the page whose job is to stop somebody,
+# was painted the same colour as the furniture around it. Stage 2's #E0A63F
+# sat 9.8 from --hot, the money colour, in tables that are nothing but money
+# and Stage numerals. The closest pair in the palette is now 24.9.
+#
+# Every value is 4.9:1 or better against both the page and the hover fill,
+# which is the pair that actually occurs.
 LAYERS = {
-    'Decide':  dict(key='decide',  color='#474F57', dark='#C6CBCF', tint='#ECEEF0', label='Decide',
+    'Decide':  dict(key='decide',  color='#474F57', dark='#D5DADE', tint='#ECEEF0', label='Decide',
                     part='I',    roman='Stage 1',  stage=1,
                     doing='Work out whether to do it at all',
                     done='You know what you spend, what you would spend instead, '
                          'and whether it is worth it.'),
-    'Buy':     dict(key='buy',     color='#8A6112', dark='#E0A63F', tint='#F4EEE1', label='Buy',
+    'Buy':     dict(key='buy',     color='#8A6112', dark='#D08A22', tint='#F4EEE1', label='Buy',
                     part='II',   roman='Stage 2',  stage=2,
                     doing='Order the hardware and sign the space',
                     done='The machines are on order and the cage is signed.'),
-    'Build':   dict(key='build',   color='#1F4E79', dark='#6FB2E6', tint='#E6ECF3', label='Build',
+    'Build':   dict(key='build',   color='#1F4E79', dark='#63A9E8', tint='#E6ECF3', label='Build',
                     part='III',  roman='Stage 3',  stage=3,
                     doing='Turn the boxes into a cluster',
                     done='A cluster that could take production traffic, and never has.'),
-    'Move':    dict(key='move',    color='#A32E1F', dark='#F0917A', tint='#F6E8E5', label='Move',
+    'Move':    dict(key='move',    color='#A32E1F', dark='#DC6553', tint='#F6E8E5', label='Move',
                     part='IV',   roman='Stage 4',  stage=4,
                     doing='Move the app, then the data',
                     done='Everything runs on your machines, and the cloud copy is still warm.'),
-    'Run':     dict(key='run',     color='#14655A', dark='#5FCCAE', tint='#E3EFED', label='Run',
+    'Run':     dict(key='run',     color='#14655A', dark='#3FC79E', tint='#E3EFED', label='Run',
                     part='V',    roman='Stage 5',  stage=5,
                     doing='Cut the traffic over, and keep it alive',
                     done='Users reach your machines, you can carry it at 03:00, '

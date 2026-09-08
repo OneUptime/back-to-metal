@@ -46,7 +46,7 @@ Putting the weight back returns new connections to the managed edge inside one t
 
 | Was | Now | Saved | Cutover | Effort | Wait |
 |---|---|---|---|---|---|
-| $760/mo | $0/mo | 100% | 10 min | 3 days | 1 week |
+| $8,900/mo | $0/mo | 100% | 10 min | 3 days | 1 week |
 
 ## What you can turn off
-The weighted record and the managed edge behind it, seven days after full weight, and with them the egress line that was most of the $760.
+The weighted record and the managed edge behind it, seven days after full weight, and with them the egress line that was most of the $8,900.

@@ -10,7 +10,7 @@
 - **Azure:** AKS — the Free tier carries no API server uptime guarantee at all, so what is given up is a paid Standard tier or nothing at all.
 
 ## Why this works
-A control plane is three machines that agree with each other, and the agreement is etcd. Talos Linux removes the reason hand-built clusters rot: no shell, no package manager, no login, so changing a machine means changing the YAML in Git and applying it. Drift stops being a category. Doing this while nothing runs is what makes the risk survivable — every mistake costs a rebuild, and an empty cluster rebuilds in twenty minutes. Be plain about the money: a managed control plane is about $73 a month — the same ten cents an hour on all three — so this is not the Move that pays for the migration.
+A control plane is three machines that agree with each other, and the agreement is etcd. Talos Linux removes the reason hand-built clusters rot: no shell, no package manager, no login, so changing a machine means changing the YAML in Git and applying it. Drift stops being a category. Doing this while nothing runs is what makes the risk survivable — every mistake costs a rebuild, and an empty cluster rebuilds in twenty minutes. Be plain about the money: a managed control plane is about $73 a month each and you run three — the same ten cents an hour at all the providers — so this is not the Move that pays for the migration.
 
 Everybody arriving from EC2 asks why there is no hypervisor — why this sits on the metal rather than on Proxmox, with as many virtual machines as you like. Because you are not moving virtual machines: Move 02's inventory is already containers, and a hypervisor under a container platform is a second control plane to patch, licence and back up for a problem this estate does not have. It also puts back the shell that Talos removes, which is what the ongoing-hours figure assumes you did not do. The Swap says when to take the other branch.
 
@@ -50,7 +50,7 @@ While the cluster is empty nothing here is hard to undo. Reverting the kube-prox
 
 | Was | Now | Saved | Cutover | Effort | Wait |
 |---|---|---|---|---|---|
-| $73/mo | $0/mo | 100% | 0 min | 4 days | — |
+| $220/mo | $0/mo | 100% | 0 min | 4 days | — |
 
 ## What you can turn off
 Nothing yet — the managed cluster still carries production and stays until Move 20. Its per-hour control-plane charge is the first bill line to reach zero.

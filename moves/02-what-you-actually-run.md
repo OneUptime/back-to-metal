@@ -10,7 +10,7 @@
 - **Azure:** Resource Graph — reads only subscriptions the caller can already see, and pages at 1,000 rows, so an unpaged query returns a truncated estate that looks complete.
 
 ## Why this works
-Leaving the cloud feels impossible because nobody can say what would have to move. The estate lives in three or four heads, so the total is always imagined larger than it is. A company spending $10,000 a month usually runs half a dozen services, one Postgres, one cache, a couple of buckets and a handful of scheduled jobs. That fits on a page, and every later Move then has something finite to count against. Nothing changes here: this Move reads, and writes down what it read. The risk is being wrong about what runs, and the bill settles that.
+Leaving the cloud feels impossible because nobody can say what would have to move. The estate lives in three or four heads, so the total is always imagined larger than it is. A company spending $100,000 a month usually runs forty or fifty services, a handful of Postgres clusters, two or three caches, a dozen buckets and a scheduler nobody has read in a year. That still fits on a page, and every later Move then has something finite to count against. Nothing changes here: this Move reads, and writes down what it read. The risk is being wrong about what runs, and the bill settles that.
 
 ## Before you start
 

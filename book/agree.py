@@ -53,7 +53,7 @@ CHECKS = [
     ]),
     ('the cloud bill', [
         (SITE / 'cost.html', rf'Infrastructure</th><td data-h="Cloud now">{MONEY}'),
-        (SITE / 'index.html', rf'bill around {MONEY} a month'),
+        (SITE / 'index.html', rf'cloud bill is around {MONEY} a month'),
     ]),
     ('the saving, in the printed book', [
         (BOOK, rf'What the difference buys</h4><p>{MONEY} a month'),

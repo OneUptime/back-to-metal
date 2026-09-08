@@ -30,7 +30,7 @@ A plan that pretends everything comes home fails in Stage 5, when somebody notic
 2. Price outbound mail on its own. Transactional sending goes to a provider whose only business is deliverability, and the sending domain's SPF, DKIM and DMARC records point at it. Marketing sends take a separate subdomain.
 3. Price mitigation upstream of your transit, the only place it works. Ask the facility and each transit vendor what is included, at what capacity and how it triggers: a hundred-gigabit attack against a ten-gigabit port is decided before it reaches your equipment.
 4. Sign all three contracts before the hardware ships, confirming each notice period and minimum term. Mail warm-up takes weeks and cannot begin during an incident.
-5. Write the total, about $620 a month, into the comparison from Move 03 as a permanent line. Then name the fourth item: whatever the business depends on that nobody here has run, such as a payments integration.
+5. Write the total, about $5,200 a month, into the comparison from Move 03 as a permanent line. Then name the fourth item: whatever the business depends on that nobody here has run, such as a payments integration.
 
 ## Operator's notes
 - **Swap:** One vendor covering delivery and mitigation halves the contracts, and one outage then takes both.
@@ -45,7 +45,7 @@ Nothing here touches a running system, so backing out is cancelling inside a not
 
 | Was | Now | Saved | Cutover | Effort | Wait |
 |---|---|---|---|---|---|
-| $620/mo | $620/mo | 0% | 0 min | 2 days | — |
+| $5,200/mo | $5,200/mo | 0% | 0 min | 2 days | — |
 
 ## What you can turn off
 Nothing, and that is the point. The cloud's versions switch off in Moves 18 and 20; these three stay on the invoice permanently.

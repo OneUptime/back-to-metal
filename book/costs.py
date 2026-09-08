@@ -12,26 +12,24 @@ out the people is the reason repatriations get approved and then regretted.
 """
 
 # --- the estate this edition is written against ---------------------------
-# One cloud, one region, about $10,000 a month. Every Move's numbers strip is a
-# slice of this bill, and the slices add up to it, which is what makes the
+# One cloud, one region, about $100,000 a month. Every Move's numbers strip is
+# a slice of this bill, and the slices add up to it, which is what makes the
 # roadmap page's arithmetic checkable.
 #
-# IT WAS $24,000 AND IT IS NOW $10,000, and that is close to the floor. The
-# quarter rack's fixed cost - space, transit, cross-connect, hands - is $1,400
-# a month whether it holds three machines or thirty, and it does not shrink
-# when the bill does. So the saving falls faster than the bill, and Move 03's
-# rule (owned must land a third under) stops clearing at about $9,000:
+# THE BOOK GETS EASIER AS THE BILL GETS BIGGER, and this edition is where that
+# stops being an assertion. The facility is a fixed cost - space, transit,
+# cross-connects, hands - and it is the thing that makes a small repatriation
+# marginal:
 #
-#     bill      owned      cloud      under     Move 03's rule
-#     $24,000   $10,594    $27,661    61.7%     clears
-#     $12,000   $ 8,827    $15,661    43.6%     clears
-#     $10,000   $ 8,633    $13,661    36.8%     clears, and this is the edition
-#     $ 8,000   $ 8,439    $11,661    27.6%     FAILS - the book says stop
+#     quarter rack, 4 machines    $1,400/mo    $350 a machine
+#     full rack,   18 machines    $4,500/mo    $250 a machine
 #
-# This edition therefore sits about one thousand dollars above its own advice
-# to stop, which is deliberate: a reader at $10,000 is exactly who needs the
-# arithmetic done in front of them rather than asserted.
-BILL_MONTH = 10000
+# At $10,000 a month the room was most of the reason to hesitate and Move 03's
+# rule stopped clearing at about $9,000. At $100,000 the room is a rounding
+# error against the bill and the rule clears by a mile. The stopping advice in
+# why.py is unchanged and still correct: it is about the floor, not this.
+BILL_MONTH = 100000
+
 
 # --- AWS list prices, us-east-1, on-demand, USD ---------------------------
 # Observed while writing. On-demand and undiscounted on purpose: a reader with a
@@ -80,18 +78,18 @@ HARDWARE = {
     # likely stale figure here, and it drives both the $3,235 and the $87,000.
     'node_capex': 13000,
     'node_life_years': 5,
-    'switch_capex': 9000,             # per pair, 25 GbE
+    'switch_capex': 14000,            # per pair, 25 GbE, enough ports for 18
     'switch_life_years': 7,
-    'rack_month': 650,                # a quarter rack, 4 kW committed, A+B power
-    # 4 kW, not 3, which is what this comment used to say while Move 07 said 4:
-    # five racked nodes and two switches draw near 2.5 kW, a facility lets you
-    # take only eighty per cent of a commitment continuously, and 2.5 / 0.8 is
-    # 3.1 - so the next size up is 4. The commitment sizes the breaker; the bill
-    # is on draw, which is power_kw_month below. The sixth machine is on the
-    # shelf and unplugged, so it is capital and not power.
-    'transit_month': 450,             # facility blended transit, 1 Gbps commit
-    'crossconnect_month': 150,
-    'remote_hands_month': 150,
+    'rack_month': 2600,               # a FULL rack, 10 kW committed, A+B power
+    # A FULL RACK, because sixteen racked nodes and two switches are 20U and
+    # draw about 7.2 kW, and a facility lets you take only eighty per cent of a
+    # commitment continuously: 7.2 / 0.8 is 9, so the next size up is 10. The
+    # commitment sizes the breaker; the bill is on draw, which is
+    # power_kw_month below. The two spares are on the shelf and unplugged, so
+    # they are capital and not power.
+    'transit_month': 1200,            # facility blended transit, 5 Gbps commit
+    'crossconnect_month': 300,        # two, to two carriers, at this size
+    'remote_hands_month': 400,
     'power_kw_month': 190,            # all-in, per kW drawn
     'node_kw': 0.45,
 }
@@ -101,7 +99,7 @@ HARDWARE = {
 # column. Loaded cost, not salary: employer taxes, equipment, benefits and the
 # recruiter you paid once.
 #
-# Half an engineer, not two. Three machines in one cage is not an enterprise
+# Sixteen machines in one cage is not an enterprise
 # platform team, and a book that asks a company to hire two people to save
 # $3,000 of hardware is asking it to lose money. Move 03 makes the reader write
 # this number down before the arithmetic, so the arithmetic cannot be argued
@@ -171,14 +169,14 @@ PEOPLE = {
     #     30 h/mo      $16,625       62 per cent
     #     60 h/mo      $16,625       56 per cent
     #
-    # Sixty was the figure for a $24,000 estate. THESE HOURS SCALE WITH THE
-    # ESTATE, and holding them fixed while the bill fell by 58 per cent was
-    # the first thing that went wrong when this edition was re-based: it left
-    # the same person running half the services and made owning look worse
-    # than it is. Forty against a $10,000 estate, with floors - somebody still
-    # upgrades the cluster and rotates the credentials whatever its size, so
-    # this falls by a third rather than by a half.
-    'cloud_ops_hours_month': 40,
+    # THESE HOURS SCALE WITH THE ESTATE, and holding them fixed across a
+    # re-basing is the first thing that goes wrong: it leaves the same person
+    # notionally running ten times the services. They do not scale LINEARLY
+    # either - a tenfold bill is about four times the operational load, because
+    # the second copy of a thing costs far less attention than the first.
+    # A hundred and sixty hours is a little under one full-time engineer
+    # against a $100,000 estate, which is what such a company actually staffs.
+    'cloud_ops_hours_month': 160,
     # What the owned platform costs on top of that.
     #
     # AND WHY OWNING IS BOOKED AS DEARER AT ALL, which is the fair question:
@@ -190,9 +188,10 @@ PEOPLE = {
     # the book declining to take the most favourable reading of its own
     # evidence, on the number its whole argument turns on.
     #
-    # Fifteen hours over the cloud rather than twenty, because the delta is
-    # driven by the machines and there are four of them now instead of six.
-    'owned_ops_hours_month': 55,
+    # Forty hours over the cloud, because the delta is driven by the MACHINES
+    # and there are eighteen of them now rather than four. Per machine it is
+    # almost exactly what it was.
+    'owned_ops_hours_month': 200,
 }
 
 # Dedicated hosts by the month, for the reader who wants the saving without the

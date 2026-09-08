@@ -2,7 +2,7 @@
 
 **Layer:** Buy · **Leaving:** The region-and-zone abstraction · **Risk:** High · **Cutover:** 0 min · **Reversible:** Until the contract is signed
 
-> A quarter rack ninety minutes from somebody who can drive to it, and the first line in this programme that costs money instead of saving it.
+> A full rack ninety minutes from somebody who can drive to it, and the first line in this programme that costs money instead of saving it.
 
 ## Leaving from
 - **AWS:** Regions and Availability Zones — zone letters are shuffled per account, so one account's us-east-1a is another's us-east-1c, and cross-zone traffic bills both ways.
@@ -10,7 +10,7 @@
 - **Azure:** regions, availability zones and zone-redundant tiers — zone support varies by region and by machine series, and a resource created without a zone cannot be moved into one later.
 
 ## Why this works
-A region and a zone were labels on an invoice. Underneath sat a building, a power feed, a loading dock and somebody's hands, and this Move buys the smallest version of all four: a quarter rack in a carrier-neutral facility, near enough that somebody can be at the cabinet within a couple of hours. Nothing binds until a signature, and every term that hurts later is negotiable before it. It also costs more rather than less — about $1,400 a month for the space, the transit, the cross-connect and the hands, paid from handover, before a machine is racked. One site, not two.
+A region and a zone were labels on an invoice. Underneath sat a building, a power feed, a loading dock and somebody's hands, and this Move buys one of each: a full rack in a carrier-neutral facility, near enough that somebody can be at the cabinet within a couple of hours. Nothing binds until a signature, and every term that hurts later is negotiable before it. It also costs more rather than less — about $4,500 a month for the space, the transit, the cross-connects and the hands, paid from handover, before a machine is racked. One site, not two.
 
 ## Before you start
 
@@ -26,7 +26,7 @@ A region and a zone were labels on an invoice. Underneath sat a building, a powe
 - Whoever signs the term, before the price is agreed
 
 ## The runbook
-1. Write one specification — quarter rack, committed kilowatts, two feeds, cross-connects, remote hands, term — and send it to three facilities within ninety minutes' drive.
+1. Write one specification — full rack, committed kilowatts, two feeds, cross-connects, remote hands, term — and send it to three facilities within ninety minutes' drive.
 2. Size the power commitment against what actually draws: five racked nodes at about 450 W plus two switches is near 2.5 kW, and the eighty per cent rule means a 3 kW commitment only permits 2.4 kW continuously. Ask for 4 kW on two feeds from separate distribution boards, and leave the sixth machine unplugged on the shelf.
 3. Put ticket-to-touch, the billing increment and a named escalation into the remote hands contract rather than the sales deck, and two named people on the access list so one holiday is not an outage.
 4. Ask which carriers have live fibre in the meet-me room and which of them will sell at your volume, then get the cross-connect price list in writing, installation and disconnection included. Three carriers and a cheap cross-connect beat better marketing.

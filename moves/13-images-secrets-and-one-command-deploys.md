@@ -51,7 +51,7 @@ All of this is a repository: a bad change is a revert, and the reconciler catche
 
 | Was | Now | Saved | Cutover | Effort | Wait |
 |---|---|---|---|---|---|
-| $300/mo | $30/mo | 90% | 0 min | 5 days | 2 weeks |
+| $2,600/mo | $260/mo | 90% | 0 min | 5 days | 2 weeks |
 
 ## What you can turn off
 The hosted runner minutes, once a week of builds has passed on your own nodes with no fallback. The non-production estate's cloud compute, once the fortnight in step seven is done and nobody has asked to go back. The cloud registry and its secret store stay funded until Move 20.

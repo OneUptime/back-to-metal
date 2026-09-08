@@ -16,7 +16,7 @@ Moves 01 and 02 produced a grouped bill and an inventory that accounts for it. T
 
 **Access**
 - Three recent invoices at the rate you actually paid, not list
-- A written quote for the three machines and one for a quarter rack
+- A written quote for the sixteen machines and one for a full rack
 
 **Software**
 - One spreadsheet, two columns: owned on the left, rented on the right
@@ -27,11 +27,11 @@ Moves 01 and 02 produced a grouped bill and an inventory that accounts for it. T
 ## The runbook
 1. Write the decision rule before any figure goes in: owned must land at least a third under rented, or the programme stops here. A thinner margin sits inside your own forecasting error.
 2. Fill the rented column from the three invoices at the rate you actually paid, discounts in and tax out on both sides. One monthly number, checkable against Move 01.
-3. Fill the owned column from the hardware quote and the facility quote: three machines and a spare over sixty months, the quarter rack, committed power, transit, the cross-connect, remote hands.
+3. Fill the owned column from the hardware quote and the facility quote: sixteen machines and two spares over sixty months, the full rack, committed power, transit, the cross-connects, remote hands.
 4. Add the salary line to BOTH columns, because both columns have one. The cloud estate already costs somebody sixty hours a month — the managed cluster upgrades itself on somebody's Tuesday, the credentials rotate, the bill gets argued with, the pager gets carried — and a cloud invoice bills for none of it. Owning adds about twenty hours a month on top of that, not a second person. Write both down. A column with the salary on one side only is not a comparison, whichever side it is missing from.
 5. Add the line that does not come home. Move 04 settles which capabilities you keep renting — the edge, outbound mail, scrubbing — and there is a residue besides: archived object storage nobody will pay the egress to extract, a registry, a queue, an off-site backup copy. It is inside the rented column already, so it has to be inside the owned column too. Leaving it out is the same error as leaving out the salary, and it is worth about a tenth of the bill.
 6. Total both columns and apply the rule. If owned is not a third under rented, stop and keep the spreadsheet. Stopping costs three Moves and a week, against a programme abandoned in month five with two estates billing.
-7. If it clears, put the capital question to the founder who signs. About $61,000 leaves the bank before anything serves a request — four machines and a pair of switches, and on eighteen months of runway that is a fair refusal; renting dedicated machines by the month is the way round it, in Move 07.
+7. If it clears, put the capital question to the founder who signs. About $248,000 leaves the bank before anything serves a request — eighteen machines and a pair of switches, and on eighteen months of runway that is a fair refusal; renting dedicated machines by the month is the way round it, in Move 07.
 
 ## Operator's notes
 - **Swap:** Price the three largest lines only; that lands within about ten per cent in an afternoon.

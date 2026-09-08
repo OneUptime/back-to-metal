@@ -49,7 +49,7 @@ EPUB_SRC = ROOT / 'dist' / EPUB_NAME
 GH_URL = f'https://{IMP.REPO}'
 
 # The crew the site quotes its schedule for. Two, because that is who this
-# edition is written for: a company with two or three engineers, one of whom
+# edition is written for: a platform of two or three engineers, one of whom
 # still has a day job. The other two are drawn only as a comparison, so a
 # reader can see what a third pair of hands actually buys - which is less than
 # people expect, because the long pole is lead time and not labour.
@@ -495,10 +495,10 @@ def hero_index(T, first):
     <h1 class="d mast">{IMP.wordmark_html(sep='<br>')}</h1>
     <p class="open">{T['n']} Moves that take a company off AWS, Google Cloud or
       Azure and onto hardware you own.</p>
-    <p class="sub">Written for a company with two or three engineers and a cloud
-      bill around {mny(T['bill'])} a month. About {T['days']:.0f} days of work
-      spread across {T['weeks']:.0f} weeks, and most of that is waiting for
-      hardware rather than working.</p>
+    <p class="sub">Written for a company whose platform is two or three
+      engineers' work and whose cloud bill is around {mny(T['bill'])} a month.
+      About {T['days']:.0f} days of work spread across {T['weeks']:.0f} weeks,
+      and most of that is waiting for hardware rather than working.</p>
     <p class="cta"><a class="btn" href="m/{page(first)}">Start at Move
       {first['num']}</a> <a class="btn ghost" href="#why">The case for
       leaving</a></p>

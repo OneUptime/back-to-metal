@@ -151,10 +151,13 @@
      two colours stop being distinguishable - so the site had six colours
      doing five jobs and two of them were the same colour. This green is 50
      from its nearest neighbour and 125 degrees of hue from where it was. */
-  --accent:#7ED957; --warn:#F5A08A; --on-c:#0C0F11;
+  --accent:#7ED957; --warn:#FF7B93; --on-c:#0C0F11;
   /* Money. The one thing on this site that is neither prose nor a
-     Stage, and the thing every reader came for. */
-  --hot:#F0B45F;
+     Stage, and the thing every reader came for. Pale butter gold
+     rather than the amber it was: at #F0B45F it sat a CIE distance of
+     9.8 from Stage 2's Buy - close enough to be the same colour - in
+     tables that are nothing but money and Stage numerals. */
+  --hot:#FFD980;
 
   /* ---- depth ----------------------------------------------------- */
   /* One lip and one lift, used everywhere or not at all. The lip is
@@ -1444,12 +1447,12 @@ html.js .sn:hover{color:var(--ink);text-shadow:0 0 14px var(--c)}
 
 /* The five Stages, written by site.py out of parse.LAYERS. The screen
    is dark, so the screen takes the `dark` hex; paper takes the other. */
-[data-part=decide]{--c:#C6CBCF}
-[data-part=buy]{--c:#E0A63F}
-[data-part=build]{--c:#6FB2E6}
-[data-part=move]{--c:#F0917A}
-[data-part=run]{--c:#5FCCAE}
-:root{--spectrum:linear-gradient(90deg,#C6CBCF 0%,#C6CBCF 20%,#E0A63F 20%,#E0A63F 40%,#6FB2E6 40%,#6FB2E6 60%,#F0917A 60%,#F0917A 80%,#5FCCAE 80%,#5FCCAE 100%)}
+[data-part=decide]{--c:#D5DADE}
+[data-part=buy]{--c:#D08A22}
+[data-part=build]{--c:#63A9E8}
+[data-part=move]{--c:#DC6553}
+[data-part=run]{--c:#3FC79E}
+:root{--spectrum:linear-gradient(90deg,#D5DADE 0%,#D5DADE 20%,#D08A22 20%,#D08A22 40%,#63A9E8 40%,#63A9E8 60%,#DC6553 60%,#DC6553 80%,#3FC79E 80%,#3FC79E 100%)}
 @media print{
 [data-part=decide]{--c:#474F57}
 [data-part=buy]{--c:#8A6112}

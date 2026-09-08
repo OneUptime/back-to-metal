@@ -46,7 +46,7 @@ Nothing here is deleted, so backing out is three configuration changes: object e
 
 | Was | Now | Saved | Cutover | Effort | Wait |
 |---|---|---|---|---|---|
-| $1,180/mo | $110/mo | 91% | 0 min | 5 days | — |
+| $12,800/mo | $1,150/mo | 91% | 0 min | 5 days | — |
 
 ## What you can turn off
 The cache nodes and the managed queues, after thirty days and a clean billing cycle. The object line shrinks rather than going: the archive stays.
