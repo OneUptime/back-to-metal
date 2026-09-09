@@ -5,6 +5,16 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [6.4.7] - 2026-09-09
+
+### Fixed
+
+- Rendered the introduction's shared emphasis as formatted text in the Kindle
+  edition, removing visible HTML tags around "open source". Added regression
+  checks for readable prose and intentional HTML inside code examples.
+- Regenerated the print interior, all covers, Kindle edition, website and README
+  so the publication files and downloads carry the same version.
+
 ## [6.4.6] - 2026-09-09
 
 ### Changed
