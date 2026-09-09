@@ -2,14 +2,14 @@
 # was installed globally or into .venv (see README).
 PY := $(shell [ -x .venv/bin/python3 ] && echo .venv/bin/python3 || echo python3)
 
-.PHONY: all deps verify audit webcheck agree releasable book covers epub pricing amazon artefacts site kdp readme clean
+.PHONY: all deps verify audit test webcheck agree releasable book covers epub pricing amazon artefacts site kdp readme clean
 
 # The build is a chain of renders, none of which parallelises, and one of the
 # links is an ordering nobody would guess from the dependency graph alone - see
 # `artefacts` below. Serial is what this Makefile means, so it says so.
 .NOTPARALLEL:
 
-all: verify audit book site webcheck readme agree
+all: verify audit artefacts
 
 deps:
 	npm install
@@ -21,6 +21,9 @@ verify:
 
 audit:
 	$(PY) book/audit.py
+
+test:
+	$(PY) -m unittest discover -s book -p 'test_*.py'
 
 # The third gate, and the only one that opens the site in a browser. verify.py
 # checks the shape of a Move and audit.py checks its content; neither of them
@@ -34,7 +37,7 @@ webcheck: site
 # be divided by two denominators - so it has been divided by the wrong one
 # three times, in three files, each caught by somebody reading two outputs side
 # by side. This reads the built artefacts and fails if they disagree.
-agree: site readme
+agree: epub site readme
 	$(PY) book/agree.py
 
 # The release gate: a bumped version, a written changelog entry, nothing left
@@ -74,9 +77,9 @@ amazon: verify audit book covers epub
 # the site is generated, or site/ ships whichever one happened to be committed.
 # `make book site covers epub` looks equivalent and is not: make walks goals
 # left to right, and site.py would run first.
-artefacts: book covers epub site webcheck readme agree
+artefacts: test book covers epub site webcheck readme agree
 
-site: book
+site: epub
 	$(PY) book/site.py
 
 kdp:

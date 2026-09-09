@@ -5,6 +5,22 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fact-checked all Moves against primary documentation; corrected cloud exports,
+  inventory scope, network configuration, state transfer, backup recovery and
+  account closure. Updated the documented platform versions and the exemplar.
+- Replaced unsupported performance and recovery promises with measured conditions,
+  clarified cost-model assumptions and corrected the printed website address.
+- Fixed calendar wait conversion and scheduling of independent work, without
+  changing the labour budget; corrected KDP royalty and short-book price bands.
+- Restored missing cloud extraction and shared decision/cost guidance in the
+  Kindle edition. The default build refreshes all editions before the website.
+- Added complete Move-content, metadata, financial and download agreement checks,
+  regression tests and a source-linked review in `docs/fact-check-2026-09-09.md`.
+- Regenerated print, Kindle, covers, website and README figures. Production
+  migration procedures remain documentation-verified and require rehearsal.
+
 ## [6.4.3] - 2026-09-09
 
 ### Changed

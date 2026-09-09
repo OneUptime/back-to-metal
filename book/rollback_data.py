@@ -18,13 +18,12 @@ def intro(oneway):
     on the one page where being wrong costs data. Every output counts the Moves
     it is rendering and hands the answer in, the way mission.py takes the total.
     """
-    tail = ('and none of them is irreversible, which is a property of this edition '
-            'rather than of the work: every Move here was chosen so that it could be'
-            ' undone.'
+    tail = ('and none is labelled irreversible from the outset. Each still has a '
+            'point of no return or conditions on recovery.'
             if oneway == 0 else
             f'and {oneway} are not reversible at all.')
     return (
-        'Every Move in this book changes something that is running. Most are reversible '
+        'Every Move in this book changes a plan, a commitment or a running system. Most are reversible '
         f'for a stated window, a few only until a particular step, {tail} The difference '
         'between a migration and an incident is almost never the technique - it is '
         'whether somebody worked out the way back before they started, and whether '
@@ -39,16 +38,19 @@ POINTS = [
      'that step today, and only then start at step one.'),
 
     ('A backup nobody restored is not a backup',
-     'It is a file. Before Stage 4, restore the backup you are relying on into a '
-     'scratch environment and count the rows against production. The number of '
-     'companies that discover their backups were empty during the incident that '
-     'needed them is not small, and every one of them had a green dashboard.'),
+     'Before Stage 4, restore the backup into isolation, with outbound jobs and '
+     'subscriptions disabled. Validate the expected data at its recorded recovery '
+     'point and test the recovered application. A changing production database '
+     'is not a valid comparison for an older backup. Record recovery time and '
+     'confirm the copy and its keys survive loss of the source site.'),
 
     ('Keep the old thing running, and keep paying for it',
      'The instinct after a successful cutover is to delete the source and book the '
-     'saving. Do not. The Reversible field on each Move is how long the old system '
-     'must stay warm, powered and receiving its own backups. That overlap is the '
-     'entire cost of being wrong, and it is cheap.'),
+     'saving. Keep the source for the window stated in that Move, with its backups. '
+     'The Reversible field can also name a condition, such as an unsigned order; '
+     'read it with the rollback. Once the destination accepts writes, a warm source '
+     'is stale unless those writes are carried back. Recovery may need a restore '
+     'and reconciliation before traffic can return.'),
 
     ('Cut over when you can undo it, not when you are confident',
      'Confidence is not evidence. The right time to move traffic is when the rollback '

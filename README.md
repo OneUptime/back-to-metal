@@ -1,38 +1,33 @@
 # Back to Metal
 
-**How a company leaves the cloud, in twenty moves**, by the makers of
+**How a company leaves the cloud, one move at a time**, by the makers of
 [OneUptime](https://oneuptime.com), published three ways: a printable
 book, a reflowable EPUB, and a static website you can host anywhere.
 
 Most writing about leaving the cloud is either an opinion piece or a programme plan for a
-company with a platform team. This is neither. It is twenty jobs, in five stages, sized for a
+company with a platform team. This handbook groups the work into stages, sized for a
 company whose platform is two or three engineers' work and whose cloud bill is somewhere around $100,000 a month.
 
 📕 **[dist/Back-to-Metal.pdf](dist/Back-to-Metal.pdf)** &nbsp;·&nbsp;
 📖 **[dist/Back-to-Metal.epub](dist/Back-to-Metal.epub)** &nbsp;·&nbsp;
 🌐 **[site/](site/)** — open `site/index.html`
 
-## Twenty Moves, five stages
+## The stages
 
-| | | |
-|---|---|---|
-| **1 · Decide** | 01–04 | Work out whether to do it at all |
-| **2 · Buy** | 05–08 | Order the hardware and sign the space |
-| **3 · Build** | 09–12 | Turn the boxes into a cluster |
-| **4 · Move** | 13–16 | Move the app, then the data |
-| **5 · Run** | 17–20 | Cut the traffic over, and keep it alive |
+Decide, Buy, Build, Move and Run. The generated tables below show the current
+Move counts, stage boundaries and prerequisites.
 
 Each Move is one job, with a stated cutover in minutes of user-visible downtime, a stated
-risk, and a rollback that names its point of no return. Each can be done on a Tuesday and
-undone on a Wednesday, and you can stop after any of them and still be somewhere coherent.
+risk, and a rollback that names its point of no return. Rehearse the return path;
+some commitments and deletions cannot be undone.
 
 ## It is honest about the size of it
 
 The first edition of this book had 122 Moves. It was correct, and it was 975 person-days and
 four and a half years of elapsed time for three engineers, which is not a plan a company can
 act on. This edition is the same argument at a size somebody can finish: the whole thing is
-around eighty person-days — the table at the foot of this file has the exact figure, computed
-from the Move files — and most of the calendar is waiting for hardware rather than working.
+estimated from the Move files. Procurement and observation windows extend the calendar
+without adding engineer-days; they are accounted for separately from labour.
 
 The exact figures are in the table at the foot of this file, and they are computed from the
 Move files rather than typed.
@@ -83,7 +78,7 @@ read top to bottom rather than search a graph.
 ## Layout
 
 ```
-moves/       the twenty Move files, numbered from 01 — the source of truth
+moves/       the Move files, numbered from 01 — the source of truth
 book/        the typesetter and the site generator
   parse.py       markdown -> structured Move data
   verify.py      structure: the contract, the arithmetic, the house style
@@ -170,12 +165,12 @@ give credit.
 | Stage 4 · Move | 4, 13–16 |
 | Stage 5 · Run | 4, 17–20 |
 | Work | 107 person-days |
-| End to end, two engineers | 44 weeks, most of it waiting for hardware |
+| End to end, two engineers | 41 weeks, including procurement and observation waits |
 | At zero downtime | 18 of 20 |
 | Whole book, end to end | 25 minutes of user-visible outage |
-| Cannot be undone | 0 |
+| Cannot be undone | 1 |
 | Risk | 3 low, 7 medium, 10 high |
-| Dependencies | 31, every one pointing backwards |
+| Dependencies | 30, every one pointing backwards |
 | Line savings across the Moves | $86,320 a month, after the facility line, before other platform costs |
 | Saving, with everything counted | $80,885 a month &mdash; $970,620 a year, 71 per cent of a $114,644 bill with the salary on both sides |
 
@@ -188,7 +183,7 @@ Every Move names the real service on AWS, Google Cloud and Azure, and the one th
 | 01 | [The bill, and the three lines that are most of it](moves/01-the-bill-and-the-three-lines-that-are-most-of-it.md) | — | Low | 0 min | Immediately |
 | 02 | [What you actually run](moves/02-what-you-actually-run.md) | — | Low | 0 min | Immediately |
 | 03 | [The number that decides it](moves/03-the-number-that-decides-it.md) | — | Medium | 0 min | Immediately |
-| 04 | [The three things you keep renting](moves/04-the-three-things-you-keep-renting.md) | Nothing — this Move decides what stays rented | Low | 0 min | Immediately |
+| 04 | [The three things you keep renting](moves/04-the-three-things-you-keep-renting.md) | Nothing — this Move decides what stays rented | Low | 0 min | Until a contract is signed |
 
 ## Stage 2 · Buy
 
@@ -224,4 +219,4 @@ Every Move names the real service on AWS, Google Cloud and Azure, and the one th
 | 17 | [The front door](moves/17-the-front-door.md) | Managed layer-7 balancers and certificate services | Medium | 0 min | Immediately |
 | 18 | [Go-live, and how you abort](moves/18-go-live-and-how-you-abort.md) | Weighted DNS and the parallel managed edge | High | 10 min | 7 days |
 | 19 | [Backups you have restored, and the pager](moves/19-backups-you-have-restored-and-the-pager.md) | Managed backup, alarms and a rented paging service | High | 0 min | Immediately |
-| 20 | [Closing the account](moves/20-closing-the-account.md) | The provider organisation, its audit trail and its support plan | High | 0 min | 30 days |
+| 20 | [Closing the account](moves/20-closing-the-account.md) | The provider organisation, its audit trail and its support plan | High | 0 min | No |

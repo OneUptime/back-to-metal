@@ -6,57 +6,56 @@
 
 # 02 · Managed Postgres, brought home
 
-**Layer:** Move · **Leaving:** Managed PostgreSQL · **Risk:** High · **Cutover:** 12 min · **Reversible:** 30 days
+**Layer:** Move · **Leaving:** Managed PostgreSQL · **Risk:** High · **Cutover:** 15 min · **Reversible:** 7 days
 
-> Logical replication carries the data while both databases are live, so the downtime is only the seconds it takes to stop writing to one and start on the other.
+> Fifteen minutes of stopped writes, at the end of a week in which the new cluster was caught up, backed up, and restored once on purpose.
 
 ## Leaving from
-- **AWS:** RDS for PostgreSQL — set the `rds.logical_replication` parameter to 1 and reboot; Aurora needs the same flag but replicates from the writer endpoint only.
-- **Google Cloud:** Cloud SQL for PostgreSQL — set the `cloudsql.logical_decoding` flag, which also reboots, and grant the `cloudsqlexternalsync` role before creating a publication.
-- **Azure:** Database for PostgreSQL Flexible Server — set `wal_level` to `logical` in server parameters; Single Server has no logical decoding at all and has to be dumped and restored instead.
+- **AWS:** RDS for PostgreSQL — the default parameter group cannot be edited, so `rds.logical_replication` needs a custom group and a reboot.
+- **Google Cloud:** Cloud SQL for PostgreSQL — `cloudsql.logical_decoding` requires a restart; retained write-ahead log can fill storage or trigger a billed increase when automatic growth is enabled.
+- **Azure:** Database for PostgreSQL flexible server — `CREATE EXTENSION` fails until the name is in the `azure.extensions` allowlist, and extensions requiring `shared_preload_libraries` also need a server restart.
 
 ## Why this works
-Every managed PostgreSQL is PostgreSQL with a control plane bolted on, and the PostgreSQL underneath speaks the same replication protocol as any other instance. A publication on the source and a subscription on the destination move the data continuously while the application keeps writing, which turns a migration into a wait. What remains at cutover is draining the last transactions, promoting the new primary and pointing the application at it. The twelve minutes are not the copy; they are the verification you should refuse to skip.
+Logical replication carries table data while the managed source keeps serving. This example targets CloudNativePG on Kubernetes, with a primary and two standbys on different physical hosts. The initial copy and a restore from an independent backup happen before the maintenance window. Fifteen minutes is a rehearsed reference allowance for the final write stop and validation, not a guarantee based on database size. Existing PostgreSQL VMs can use their own tested replication and backup plan instead.
 
 ## Before you start
 
 **Access**
-- Superuser or the provider's nearest equivalent on the source, with logical decoding already enabled and the reboot taken
-- A maintenance window agreed with whoever owns the application
+- Logical decoding enabled on the managed instance, with the reboot taken
+- Credentials for an object-backup repository and an independent off-site copy, separate from the cluster's
+- A Kubernetes database platform, local NVMe and physical-host replica separation
 
 **Software**
-- CloudNativePG 1.25 or newer, installed and running a test cluster you have already failed over
-- `psql` and `pg_dump` at a version at least as new as the server
-- `pgbackrest` 2.54 or newer, writing to a repository in a third location
+- CloudNativePG 1.30.0, with a pinned PostgreSQL image on the source's supported major version and a rehearsed failover
+- Barman Cloud plugin 0.15.0 and cert-manager 1.21.1; the plugin requires CloudNativePG 1.26 or later
+- `psql` and `pg_dump` no older than the managed server
 
-**Hardware**
-- Local NVMe on at least three nodes, with a storage class that pins a volume to its node
-- Enough disk for the database plus fifty per cent, measured rather than estimated
+**People**
+- The application owner, present for the window when writes stop
 
 ## The runbook
-1. Take a `pgbackrest` backup of the destination's empty cluster and restore it into a scratch namespace. A backup nobody restored is not a backup, and this is the cheapest moment to find that out.
-2. Copy the schema only, with `pg_dump --schema-only`, and apply it to the destination. Create every table but no indexes on large tables yet; they slow the initial sync and are faster to build afterwards.
-3. Create a publication on the source for all tables, and a subscription on the destination. Watch `pg_stat_subscription` until the initial copy finishes and the lag settles under a second.
-4. Build the deferred indexes on the destination, then compare row counts table by table and checksum a sample of the largest three. Do not proceed on a count that disagrees, however small the difference looks.
-5. Open the maintenance window. Stop the application's writers, wait for replication lag to reach zero, and confirm it with `pg_current_wal_lsn` on both sides.
-6. Advance every sequence on the destination past its source value. A migration that forgets the sequences works perfectly until the first insert collides, which is usually about ninety seconds later.
-7. Repoint the application's connection string at the destination and start the writers. Watch error rates and query latency for ten minutes before you call it done.
-8. Leave the managed instance running, and leave its automated backups on, for the full thirty days.
+1. List extensions, roles, large objects and table replica identities with `psql`. Recreate required roles and grants; provider-only extensions or unsupported objects block the Move until a tested alternative exists. Freeze schema changes and rehearse returning destination writes to the managed instance.
+2. Apply `pg_dump --schema-only` to a CloudNativePG cluster with one primary and two standbys on separate hosts. Preserve primary keys and replica-identity indexes. Confirm every updated or deleted source table has a suitable replica identity; the schema dump does not copy cluster-wide roles.
+3. Create the publication and subscription, keeping application writes off the destination. Monitor `pg_stat_subscription`, table synchronization and retained source WAL continuously. Require every table to finish its initial copy and application queries to pass before booking cutover.
+4. Configure the Barman Cloud plugin's ObjectStore and cluster plugin settings for continuous archiving and scheduled full backups. Keep an independent off-site copy with its keys. Check WAL arrival and archive failures; backups confined to the rack do not survive its loss.
+5. Restore from the off-site copy into isolation and replay to a recorded timestamp. Disable subscriptions and outbound jobs there; compare with checks recorded for that recovery point, not a changing production database. Measure recovery and confirm the recovered application works before allowing destination writes.
+6. Open the window. Stop all source writers and wait for in-flight transactions. Record a final published transaction and confirm the subscriber applies it after every table is synchronized. Compare final data, transfer any separately handled objects and set destination sequences from source values. Abort to the source if checks exceed the rehearsed deadline.
+7. Disable the forward subscription, fence source writers and switch every connection string. Start writes only on the destination, then verify VM and container clients, errors and query latency. Keep destination backups running and preserve the tested return procedure throughout the seven days.
 
 ## Operator's notes
-- **Swap:** For a database under 50 GB with a tolerant maintenance window, `pg_dump` and restore is simpler and finishes inside an hour. Logical replication earns its complexity above roughly that size.
-- **Do it faster:** Run the initial sync from a read replica rather than the primary. It costs an extra instance for a day and takes the load off the database serving traffic.
-- **Watch out:** Logical replication does not carry sequences, large objects, or DDL. Every one of those has ended a cutover that otherwise went perfectly.
-- **Leftovers:** The publication and subscription stay in place until you drop them. Drop them deliberately after the thirty days, or the source keeps retaining write-ahead log for a subscriber nobody is reading.
+- **Swap:** A reverse subscription can shorten rollback only if the managed service permits it and its replication loop prevention and sequence repair have been rehearsed. Keeping the old instance alone does not keep its data current.
+- **Do it faster:** Tune `max_sync_workers_per_subscription` within the source's slot and destination's worker budgets. Initial table copies already support parallelism; splitting related tables across subscriptions loses their shared transaction boundary.
+- **Watch out:** Replication carries rows only. Sequences, large objects, schema changes and tuned parameters stay behind, and a sequence left at one collides on the first insert.
+- **Leftovers:** A disabled subscription still retains source WAL. Once rollback no longer needs it, remove the subscription and verify slot cleanup; normal subscription removal drops its slot, but a detached or orphaned slot needs separate cleanup.
 
 ## Rollback
-Until step seven the source is still the primary and still authoritative, so backing out is stopping the subscription and doing nothing else. The point of no return is the first write that lands on the destination: from that moment the two databases have diverged and returning means replicating backwards, not switching back. If you must return after that, stop the writers, set up the reverse subscription from destination to source, wait for it to drain, and repoint. Keep the managed instance and its automated backups for thirty days so a restore to a known good point stays possible.
+Until destination writes resume, return connection strings to the source and release its write pause. The point of no return for that quick return is the first destination commit. After it, stop writers again and use the rehearsed reverse replication or restore-and-replay procedure to carry those commits back; verify data and sequence positions before reopening the source. A source backup predating cutover cannot recover newer writes. Retain the managed instance and its backups for seven days, and take destination backups throughout that period.
 
 ## The numbers
 
 | Was | Now | Saved | Cutover | Effort | Wait |
 |---|---|---|---|---|---|
-| $4,180/mo | $410/mo | 90% | 12 min | 6 days | — |
+| $4,180/mo | $410/mo | 90% | 15 min | 6 days | — |
 
 ## What you can turn off
-The managed instance, its read replicas and its snapshots — after thirty days, and after a full billing cycle has shown the line gone.
+The managed instance and read replicas after seven days, verified destination recovery and the required snapshot retention. Confirm the resulting charges disappear on the next invoice; an active instance cannot produce that evidence first.

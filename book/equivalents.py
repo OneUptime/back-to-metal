@@ -26,7 +26,7 @@ ROWS = [
     ('AMI',                  'Machine images',        'Managed images',
      'KVM guest templates; rebuild or rehearse a supported disk import', '14'),
     ('VPC',                  'VPC networks',          'Virtual Network',
-     'Two switches, four ranges, and an address plan on one page', '10'),
+     'Two switches, separate address ranges, and a documented routing plan', '10'),
 
     # --- storage and data
     ('EBS',                  'Persistent Disk',       'Managed Disks',
@@ -42,7 +42,7 @@ ROWS = [
     ('SQS and SNS',          'Pub/Sub',               'Service Bus',
      'NATS JetStream, or a table in the database you already have', '15'),
     ('Glacier Deep Archive', 'Archive storage class', 'Archive tier',
-     'Keep paying - the egress to extract it costs more than the years', '15'),
+     'Keep paying where retrieval, retention and migration costs justify it', '15'),
     ('AWS Backup',           'Backup and DR Service', 'Azure Backup',
      'Whole-VM backups, Velero and database archives, held off-site', '19'),
 
@@ -50,9 +50,9 @@ ROWS = [
     ('Application Load Balancer', 'Cloud Load Balancing', 'Application Gateway',
      'Envoy Gateway behind a virtual IP that fails over', '17'),
     ('ACM',                  'Certificate Manager',   'Key Vault certificates',
-     'cert-manager, issuing and renewing without anybody watching', '17'),
+     'cert-manager, with renewal failures and expiry monitored', '17'),
     ('Route 53',             'Cloud DNS',             'Azure DNS',
-     'Two independent authoritative providers, never one', '18'),
+     'Managed authoritative DNS; rehearse changes separately from cutover', '18'),
     ('NAT Gateway',          'Cloud NAT',             'NAT Gateway',
      'Node addresses, and one translation hop for the few that need it', '18'),
     ('CloudFront',           'Cloud CDN',             'Azure Front Door',
@@ -68,7 +68,7 @@ ROWS = [
     ('Secrets Manager',      'Secret Manager',        'Key Vault',
      'Encrypted in the repository, with the key held outside the cluster', '13'),
     ('CodeBuild',            'Cloud Build',           'Azure Pipelines',
-     'Runners on the machines you already own and are not using', '13'),
+     'Isolated build runners, or the existing hosted CI service', '13'),
     ('CloudWatch metrics',   'Cloud Monitoring',      'Azure Monitor',
      'Prometheus, with a cardinality budget agreed in advance', '19'),
     ('CloudWatch Logs',      'Cloud Logging',         'Log Analytics',
@@ -78,7 +78,7 @@ ROWS = [
     ('Cost Explorer',        'Cloud Billing reports', 'Cost Management',
      'A model built from invoices, counting power, spares and the rota', '03'),
     ('Organizations',        'Organisation and projects', 'Subscriptions and Entra',
-     'One account left open only until the last invoice reads zero', '20'),
+     'Retire empty accounts; keep those that own retained services or records', '20'),
 ]
 
 CLOUDS = ['AWS', 'Google Cloud', 'Azure']

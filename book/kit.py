@@ -61,23 +61,23 @@ HOMELAB_KIT = [
 ]
 
 COST_SCOPE = (
-    'These figures price the container reference build. For VMs, include '
-    'hypervisor support, guest licences and VM backup capacity, and replace the '
-    'reference operating hours with your measured budget in Move 03.'
+    'This prices a container estate at one site with off-site recovery. Add VM '
+    'support, licences, backups and any required second site. Validate operating '
+    'hours in Move 03. Totals exclude transition labour, overlapping cloud bills, '
+    'financing and taxes.'
 )
 
 PLATFORM_SCOPE = (
-    'Cloud VMs move to KVM guests on Proxmox VE hosts; several guests share each '
-    'physical machine. Already-containerised workloads use Talos and Kubernetes, '
-    'directly on hardware or in guests when sharing a VM estate. Classify the '
-    'workloads in Move 02 before assigning hosts in Move 11. ' + COST_SCOPE
+    'Cloud VMs share Proxmox VE hosts as KVM guests. Containers run on Talos and '
+    'Kubernetes, on hardware or in guests. Classify workloads in Move 02 before '
+    'assigning hosts in Move 11. ' + COST_SCOPE
 )
 
 SHELVES = [
     ('Compute', [
         f'{REFERENCE["nodes"]} 1U dual-socket servers, and {REFERENCE["spares"]} on the shelf',
         '32 physical cores a node, current-generation EPYC or Xeon',
-        '256 GB ECC memory a node, all channels populated',
+        '256 GB ECC memory a node, in a vendor-approved balanced configuration',
         'Redundant hot-swap power supplies, each fed from a different strip',
         'A management controller on every node - Redfish, not just a web console',
     ]),
@@ -99,11 +99,11 @@ SHELVES = [
     ('The software stack', [
         'Proxmox VE on VM hosts, with KVM guests for Linux and Windows workloads',
         'Talos Linux for Kubernetes nodes, on hardware or in KVM guests',
-        'Kubernetes, on a version at least one minor behind the newest',
+        'Kubernetes, on a supported version compatible with the whole stack',
         'Cilium for the cluster network, with kube-proxy replaced',
         'Ceph owned by Proxmox for VM disks or by Rook on direct Talos nodes',
         'CloudNativePG, on local NVMe rather than on Ceph',
-        'cert-manager and Envoy Gateway',
+        'cert-manager before database backup plugins; Envoy Gateway at the edge',
         'Argo CD, with the cluster state in Git',
         'Prometheus and Loki for the stores, OneUptime for what wakes somebody',
         'Velero for Kubernetes; separate whole-VM backups, each restore rehearsed',
@@ -131,12 +131,13 @@ KIT = [
 # for a company with two engineers rather than twenty.
 RULES = [
     ('Move the cheapest thing first.',
-     'Not the most expensive. The first Move exists to prove the platform and the '
+     'The first service cutover exists to prove the platform and the '
      'team, and it should be something whose failure is a shrug. You are buying '
      'evidence, and evidence is worth more early than savings are.'),
     ('Data moves last and leaves last.',
-     'Every stateless thing can be cut over and cut back in minutes. State cannot. '
-     'Move compute first, run it against the cloud database across the link, and '
+     'Stateless traffic can return quickly when both paths and client behaviour '
+     'have been tested. State needs a transfer plan. Move compute first, run it '
+     'against the cloud database across the link, and '
      'only then move the database - by which point you have already learned the '
      'things you would otherwise learn during a data migration.'),
     ('Never run two platforms longer than you planned to.',

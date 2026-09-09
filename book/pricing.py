@@ -5,11 +5,10 @@ making the copy — royalty minus printing for the print editions, royalty minus
 delivery fee for Kindle. It is the number that decides whether the book is worth
 selling, and on a long colour book it is set almost entirely by the page count.
 
-Every figure this uses is marked UNVERIFIED in book/imprint.py. Confirm them in
-KDP's own printing-cost calculator before pricing anything: the conclusions here
-are only as good as those inputs.
+Public rate sources and verification dates are recorded in book/imprint.py.
+Confirm the title configuration and converted ebook size in KDP before pricing.
 """
-import re, sys
+import math, re, sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -29,8 +28,27 @@ def pages():
 
 
 def print_cost(n, ink):
+    if ink == 'premium colour' and n <= IMP.PREMIUM_SHORT_MAX_PAGES:
+        return IMP.PREMIUM_SHORT_COST_USD
     fixed, per_page = IMP.INK[ink]
     return fixed + per_page * n
+
+
+def print_rate(listed):
+    return (IMP.PRINT_LOWER_ROYALTY_RATE if listed < IMP.PRINT_60_MIN_USD
+            else IMP.PRINT_ROYALTY_RATE)
+
+
+def print_min_list(unit_cost, margin):
+    """Solve each royalty band, then take the cheapest valid cent price."""
+    low = min_list(unit_cost, IMP.PRINT_LOWER_ROYALTY_RATE, margin)
+    if low is not None:
+        low = math.ceil(low * 100 - 1e-9) / 100
+        if low < IMP.PRINT_60_MIN_USD:
+            return low
+    high = min_list(unit_cost, IMP.PRINT_ROYALTY_RATE, margin)
+    return (max(IMP.PRINT_60_MIN_USD, math.ceil(high * 100 - 1e-9) / 100)
+            if high is not None else None)
 
 
 def min_list(unit_cost, rate, margin):
@@ -53,6 +71,25 @@ def row(label, unit_cost, rate, target, listed):
     got = margin_at(listed, unit_cost, rate) if listed else None
     return {'label': label, 'cost': unit_cost, 'rate': rate, 'need': need,
             'listed': listed, 'margin': got}
+
+
+def print_row(label, cost, target, listed):
+    need = print_min_list(cost, target)
+    r = row(label, cost, print_rate(listed if listed is not None else need), target, listed)
+    r.update(need=need, floor=print_min_list(cost, 0))
+    return r
+
+
+def kindle_row(mb, listed):
+    # KDP: rate * (price - delivery), NOT rate * price - delivery.
+    # https://kdp.amazon.com/en_US/help/topic/G200644210 (2026-09-09)
+    deduction = mb * IMP.KDP_DELIVERY_PER_MB * IMP.KINDLE_ROYALTY_RATE
+    r = row(f'Kindle ({mb:.2f} MB estimate)', deduction, IMP.KINDLE_ROYALTY_RATE,
+            IMP.MIN_KINDLE_MARGIN, listed)
+    r['need'] = max(IMP.KDP_70_BAND[0], math.ceil(r['need'] * 100 - 1e-9) / 100)
+    r['floor'] = max(IMP.KDP_70_BAND[0],
+                     math.ceil(mb * IMP.KDP_DELIVERY_PER_MB * 100 - 1e-9) / 100)
+    return r
 
 
 def main():
@@ -90,16 +127,16 @@ def main():
 
     # ---- print editions ----------------------------------------------------
     pb_cost = print_cost(n, IMP.INK_CHOICE)
-    rows.append(row(f'Paperback ({IMP.INK_CHOICE})', pb_cost,
-                    IMP.PRINT_ROYALTY_RATE, target, IMP.LIST_USD.get('paperback')))
+    rows.append(print_row(f'Paperback ({IMP.INK_CHOICE})', pb_cost,
+                          target, IMP.LIST_USD.get('paperback')))
 
     # The hardcover rate is a property of the trim and the ink, so it can be
     # computed - but only for a page count KDP will actually print.
     hb_cost = (IMP.HARDBACK_PRINT_COST_USD if IMP.HARDBACK_PRINT_COST_USD is not None
                else IMP.HARDBACK_FIXED_USD + IMP.HARDBACK_PER_PAGE_USD * n)
     if hardback_printable:
-        rows.append(row(f'Hardback ({IMP.HARDBACK_INK})', hb_cost,
-                        IMP.PRINT_ROYALTY_RATE, target, IMP.LIST_USD.get('hardback')))
+        rows.append(print_row(f'Hardback ({IMP.HARDBACK_INK})', hb_cost,
+                              target, IMP.LIST_USD.get('hardback')))
         notes.append('Hardcover is premium colour only — KDP does not offer standard colour '
                      'for it, so the hardback cannot be made cheaper the way the paperback can.')
     else:
@@ -110,18 +147,16 @@ def main():
     # ---- kindle ------------------------------------------------------------
     if EPUB.exists():
         mb = EPUB.stat().st_size / 1e6
-        delivery = mb * IMP.KDP_DELIVERY_PER_MB
-        k = row(f'Kindle ({mb:.2f} MB)', delivery, IMP.KINDLE_ROYALTY_RATE,
-                IMP.MIN_KINDLE_MARGIN, IMP.KINDLE_LIST_USD)
+        k = kindle_row(mb, IMP.KINDLE_LIST_USD)
         rows.append(k)
         lo, hi = IMP.KDP_70_BAND
         if not (lo <= IMP.KINDLE_LIST_USD <= hi):
             problems.append(f'Kindle list ${IMP.KINDLE_LIST_USD:.2f} is outside the '
                             f'{IMP.KINDLE_ROYALTY_RATE:.0%} band ${lo:.2f}-${hi:.2f}; '
                             f'it would earn 35%, not 70%')
-        notes.append('KDP charges delivery on the CONVERTED file size, not the EPUB. '
-                     'Measured once, on the illustrated 1.0.0 edition: a 4.23 MB EPUB '
-                     'converted to 4.56 MB, so this estimate runs slightly optimistic.')
+        notes.append('Kindle deducts delivery before applying the royalty percentage. '
+                     'KDP charges on the converted file size; the EPUB size here is '
+                     'only an estimate. Confirm the converted size and account eligibility.')
     else:
         notes.append('No EPUB built, so the Kindle edition was not checked (make epub).')
 
@@ -129,14 +164,14 @@ def main():
     print(f'pricing: {n} pages, ink "{IMP.INK_CHOICE}", '
           f'target margin {target:.0%} print / {IMP.MIN_KINDLE_MARGIN:.0%} Kindle\n')
     w = max(len(r['label']) for r in rows)
-    print(f'  {"edition".ljust(w)}  {"unit cost":>9}  {"KDP min":>8}  '
+    print(f'  {"edition".ljust(w)}  {"deduction":>9}  {"KDP min":>8}  '
           f'{"25% at":>8}  {"your list":>9}  {"margin":>7}')
     for r in rows:
         need = f"${r['need']:.2f}" if r['need'] else 'impossible'
         listed = f"${r['listed']:.2f}" if r['listed'] else '—'
         marg = f"{r['margin']:.0%}" if r['margin'] is not None else '—'
         # KDP will not accept a list price below printing cost / royalty rate
-        floor = f"${r['cost'] / r['rate']:.2f}"
+        floor = f"${r['floor']:.2f}"
         print(f"  {r['label'].ljust(w)}  {'$%.2f' % r['cost']:>9}  {floor:>8}  "
               f"{need:>8}  {listed:>9}  {marg:>7}")
     print()
@@ -162,8 +197,8 @@ def main():
         print(f'  paperback at ${pb_list:.2f}, by ink:')
         for ink in IMP.INK:
             cost = print_cost(n, ink)
-            m = margin_at(pb_list, cost, IMP.PRINT_ROYALTY_RATE)
-            per_copy = IMP.PRINT_ROYALTY_RATE * pb_list - cost
+            m = margin_at(pb_list, cost, print_rate(pb_list))
+            per_copy = print_rate(pb_list) * pb_list - cost
             verdict = ('below cost' if per_copy < 0
                        else 'clears target' if m >= target else 'under target')
             mark = '<-- selected' if ink == IMP.INK_CHOICE else ''
@@ -182,7 +217,7 @@ def main():
         print('\npricing: TARGET NOT MET')
         for x in problems:
             print('  -', x)
-        print('\n  Every figure here is unverified — check KDP\'s printing-cost calculator '
+        print('\n  Confirm the title configuration in KDP\'s printing-cost calculator '
               'before treating this as final.')
         sys.exit(1)
     print('\npricing: all editions clear their target margin')
