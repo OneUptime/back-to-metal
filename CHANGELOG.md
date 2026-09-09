@@ -5,6 +5,16 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [6.3.1] - 2026-09-09
+
+### Fixed
+
+- The printed Move metadata uses equal-width columns with space on both sides
+  of each dividing rule. Labels and values share a consistent left edge.
+- The foreword's anatomy illustration fits its column, preserving the gap
+  between the diagram and its numbered key.
+- Regenerated the print and Kindle editions, covers and website for this patch.
+
 ## [6.3.0] - 2026-09-09
 
 Two practical routes off the cloud, with the existing operations team.
