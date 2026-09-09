@@ -12,8 +12,18 @@
 4. `make releasable` — the release gate. It is not part of `make`, because CI has to stay green
    while work is in progress and this is the one check that must not pass until it should.
 5. Commit the regenerated `dist/`, `site/` and `README.md` along with the sources.
-6. Merge to the `release` branch and push. **That is the release**: pushing to `release` runs
-   `.github/workflows/release.yml`, which does everything below on its own.
+6. Merge the reviewed changes into `main` and wait for CI to pass. Fast-forward `release` to
+   that commit and push. **That is the release**: pushing to `release` runs
+   `.github/workflows/release.yml`, which does everything below on its own, including creating
+   the version tag. With `release` still an ancestor of `main`, no local branch switch is needed:
+
+   ```bash
+   git fetch origin main release --tags
+   git merge-base --is-ancestor origin/release origin/main && \
+     git push origin refs/remotes/origin/main:refs/heads/release
+   ```
+
+   If the ancestry check fails, reconcile the branches before releasing; do not force-push.
 
 `EPUB_ID` in `book/imprint.py` must **not** change. It names the work, not the build: retailers
 and libraries key on it, and a new string presents the next version as a different book. The
@@ -49,12 +59,14 @@ CI also runs `make artefacts` once. This builds the interior and covers once, ge
 Kindle edition before the site copies it, refreshes the README's figures and runs the browser
 and figure-agreement checks. Both workflows reject changes to generated site files or the
 README after that build; timestamped PDF and EPUB downloads are excluded from the comparison.
+Both workflows also require a nonempty `dist/cover-hardback.pdf` before bundling the editions.
 
 **Publish** deploys `site/` to Firebase, fetches the page it has just published and fails
 unless it is serving this version, and then cuts the GitHub release with the interior, the
-Kindle edition, the paperback wrap and the Kindle cover attached. The hardback case is not
-among them: `cover.py` will not guess its dimensions, so until `HC` is measured there is
-nothing to attach. Re-running a release corrects it rather than failing on it.
+Kindle edition, the paperback wrap, the hardcover case and the Kindle cover attached. The
+hardcover file is `dist/cover-hardback.pdf`; its dimensions come from the KDP Cover Calculator
+recorded in `HC`, and `cover.py` refuses to guess them. Re-running a release corrects it
+rather than failing on it.
 
 Two ways to start it:
 
@@ -192,8 +204,10 @@ These are the human steps the build deliberately will not take for you.
    `imprint.ISBN`. The two records have to go on agreeing with each other.
 6. `make amazon`. It runs verify, audit, the interior, both wraps, the Kindle edition and the
    margin gate, and refuses to finish if the hardback case is unmeasured or the economics do not
-   work.
-7. Run Adobe epubcheck and Kindle Previewer 3 against `dist/Back-to-Metal.epub`. The built-in
+   work. The submission files are `dist/Back-to-Metal.pdf`, `dist/Back-to-Metal.epub`,
+   `dist/cover-paperback.pdf`, `dist/cover-hardback.pdf` and `dist/cover-kindle.jpg`.
+   This prepares the files; it does not submit them to KDP or create a separate archive.
+7. Run EPUBCheck and Kindle Previewer 3 against `dist/Back-to-Metal.epub`. The built-in
    `epubcheck.py` catches what breaks a Kindle conversion, but it is not a substitute.
 8. Once the editions are live, put the ASINs in `imprint.AMAZON`. The website links to the
    product pages only when they exist, so nothing needs disabling until then.

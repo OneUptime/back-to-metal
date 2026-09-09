@@ -5,6 +5,20 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [6.4.6] - 2026-09-09
+
+### Changed
+
+- Added the submitted Bowker ISBNs for the paperback and hardcover, and aligned
+  the publisher name with the filed HackerBay, Inc. records.
+- Configured the hardcover case from KDP's official template for the 76-page,
+  8.25 × 11 inch premium colour edition. Kept the spine free of text and reserved
+  the barcode area.
+- Included the hardcover cover in checked CI bundles and GitHub releases.
+- Regenerated the print interior, all covers, Kindle edition, website and README
+  for the final submission checks. Amazon publication remains subject to its
+  preview and submission process.
+
 ## [6.4.5] - 2026-09-09
 
 ### Changed
