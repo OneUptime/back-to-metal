@@ -133,7 +133,7 @@
   --tick:22px;                      /* a checkbox */
   --mark:32px;                      /* the OneUptime mark, height and <img> */
   --fcol:240px;                     /* one column of the footer directory */
-  --hook-min:16em;                  /* a Move row's hook, below which it goes */
+  --mv-facts:160px;                 /* shared facts column in every Move row */
   --seg:6px;                        /* one segment of the progress bar */
   --next-w:22em;                    /* the header's next title, truncated */
   --chart:700px;                    /* the cost chart, at its own scale */
@@ -920,36 +920,31 @@ html.scrolled .wm{font-size:16px}
    ================================================================ */
 .stages,.mv{list-style:none;margin:0;padding:0}
 .mv>li{border-top:1px solid var(--rule2);position:relative}
+.mv>li:last-child{border-bottom:1px solid var(--rule2)}
 .mv a{display:grid;
-  grid-template-columns:var(--num) minmax(9em,15em)
-                        minmax(var(--hook-min),1fr) max-content;
-  gap:0 var(--s5);align-items:baseline;padding:var(--s4) 0;text-decoration:none;
-  transition:background var(--t-move) var(--e-out)}
-/* Hovering a row lights a 2px marker in the Stage colour down its
-   left edge, growing from the top rather than appearing, and washes
-   the fill in from the same edge. Both start at the left because the
-   ordinal is at the left and that is where the eye already is. */
+  grid-template-columns:var(--num) minmax(0,1fr) minmax(0,1.15fr) var(--mv-facts);
+  gap:0 var(--s5);align-items:baseline;padding:var(--s5) var(--s4);
+  text-decoration:none}
+.mv a>span{min-width:0}
+/* Every row uses the same tracks and inset. The stage marker and
+   underline indicate interaction without shifting the title column. */
 .mv>li::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
-  background:var(--c);transform:scaleY(0);transform-origin:50% 0;
+  background:var(--c);pointer-events:none;transform:scaleY(0);transform-origin:50% 0;
   transition:transform var(--t-move) var(--e-out)}
 .mv>li:hover::before,.mv>li:focus-within::before{transform:none}
-.mv a:hover,.mv a:focus-visible{
-  background:linear-gradient(90deg,var(--fill),transparent 72%)}
-.mv a:hover .mv-t{text-decoration:underline;text-underline-offset:3px}
+.mv a:hover .mv-t,.mv a:focus-visible .mv-t{
+  text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:var(--s1)}
 .mv-n{font:400 var(--m-val)/1.3 var(--mono);color:var(--c);
   font-variant-numeric:tabular-nums}
-.mv-t{transition:transform var(--t-move) var(--e-out)}
-.mv a:hover .mv-t{transform:translateX(3px)}
 .mv-t{font-size:var(--t-body);line-height:1.3;font-variation-settings:'wdth' 92;
   font-weight:600;color:var(--ink)}
-/* Hooks run to 171 characters and the rows have to stay a scannable
-   height, so three lines is the clamp: it holds all but the longest
-   two, and the Move page carries every hook in full. */
-.mv-h{font-size:var(--t-sub);line-height:var(--lh-sub);color:var(--ink3);
-  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+/* Keep the full hook readable when a narrow column wraps it. */
+.mv-h{font-size:var(--t-sub);line-height:var(--lh-sub);color:var(--ink3)}
 .mv-f,.ck-f{font:400 var(--m-lab)/1.6 var(--mono);color:var(--ink3);
   font-variant-numeric:tabular-nums}
-.mv-f{display:flex;flex-wrap:wrap;gap:0 var(--s4)}
+.mv-f{display:grid;gap:var(--s1);font-size:var(--t-fine)}
+.mv-f i{display:flex;justify-content:space-between;gap:var(--s2)}
+.mv-f b{font-weight:400;color:var(--ink2)}
 /* FOUR FIGURES, FOUR COLUMNS. As a flex row inside a per-row grid each
    strip sized itself, so down twenty rows the effort figure started at
    fourteen different positions, the risk at eight and the downtime at
@@ -1544,6 +1539,7 @@ html.js .sn:hover{color:var(--ink)}
   html.scrolled .bar-in{row-gap:0}
   .mv a{grid-template-columns:var(--num) minmax(0,1fr);gap:var(--s1) var(--s4)}
   .mv-t,.mv-h,.mv-f{grid-column:2}
+  .mv-f{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s4);margin-top:var(--s2)}
   .symp li{grid-template-columns:minmax(0,1fr);gap:var(--s2) 0}
   .clouds li{grid-template-columns:minmax(0,1fr);gap:2px}
   .clouds b{margin-top:var(--s2)}
@@ -1553,6 +1549,8 @@ html.js .sn:hover{color:var(--ink)}
 }
 @media (max-width:640px){
   .next-t{display:none}
+  .mv a{grid-template-columns:var(--s6) minmax(0,1fr);gap:var(--s2) var(--s3);
+    padding:var(--s5) var(--s3)}
   .cta .btn,.actions .btn{flex:1 1 auto}
   .ck{grid-template-columns:var(--tick) var(--num) minmax(0,1fr);
     gap:var(--s1) var(--s3)}

@@ -756,8 +756,9 @@ def build_index(moves, T):
             f'<b class="mv-n">{m["num"]}</b>'
             f'<span class="mv-t">{esc(m["title"])}</span>'
             f'<span class="mv-h">{inline(m["hook"])}</span>'
-            f'<span class="mv-f"><i>{esc(m["figures"][4])}</i><i>{esc(m["risk"])}</i>'
-            f'<i>{downtime(m)}</i></span></a></li>' for m in rows)
+            f'<span class="mv-f"><i><span>Effort</span> <b>{esc(m["figures"][4])}</b></i> '
+            f'<i><span>Risk</span> <b>{esc(m["risk"])}</b></i> '
+            f'<i><span>Cutover</span> <b>{downtime(m)}</b></i></span></a></li>' for m in rows)
         blocks.append(
             f'<li class="stage" data-part="{info["key"]}">'
             f'<div class="stage-head">'

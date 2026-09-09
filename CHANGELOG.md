@@ -5,6 +5,16 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [6.4.2] - 2026-09-09
+
+### Fixed
+
+- Move lists use consistent columns and spacing for numbers, titles,
+  descriptions and facts. Hover and keyboard focus keep titles in place.
+- Effort, risk and cutover have explicit labels. Full descriptions remain
+  visible, and rows stack with readable spacing on tablet and phone screens.
+- Regenerated the print and Kindle editions, covers and website for this patch.
+
 ## [6.4.1] - 2026-09-09
 
 ### Changed
