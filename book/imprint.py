@@ -52,8 +52,9 @@ def wordmark_html(sep='<br>', accent='em'):
 # Paperback 978-1-950600-03-8 was submitted on 2026-09-09 under HackerBay, Inc.
 # Bowker's dashboard shows Back to Metal / Paperback / Pending. Hardcover
 # 978-1-950600-04-5 was submitted the same day and its form confirmed a successful
-# save; dashboard verification is pending. These are submitted records, not
-# confirmation of completed Bowker processing or KDP publication.
+# save; its dashboard was verified as Back to Metal / Hardback / Pending. These
+# are submitted records, not confirmation of completed Bowker processing or KDP
+# publication.
 # In the same block, -00-7 belongs to incomplete Simplified JavaScript metadata;
 # -01-4 and -02-1 belong to The 20-Minute Table.
 # The exact filing and observed status are recorded in PUBLISHING.md.

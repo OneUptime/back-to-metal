@@ -63,6 +63,13 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
+      # Playwright downloads its own Chromium. The runner's unused Chrome APT
+      # source can fail its index hash check and block Ubuntu dependency setup.
+      - name: Disable the runner's Google Chrome APT source
+        run: |
+          sudo rm -f /etc/apt/sources.list.d/google-chrome.list \
+            /etc/apt/sources.list.d/google-chrome.sources
+
       - name: Install Chromium
         run: python -m playwright install --with-deps chromium
 
