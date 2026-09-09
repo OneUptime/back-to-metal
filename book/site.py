@@ -1103,22 +1103,26 @@ def build_cost(moves, T):
             (f'{T["pct"]:.0f}%', 'Off what you pay now')]))}
 
 {band('compare', 'The comparison, with the salary in it',
-      f'<p>Three ways to run the same workload, with the same operations team and '
-      f'monthly hours in every column. Cloud-ops engineers transition into on-prem '
+      f'<p>The reference model keeps the existing operations team, monthly hours '
+      f'and salary in every column, so additional staffing cost is '
+      f'{mny(owned["people"])} for colocation and {mny(ded["people"])} for rented metal. '
+      f'Cloud ops engineers transition into on-prem '
       f'ops: deployment, monitoring, patching and recovery remain their work. '
-      f'Colocation remote hands handles physical interventions; rented-metal '
-      f'providers maintain their hardware under the support agreement.</p>'
-      f'<p>The savings come from the infrastructure bill. The model retains the '
-      f'existing salary, budgets remote hands in the facility cost, and counts '
-      f'migration effort separately in the plan. Replace these assumptions with '
-      f'your measured hours and quotes before choosing a route.</p>'
+      f'Colocation remote hands handles contracted physical tasks, already priced '
+      f'in the facility bill; rented-metal providers include hardware maintenance '
+      f'in their support agreement.</p>'
+      f'<p>On-premises operations roles can cost less than cloud specialist roles, '
+      f'offering further salary savings. The figures here keep the existing salary '
+      f'cost and count none of those potential savings. Migration effort is '
+      f'budgeted separately. Use your actual staffing plan, local pay rates, '
+      f'measured hours and support quotes to price any recurring difference.</p>'
       ,
       margin=mg_note('The people row',
-                     f'All three columns carry it. A cloud invoice '
-                     f'bills for machines, not for whoever upgrades the managed '
-                     f'cluster and carries the pager &mdash; about '
+                     f'This is the full existing salary cost, not an additional '
+                     f'hire. All three columns budget '
                      f'{COSTS.PEOPLE["cloud_ops_hours_month"]} hours a month, or '
-                     f'{mny(COSTS.cloud_people_month())}.')
+                     f'{mny(COSTS.cloud_people_month())}. The team transitions '
+                     f'from cloud operations to running the on-premises platform.')
       + mg_note('Remote hands at the rack',
                 'Disk swaps, cabling and power cycles can be carried out by the '
                 'facility team under your runbooks. Agree coverage, response times '
@@ -1150,7 +1154,8 @@ def build_cost(moves, T):
                      'Rented metal preserves the cash you would spend buying '
                      'servers. Colocation trades that purchase for lower running '
                      'costs and ownership of the fleet. Both use the same operations '
-                     'hours here. Let your runway, workload and provider quotes '
+                     'hours and salary here; potential staffing savings are '
+                     'excluded. Let your runway, workload and provider quotes '
                      'decide which route fits.')
       + mg_note('The residual', 'After sixty months the '
       f'owned machines remain yours. The model credits a residual value of '

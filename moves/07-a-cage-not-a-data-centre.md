@@ -10,7 +10,7 @@
 - **Azure:** regions, availability zones and zone-redundant tiers — zone support varies by region and by machine series, and a resource created without a zone cannot be moved into one later.
 
 ## Why this works
-Colocation puts the building, power, cooling and physical support under one facility contract. Remote hands can inspect equipment, replace labelled parts and move cables to an agreed runbook while your existing operations team manages the platform remotely. This Move adds a facility charge — about $4,500 a month for space, transit, cross-connects and hands before usage-based power — in exchange for that support. Rented metal bundles the room and machines into the monthly server price. Price both routes before signing; either lets the team operate infrastructure without running a data centre.
+Colocation puts the building, power, cooling and physical support under one facility contract. Remote hands can inspect equipment, replace labelled parts and move cables to an agreed runbook while cloud operations engineers take on the on-prem platform. This Move adds a facility charge — about $4,500 a month for space, transit, cross-connects and hands before usage-based power — in exchange for that support. Rented metal bundles the room, machines and contracted hardware support into the monthly server price. Those physical tasks are already costed in the reference facility or rental charge. Price both routes before signing.
 
 ## Before you start
 
@@ -34,7 +34,7 @@ Colocation puts the building, power, cooling and physical support under one faci
 6. Before anyone signs, price the alternative in the next column: the same eighteen machines rented by the month, with power, networking and hardware replacement terms specified. Compare current quotes at matching capacity and support. Rented metal removes the fleet purchase and the separate facility agreement; use Move 03's full-cost comparison to choose the route.
 
 ## Operator's notes
-- **Swap:** Rented dedicated servers can shorten procurement and avoid a separate cage contract. Confirm delivery dates, private networking, address portability and replacement response before ordering. The reference budgets the same operations hours for both routes: remote hands covers contracted physical work in colocation, and the rental provider covers it on dedicated servers. Choose renting when keeping capital available matters more than owning the fleet.
+- **Swap:** Rented dedicated servers can shorten procurement and avoid a separate cage contract. Confirm delivery dates, private networking, address portability and replacement response before ordering. Both routes retain the reference cloud staffing hours and salary; any lower cost for on-prem roles is a potential saving to validate in Move 03. Choose renting when keeping capital available matters more than owning the fleet.
 - **Do it faster:** Ask for the standard agreement and the cross-connect list before price is discussed; a day of reading decides which clauses are worth arguing.
 - **Watch out:** A second building doubles the hardware, the spares and the change surface, and is the commonest reason a repatriation stalls. One site with backups held elsewhere beats two nobody has exercised.
 - **Leftovers:** The cage invoices from handover while the cloud bill stays where it was; both run in parallel for about four months.

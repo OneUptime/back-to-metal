@@ -19,9 +19,12 @@ PARAS = [
     'A generation of engineers has now been trained to believe that owning a server is a '
     'kind of professional failure. It is not. It is a trade, and like every trade it has '
     'terms: you choose dedicated capacity, rented or owned in colocation, and keep '
-    'more of the budget as your workload grows. The cloud-ops team transitions to '
-    'on-prem ops with the same planned hours, while remote hands handles physical '
-    'interventions. For a company with steady demand and a substantial cloud bill, '
+    'more of the budget as your workload grows. Existing cloud ops engineers transition '
+    'to on-premises platform work; contracted physical tasks go to remote hands, '
+    'already priced in the facility bill, or to the rental provider. The model keeps '
+    'the same hours and salary. On-premises roles can cost less than cloud specialist '
+    'roles, but those potential savings are not counted. For a company with steady '
+    'demand and a substantial cloud bill, '
     'both routes deserve a serious comparison.',
 
     'What has been missing is not the argument. It is a plan short enough to finish. '
