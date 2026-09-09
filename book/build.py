@@ -18,7 +18,7 @@ from collections import Counter, defaultdict
 from parse import load_all, LAYERS, ORDER, CUTOVER_CAP, inline
 from icons import icon, meter, risk_bars, anatomy, cost_chart
 from deps import needs as dep_needs, unlocks as dep_unlocks, DEPS
-from kit import SHELVES, KIT, RULES, REFERENCE, HOMELAB, HOMELAB_KIT
+from kit import SHELVES, KIT, RULES, REFERENCE, HOMELAB, HOMELAB_KIT, PLATFORM_SCOPE, COST_SCOPE
 from rollback_data import intro as rb_intro, POINTS as RB_POINTS, DISCLAIMER as RB_DISC
 from equivalents import ROWS as EQ_ROWS, CLOUDS
 from symptoms import SYMPTOMS
@@ -422,6 +422,7 @@ def build(moves):
     and because at this size losing one costs six per cent of the fleet rather than a third; the
     spares because a dead board is a return authorisation and three weeks. Scale the
     numbers; do not scale away the redundancy.</p>
+    <p class="pintro">{esc(PLATFORM_SCOPE)}</p>
     <div class="hrule" style="margin:5mm 0"></div>
     <div class="shelves">{shelves_html}</div>
     """, 'THE REFERENCE BUILD'))
@@ -434,8 +435,8 @@ def build(moves):
     <p class="pintro">Almost nobody should sign a facility contract before they have run this
     stack once. A cluster of {HOMELAB['nodes']} refurbished machines with
     {HOMELAB['cores_per_node']} cores and {HOMELAB['ram_gb_per_node']} GB each, on a managed
-    switch under a desk, will run every Move in Stage 3 unchanged and most of Stage 4
-    besides. It costs about
+    switch under a desk, lets you rehearse the chosen platform and a service migration.
+    Adapt the disk layout to the smaller kit. It costs about
     ${COSTS.homelab_capex():,.0f} once and about ${COSTS.homelab_month():.0f} a month in
     electricity, it saves nothing whatsoever, and it is the cheapest way to find out whether the
     rest of this book is for you.</p>
@@ -446,10 +447,10 @@ def build(moves):
       quorum, fencing and upgrades needs somewhere to go wrong. Second-hand because a machine
       two generations old runs Kubernetes exactly as well as a new one at roughly a tenth of the
       price, and because you want to be willing to break it.</p></div>
-      <div class="pcard"><h4>What it genuinely proves</h4><p>The whole software estate. Talos,
-      the control plane, Cilium with kube-proxy replaced, Rook and Ceph, the registry, secrets,
-      the observability stack, and a Postgres cutover rehearsed end to end against a copy. If a Move works here it will work on the metal; the difference is scale,
-      not shape.</p></div>
+      <div class="pcard"><h4>What it proves</h4><p>For VMs, Proxmox guest provisioning,
+      networking and a backup restored on another host. For containers, Talos,
+      Kubernetes and a Postgres cutover against a copy. Rehearse the storage branch you
+      intend to run; this small kit does not prove production capacity or recovery time.</p></div>
       <div class="pcard"><h4>What it cannot teach you</h4><p>Every word of Stage 2. A homelab
       has one power feed, one switch, no cross-connect, no remote hands and nobody to escalate
       to at three in the morning. It cannot show you what a colocation contract is for, or what
@@ -539,10 +540,9 @@ def build(moves):
     pages.append(page('', '#8A6112', f"""
     <div class="pkicker">The arithmetic, with the salary in it</div>
     <h2 class="ptitle d">What It Actually Costs</h2>
-    <p class="pintro">Cloud ops transitions into on-prem ops, with
-    {COSTS.PEOPLE['cloud_ops_hours_month']} hours a month in every option. Remote hands or the
-    rental provider covers physical work. Every column counts the salary. Substitute your
-    own rates and hours; migration effort is separate.</p>
+    <p class="pintro">The existing operations team carries
+    {COSTS.PEOPLE['cloud_ops_hours_month']} hours a month in every option; physical support
+    stays in the provider charges. Substitute your rates and hours. {esc(COST_SCOPE)}</p>
     <div class="hrule" style="margin:5.5mm 0"></div>
     <div class="pan">
       <div class="pcard"><h4>On AWS, compute alone</h4><p>{vcpu:,} vCPU of current-generation
@@ -872,7 +872,7 @@ def build(moves):
         if len(text) <= n:
             return text
         cut = text[:n].rsplit(' ', 1)[0].rstrip(' ,;:-')
-        return cut + '\u2009&hellip;'
+        return cut + '\u2009\u2026'
 
     def derive_trio(ms):
         """Three Moves worth doing first: the safest start, the biggest saving,

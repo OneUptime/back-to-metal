@@ -59,6 +59,14 @@ opens with three lines naming the real product on each provider and the one thin
 genuinely different there — a flag that needs a reboot, a tier that cannot do it at all, a
 resource that outlives its parent. The runbook itself is written once.
 
+Existing cloud VMs move to **KVM guests on Proxmox VE**, with several guests sharing each
+physical host. Already-containerised services follow the Talos/Kubernetes path, directly on
+hardware or in guests when sharing a VM estate. Move 02 identifies which path each workload
+needs; Moves 11–14 cover provisioning, storage and the first migration, and Move 19 covers
+whole-VM restoration alongside Kubernetes and database recovery. Moving out of the cloud does
+not require converting a working VM application to containers. The published cost model is
+the container reference build; price your VM mix in Move 03.
+
 ## The dependency invariant
 
 Every Move's prerequisites are **lower-numbered Moves**. A reader who has reached Move 14 has,
@@ -191,7 +199,7 @@ Every Move names the real service on AWS, Google Cloud and Azure, and the one th
 |---|---|---|---|---|---|
 | 09 | [Racking day](moves/09-racking-day.md) | The provider's serial console and boot diagnostics | Medium | 0 min | Immediately |
 | 10 | [The network, and the way back in when it breaks](moves/10-the-network-and-the-way-back-in-when-it-breaks.md) | Cloud-managed private networking | High | 0 min | Immediately |
-| 11 | [A cluster, in an afternoon](moves/11-a-cluster-in-an-afternoon.md) | The managed Kubernetes control plane | High | 0 min | Immediately |
+| 11 | [The platform your workloads need](moves/11-the-platform-your-workloads-need.md) | Managed VM and Kubernetes compute | High | 0 min | Immediately |
 | 12 | [Disks: what goes local, what goes on Ceph](moves/12-disks-what-goes-local-what-goes-on-ceph.md) | Managed block and shared-file storage | High | 0 min | Immediately |
 
 ## Stage 4 · Move
@@ -199,7 +207,7 @@ Every Move names the real service on AWS, Google Cloud and Azure, and the one th
 | # | Move | Leaving | Risk | Cutover | Back out for |
 |---|---|---|---|---|---|
 | 13 | [Images, secrets and one-command deploys](moves/13-images-secrets-and-one-command-deploys.md) | Managed registries, secret stores and hosted CI runners | Medium | 0 min | Immediately |
-| 14 | [The first service, end to end](moves/14-the-first-service-end-to-end.md) | Managed container compute | Medium | 0 min | Immediately |
+| 14 | [The first service, end to end](moves/14-the-first-service-end-to-end.md) | Cloud VM and container compute | Medium | 0 min | Immediately |
 | 15 | [Buckets, cache and queues](moves/15-buckets-cache-and-queues.md) | Managed object storage, Redis and queues | High | 0 min | 30 days |
 | 16 | [Postgres, the one that matters](moves/16-postgres-the-one-that-matters.md) | Managed PostgreSQL | High | 15 min | 7 days |
 

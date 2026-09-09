@@ -2,45 +2,49 @@
 
 **Layer:** Build · **Leaving:** Managed block and shared-file storage · **Risk:** High · **Cutover:** 0 min · **Reversible:** Immediately
 
-> Ceph takes three drives a node for anything that must survive a node dying. The fourth stays raw under PostgreSQL, which already replicates itself.
+> Choose who owns each physical disk. Proxmox supplies VM datastores; Rook supplies storage on the direct Talos path. Replication belongs in one layer.
 
 ## Leaving from
-- **AWS:** EBS and EFS — a gp3 volume lives in one Availability Zone and caps at 16,000 IOPS however large it grows, and EFS in bursting mode spends credits that run out.
+- **AWS:** EBS and EFS — a gp3 volume lives in one Availability Zone and its provisioned throughput is separate from capacity; EFS in bursting mode spends credits that run out.
 - **Google Cloud:** Persistent Disk and Filestore — Persistent Disk performance scales with provisioned size and the attached machine's vCPU count, and a Filestore instance grows but never shrinks.
 - **Azure:** Managed Disks and Azure Files — Premium SSD steps in fixed tier sizes rather than a dial, and premium file shares need a FileStorage account that standard shares cannot move into.
 
 ## Why this works
-Two storage systems, and one rule for choosing between them. Ceph, run by Rook, takes anything that must survive a node dying without waking anybody: replicated block volumes, a shared filesystem for the few things that need one, and the object gateway Move 15 and Move 16 build on. PostgreSQL takes the other path, a raw local drive with nothing replicating beneath it. The volume it used to sit on provisioned a few thousand IOPS; the four drives already in the machine will do several hundred thousand. A database writes copies to its own standbys, so a layer repeating that work underneath spends flash to buy nothing.
+A VM needs a datastore before it needs Kubernetes. On the Proxmox path, the hosts own Ceph and present shared block storage to guests. On the direct Talos path, Rook manages Ceph on physical disks. Running another replicated Ceph inside guests whose disks already sit on host Ceph multiplies copies and hides the physical failure domains. Choose one owner per device.
+
+PostgreSQL can use local NVMe because it replicates to its own standbys. That saves a second replication layer but binds each copy to its host. Its standbys must occupy different physical machines, even when the database runs inside Kubernetes VMs. The reference disk split and savings below describe the direct Talos build; price the VM datastore and its recovery capacity separately.
 
 ## Before you start
 
 **Access**
-- The device inventory from Move 09, with the four NVMe drives on each node known by serial
-- A Talos machine configuration you can edit and roll, because disk layout is fixed at boot
+- The device inventory from Move 09, with data drives identified by serial and boot drives excluded
+- Proxmox storage administration or the Talos configuration from Move 11, according to the chosen platform
 
 **Software**
-- `helm` and `kubectl`, with the Rook chart pinned rather than tracking whatever is newest
+- The Proxmox-supported Ceph package version pinned across hosts on the VM path
+- `helm` and `kubectl` for the Talos path or external Ceph clients, with Rook 1.16.9 and a compatible Ceph image pinned in the deployment configuration
 - `ceph` for health, capacity and recovery output during the drive-pull test
 
 **People**
-- One named owner for Ceph, who will read its health output on the day it is unhappy
+- One named owner for Ceph, including its object gateway and the recovery drill
 
 ## The runbook
-1. Name the owner for Ceph, then write the split into the Talos machine configuration: three of the four NVMe devices per node to Ceph, the fourth raw for PostgreSQL. Layout is fixed at boot, so changing it later means draining one node at a time.
-2. Install Rook with `helm install rook-ceph rook-release/rook-ceph --version 1.16.9` and let the operator adopt the 15 devices offered. Take the Ceph release that chart version ships with, not the newest published.
-3. Create a replicated block pool with three copies and `min_size 2`, a shared filesystem, and the object gateway on its own pool. Erasure coding is arguable at sixteen nodes and wrong at five, and this pool is block storage under a database: replication is the answer either way, and a pool holding data will not take a different scheme later.
-4. Size for recovery, not for today. Losing one node of five pushes a fifth of the data onto the survivors, so run `ceph df` and hold the pools under 70 per cent. Fuller than that, recovery backfills into a wall and writes start failing.
-5. Bind a claim with `kubectl`, write to it, reboot the node beneath it and check the contents survived. Repeat on the shared filesystem, then create the first bucket on the gateway; Move 15 and Move 16 expect that endpoint already.
-6. Pull a drive from a running node and time the recovery with `ceph -s`, once the claims above are verified and nothing real is bound. Reseat it and watch the cluster take it back. That number is what somebody works against the first time a device dies for real.
+1. Record each disk's owner and confirm the selected devices are empty before provisioning. On direct Talos, reserve three data drives per participating node for Rook and the fourth for local PostgreSQL; exclude shelf spares. On Proxmox, assign host datastore disks separately from any local database devices.
+2. For Proxmox, use its Ceph wizard with the pinned package version, monitors on separate physical hosts, and only the recorded datastore devices. Add an RBD pool as VM storage. For direct Talos, install Rook using `helm install rook-ceph rook-release/rook-ceph --version 1.16.9`, then apply the pinned CephCluster configuration selecting the inventoried raw disks.
+3. Set replicated pools to three copies and `min_size 2`, with the failure domain at the physical host. Use `ceph df` and model redistribution after losing the largest storage host; keep utilisation below 70 per cent and verify recovery still has room. Guest count is not a count of independent replicas.
+4. Provision the shared filesystem and object gateway required by Moves 15 and 16. Rook creates these on direct Talos. For host-owned Ceph, its owner provisions CephFS and a separate RADOS gateway service; an RBD datastore alone supplies neither an S3 endpoint nor its credentials. Connect Kubernetes through Rook's external-cluster mode, with restricted client keys and the existing gateway endpoint, never guest OSD disks.
+5. Keep each local PostgreSQL copy on a different physical host, with placement rules enforced during failover. If passing a disk or controller into a guest, give it exclusive ownership and exclude it from host Ceph. That guest loses ordinary live migration; database replication and a tested restore provide its recovery path.
+6. On Proxmox, move ordinary guest disks from Move 11's local bootstrap datastore to shared RBD. Verify every required disk and network exists on eligible hosts, then register those guests as HA resources with negative resource-affinity rules separating control planes. Exclude guests tied to local or passthrough devices. Write test data to a VM disk or a claim created with `kubectl` on Talos. Power off one physical host and verify recovery and contents, including the filesystem and gateway. Confirm no failure removes every database replica.
+7. With only verified test data present, pull a storage drive and time recovery with `ceph -s`. Reseat it, wait for health to recover, and record the duration before accepting production data.
 
 ## Operator's notes
-- **Swap:** A workload that must move between nodes freely and cannot replicate itself goes on Ceph block, latency included. The choice is which layer pays for replication.
-- **Do it faster:** Name the storage classes for the promise they make, not the technology beneath. An engineer picking one is choosing durability, not a product.
-- **Watch out:** Ceph says loudly that it is unwell and quietly why. Learn to read `ceph health detail` on a calm afternoon rather than during an outage.
-- **Leftovers:** The managed volumes, file shares and their snapshots bill right through Stage 4. This Move stands the replacement up; it stops nothing.
+- **Swap:** Proxmox can use existing shared storage or local datastores. Local disks need transfer during migration; host failure needs replication or restore, so demonstrate the promised recovery before choosing them.
+- **Do it faster:** Name storage classes and datastores for the recovery promise they make, so each workload gets a deliberate placement.
+- **Watch out:** Snapshotting a volume is not an independent backup. Keep a tested copy beyond the storage cluster that serves it.
+- **Leftovers:** The managed volumes, file shares and snapshots keep billing until their contents have moved and the retention window ends.
 
 ## Rollback
-Nothing is bound yet, so removing Rook and handing the devices back is a morning's work — until the first claim binds or the first object lands in the gateway. That is the point of no return: after it, leaving Ceph is a data migration with a write stop, not a configuration change. Prove the way back before you get there — snapshot a test volume, delete the claim, restore it, confirm the contents match. The raw drives hold nothing until Move 16.
+Before test data lands, backing out means removing the empty pools and restoring the recorded disk layout. The point of no return is the first production write: leaving either Ceph or a local datastore then requires a data migration with a write stop. Back up a test VM or volume outside this cluster, restore it elsewhere, and verify its contents before acceptance. A local database copy needs its own restored backup as well as surviving replicas.
 
 ## The numbers
 

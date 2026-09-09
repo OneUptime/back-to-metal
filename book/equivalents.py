@@ -16,21 +16,21 @@ have to be longer to cover honestly, and the second is rarer than it looks.
 ROWS = [
     # --- the machines and the cluster
     ('EC2',                  'Compute Engine',        'Virtual Machines',
-     'Bare metal you own, or dedicated machines by the month', '07'),
+     'KVM virtual machines on Proxmox VE hosts', '11'),
     ('EC2 Auto Scaling',     'Managed instance groups', 'Virtual Machine Scale Sets',
      'Fixed capacity, a priority class, and a spare on the shelf', '06'),
     ('EKS',                  'GKE',                   'AKS',
-     'Talos Linux, and Kubernetes you run yourself', '11'),
+     'Talos and Kubernetes, on hardware or in Proxmox VE guests', '11'),
     ('ECS on Fargate',       'Cloud Run',             'Container Apps',
      'Deployments and Jobs on your own nodes', '14'),
     ('AMI',                  'Machine images',        'Managed images',
-     'A Talos machine configuration, applied over the network', '11'),
+     'KVM guest templates; rebuild or rehearse a supported disk import', '14'),
     ('VPC',                  'VPC networks',          'Virtual Network',
      'Two switches, four ranges, and an address plan on one page', '10'),
 
     # --- storage and data
     ('EBS',                  'Persistent Disk',       'Managed Disks',
-     'Ceph RBD under Rook, with local NVMe underneath it', '12'),
+     'Proxmox VM disks on Ceph RBD; Rook volumes for Kubernetes', '12'),
     ('EFS',                  'Filestore',             'Azure Files',
      'CephFS under Rook, or a filesystem the application stops needing', '12'),
     ('S3',                   'Cloud Storage',         'Blob Storage',
@@ -44,7 +44,7 @@ ROWS = [
     ('Glacier Deep Archive', 'Archive storage class', 'Archive tier',
      'Keep paying - the egress to extract it costs more than the years', '15'),
     ('AWS Backup',           'Backup and DR Service', 'Azure Backup',
-     'Velero and the database operator\'s own archive, held somewhere else', '19'),
+     'Whole-VM backups, Velero and database archives, held off-site', '19'),
 
     # --- the edge
     ('Application Load Balancer', 'Cloud Load Balancing', 'Application Gateway',

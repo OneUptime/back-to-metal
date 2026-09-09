@@ -5,6 +5,35 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [6.4.0] - 2026-09-09
+
+Existing cloud VMs now have an explicit route to KVM guests on Proxmox VE hosts.
+
+### Changed
+
+- Inventory and sizing distinguish VM workloads from container workloads before
+  buying hardware. Multiple VMs share a physical host; guest memory, hypervisor
+  reserves and host-failure headroom are sized together.
+- The platform and first-service Moves cover Proxmox hosts, guest templates,
+  network and identity changes, and a rehearsed migration. Talos/Kubernetes remains
+  the path for already-containerised services, on hardware or in guests.
+- Storage and recovery guidance assigns each disk one owner, keeps replicas on
+  separate physical hosts, and distinguishes whole-VM backups from Kubernetes
+  objects and application data. Persistent VM state requires its own tested
+  write-stop and return plan.
+- The reference build and cloud-equivalence map now distinguish the two paths in
+  print, EPUB and web. VM support, guest licences, backup capacity and recurring
+  work must be priced against the reader's inventory; the existing figures remain
+  a container reference, not a VM cost quotation.
+
+### Fixed
+
+- Removed the unsupported claim that the inventory was already containers and
+  the direct mapping from cloud VM images to Talos machine configurations.
+- Corrected stale active-host and spare counts in the purchasing and setup
+  guidance, and replaced fixed storage-device totals with the actual disk inventory.
+- Stage-divider summaries render an ellipsis instead of a literal HTML entity.
+
 ## [6.3.1] - 2026-09-09
 
 ### Fixed

@@ -29,7 +29,8 @@ Leaving the cloud feels impossible because nobody can say what would have to mov
 2. Add what those APIs never return: scheduled jobs, queues, third-party services with a webhook into production, and the DNS records pointing at any of it.
 3. Reconcile against the billing export from Move 01 both ways. A bill line with no row is unowned; a row with no bill line is free, or in an account nobody has opened.
 4. Hunt what hides: snapshots whose disk is gone, volumes attached to nothing, load balancers with no target, staging at full size overnight, the accounts opened for a proof of concept in 2022.
-5. Sort every row into one of four piles — moves as-is, moves with work, stays rented, gets deleted. The fourth is the biggest; confirm each row with its owner and check thirty days of metrics first.
+5. Label each workload VM, container or managed service. For each VM record its operating system, CPU architecture, boot mode, attached disks, licences and metadata credentials; mark which disks contain persistent state. A VM stays a VM on Proxmox VE in Move 11. Moving an application into containers is a separate project, not an unstated prerequisite.
+6. Sort every row into one of four piles — moves as-is, moves with work, stays rented, gets deleted. The fourth is the biggest; confirm each row with its owner and check thirty days of metrics first. Record a destination and a data-transfer method for every row that moves; image export is only an option after its restrictions are checked.
 
 ## Operator's notes
 - **Swap:** Where accounts are few and tags honest, the provider's tag report is a quicker first pass. Untagged resources still have to be found by hand.

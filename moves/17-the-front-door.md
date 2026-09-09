@@ -10,38 +10,40 @@
 - **Azure:** Application Gateway and Key Vault certificates — the gateway reads its certificate through a managed identity, and withdrawing that grant fails the gateway.
 
 ## Why this works
-An edge cannot be half-tested once it is live, so this one is built beside the live one. Envoy Gateway takes an address from the range ordered in Move 08, terminates its own certificates, and routes to the services Move 14 and Move 16 already put on your hardware. No user arrives, because no DNS record points at it. That exposes the hard part cheaply: the listener rules and rewrites accumulated in the managed balancer over three years, which nobody has a full list of. As Gateway API objects they can be read and diffed.
+An edge cannot be half-tested once it is live, so this one is built beside the live one. For Kubernetes, Envoy Gateway terminates TLS and routes to services. For a VM estate, a pair of proxy guests routes directly to application guests; Kubernetes is unnecessary. Either edge takes an address from Move 08 and reaches the services already tested on your hardware. No user arrives, because no DNS record points at it. That exposes the hard part cheaply: the listener rules and rewrites accumulated in the managed balancer over three years, which nobody has a full list of. Store those rules in versioned proxy configuration or Gateway API objects. The figures below retain the reference Kubernetes edge; price the VM pair separately.
 
 ## Before you start
 
 **Access**
 - The public address range from Move 08, with one address held back for the gateway
-- Write access to the repository from Move 13, the one Argo CD reconciles
+- Write access to the VM configuration repository or the Argo CD repository from Move 13
+- DNS challenge credentials restricted to certificate validation records
 - An export of every listener rule, redirect, rewrite and health check from the managed balancer
 
 **Software**
-- `helm`, with a pinned chart version for each of the two installs below
-- `cmctl` and `openssl`, to check issuance and to read what a listener actually serves
+- For VMs: a supported reverse proxy and ACME client, plus Keepalived, with exact package versions and configuration pinned in the guest template
+- For Kubernetes: `helm` and `cmctl`, with the controller chart versions pinned below
+- `openssl`, to inspect the certificate each listener actually serves
 
 **People**
 - Whoever owns the two most valuable transactions, to walk them end to end first
 
 ## The runbook
-1. Install both controllers with `helm` at fixed versions — `helm install eg oci://docker.io/envoyproxy/gateway-helm --version v1.4.2`, and cert-manager at `v1.17.2`. Commit the values to the repository so Argo CD owns them.
-2. Bind the gateway to one address from the Move 08 range as a virtual IP in layer-2 mode. Cut power to the node holding it and time the recovery: on one rack that is neighbour cache expiry, not anycast, and ten to thirty seconds is honest.
-3. Issue certificates through cert-manager, confirm with `cmctl status certificate`, then read what the listener serves using `openssl s_client -connect`. Prove renewal in a scratch cluster by winding its clock past the threshold, not by waiting until day eighty-nine.
+1. For VMs, deploy the pinned proxy template to a pair of guests, with placement rules keeping them on different physical hosts. Reuse your team's supported proxy where available. For Kubernetes, install Envoy Gateway with `helm install eg oci://docker.io/envoyproxy/gateway-helm --version v1.4.2` and cert-manager at `v1.17.2`; commit values for Argo CD.
+2. Assign one virtual IP from Move 08. For VM proxies, configure Keepalived to track proxy health and transfer it between guests on the same layer-2 network; permit its peer traffic and address announcements through the host bridges. For Kubernetes, use the cluster network's layer-2 announcement. Power off the physical host serving the address and measure recovery, then test a failed proxy process separately.
+3. Use DNS validation so issuance works before traffic moves. On VMs, schedule the pinned ACME client and securely deploy renewed certificates to both proxies with a reload hook. On Kubernetes, issue through cert-manager and check `cmctl status certificate`. Rehearse renewal against the ACME staging service, then check production certificates with `openssl s_client -connect`, including each proxy after failover.
 4. Read the balancer export line by line into a table: one row per listener rule, path condition, redirect, header rewrite, sticky-session setting and health check. The rule nobody remembers is the one a customer depends on.
-5. Translate each row into an HTTPRoute in the repository and write one request that proves it. Priority ordering and specificity ordering disagree, so a rule shadowed for two years comes back to life once translated faithfully.
+5. Translate each row into the VM proxy configuration or a Kubernetes HTTPRoute, and write one request that proves it. Point VM backends at the application guests and enable health checks. Priority ordering and specificity ordering disagree, so a rule shadowed for two years comes back to life once translated faithfully.
 6. Point a laptop at the new address with a host file entry and walk sign-in, the two most valuable transactions, a large upload and any websocket. Cut nothing over; Move 18 moves the traffic.
 
 ## Operator's notes
 - **Swap:** Under a dozen rules, skip the table and write the routes directly. It earns its keep around thirty.
 - **Do it faster:** Stand the gateway up against one low-traffic service and keep that route as a permanent smoke test. It exercises address, certificate and route before the table exists.
-- **Watch out:** A renewed certificate and a reloaded one are different events. Envoy takes a new secret in seconds; a legacy proxy behind it may not. cert-manager renews at day sixty of a ninety-day certificate, so the stale copy stays valid for another thirty and the symptom arrives on day ninety.
+- **Watch out:** A renewed certificate and a reloaded one are different events. Alert on the expiry of the certificate actually served by each proxy, and verify that the standby has the new certificate before it takes the virtual IP.
 - **Leftovers:** The managed balancer charges per hour and per capacity unit until Move 18, and its validation records must stay in the zone or its certificates stop renewing.
 
 ## Rollback
-Nothing here serves users, so backing out is removing the gateway objects and the address assignment, once no host file entry still points at them. There is no point of no return in this Move, by design. Keep the definitions in the repository so the edge can be restored in an afternoon.
+Nothing here serves users, so backing out is removing the test gateway or proxy guests and their address assignment, once no host file entry still points at them. There is no point of no return in this Move, by design. Keep the definitions in the repository so the edge can be restored in an afternoon.
 
 ## The numbers
 
@@ -50,4 +52,4 @@ Nothing here serves users, so backing out is removing the gateway objects and th
 | $2,400/mo | $320/mo | 87% | 0 min | 4 days | — |
 
 ## What you can turn off
-Nothing yet. The managed balancer, its listener rules and its certificate service switch off in Move 18, where the $780 line stops.
+Nothing yet. The managed balancer, its listener rules and its certificate service can switch off after Move 18's retention window and a verified replacement.

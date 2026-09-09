@@ -27,7 +27,7 @@ Moves 01 and 02 produced a grouped bill and an inventory that accounts for it. T
 ## The runbook
 1. Write the decision rule in the spreadsheet before any figure goes in: a metal option must land at least a third under the current cloud cost to justify this programme. Apply the same margin to rented metal and colocation.
 2. Fill the cloud column from the three invoices at the rate you actually paid, discounts in and tax out across all columns. One monthly number, checkable against Move 01.
-3. Fill the colocation column from the hardware and facility quotes: sixteen machines and two spares over sixty months, the full rack, power, transit, cross-connects and remote hands. Beside it, quote the equivalent rented fleet with its traffic allowance and hardware support included.
+3. Fill the colocation column from hardware and facility quotes: sixteen machines and two spares over sixty months, rack, power, transit, cross-connects and remote hands. Quote equivalent rented metal with traffic and hardware support. For VMs, add the chosen Proxmox support subscription, guest OS and application licences, and off-site VM backup capacity to each applicable column. The published figures describe the container reference estate; price your VM mix separately.
 4. Carry the existing operations salary into all three columns. This reference model budgets the same 160 hours a month for each: cloud ops transitions to platform ops, with physical work assigned to the facility's remote hands or the rental provider under the support contract. Validate that assumption with the pilot and the people doing the work. Price setup, training and migration once in the project budget; any measured recurring difference belongs in the monthly line.
 5. Add the services that stay rented. Move 04 identifies the edge, outbound mail and scrubbing; later Moves retain archived object storage, a registry, a queue and an off-site backup copy. Their cost is already in the cloud invoice and must remain in both metal columns.
 6. Total the three columns and apply the rule. If either metal option clears it, compare the five-year totals and the monthly cash requirement. If neither clears, keep the sheet and revisit it when the estate or quotes change.
@@ -36,7 +36,7 @@ Moves 01 and 02 produced a grouped bill and an inventory that accounts for it. T
 ## Operator's notes
 - **Swap:** Price the three largest lines only; that lands within about ten per cent in an afternoon.
 - **Do it faster:** Use one sheet with the same capacity, support and retained-service assumptions in every column; compare it with the cloud rate you actually pay.
-- **Watch out:** Equal recurring hours assumes a team that already operates production, a standardised platform and contracted physical support. Check that scope, then vary hours, rental rates and hardware life in the sheet. A migration task becomes a monthly cost only if it actually recurs.
+- **Watch out:** Equal recurring hours assumes an existing production team, a standardised platform and contracted physical support. For VMs, include hypervisor updates, guest OS patching and restore drills when validating that assumption. Vary hours, rental rates and hardware life in the sheet; setup and migration are one-time work.
 - **Leftovers:** The committed-spend agreement bills to the end of its term, and that renewal date is the deadline.
 
 ## Rollback
