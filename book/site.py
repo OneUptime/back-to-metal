@@ -464,7 +464,7 @@ def totals(moves):
     #
     # It comes off the priced Moves rather than off every Move, and that is
     # load-bearing rather than incidental. A Move whose Now is part of the
-    # OWNED SITE - Move 07's cage, at $1,400 - states no Was, because there was
+    # OWNED SITE - Move 07's rack, at $4,500 - states no Was, because there was
     # nothing there before to state, and site_month() already carries it. So
     # the rule is: a Move that states both halves is trading one bill for a
     # smaller bill, and the smaller bill is retained; a Move that states only a
@@ -595,11 +595,11 @@ def hero_index(T, first):
   <div class="acct">
     <h1 class="d mast">{IMP.wordmark_html(sep='<br>')}</h1>
     <p class="open">{T['n']} Moves that take a company off AWS, Google Cloud or
-      Azure and onto hardware you own.</p>
+      Azure and onto dedicated servers you rent or own in colocation.</p>
     <p class="sub">Written for a company whose platform is two or three
       engineers' work and whose cloud bill is around {mny(T['bill'])} a month.
-      About {T['days']:.0f} days of work spread across {T['weeks']:.0f} weeks,
-      and most of that is waiting for hardware rather than working.</p>
+      Keep the team, bring your platform skills, and let remote hands handle the
+      physical work. Rent to preserve cash; colocate to own the capacity.</p>
     <p class="cta"><a class="btn" href="m/{page(first)}">Start at Move
       {first['num']}</a> <a class="btn ghost" href="#why">The case for
       leaving</a></p>
@@ -609,7 +609,7 @@ def hero_index(T, first):
     <dl class="bal-l">
       <div><dt>Cloud infrastructure</dt><dd class="was">{mny(T['bill'])}</dd></div>
       <div><dt>Machines you own</dt><dd>{mny(T['owned']['infrastructure'])}</dd></div>
-      <div><dt>The extra ops time</dt><dd>{mny(T['owned']['people'])}</dd></div>
+      <div><dt>Additional ops cost</dt><dd>{mny(T['owned']['people'])}</dd></div>
       <div><dt>Still somebody else&rsquo;s invoice</dt>
         <dd>{mny(T['owned']['retained'])}</dd></div>
       <div class="tot"><dt>What the bill becomes</dt>
@@ -680,12 +680,8 @@ def why_facts(T):
         'five_year_saved': mny(own['saved']),
         'five_year_pct': f'{own["pct"]:.0f}',
         'egress_100tb': mny(COSTS.egress_month(100)),
-        'capex': mny(own['capex']),
         'weeks': f'{T["weeks"]:.0f}',
         'days': f'{T["days"]:.0f}',
-        'ops_hours': COSTS.PEOPLE['owned_ops_hours_month']
-                     - COSTS.PEOPLE['cloud_ops_hours_month'],
-        'owned_hours': COSTS.PEOPLE['owned_ops_hours_month'],
         'cloud_hours': COSTS.PEOPLE['cloud_ops_hours_month'],
         'retained': mny(T['retained']),
     }
@@ -821,15 +817,14 @@ def build_index(moves, T):
       margin=f'<p class="lbl">What is at stake</p>'
       f'<dl class="bal-l">'
       f'<div><dt>Over five years</dt><dd>{mny(T["five_year"]["rows"][2]["saved"])}</dd></div>'
-      f'<div><dt>Capital, day one</dt><dd>{mny(T["five_year"]["rows"][2]["capex"])}</dd></div>'
-      f'<div><dt>Extra hours a month</dt>'
+      f'<div><dt>Additional ops hours</dt>'
       f'<dd>{COSTS.PEOPLE["owned_ops_hours_month"] - COSTS.PEOPLE["cloud_ops_hours_month"]}</dd></div>'
       f'<div><dt>Days of work</dt><dd>{T["days"]:.0f}</dd></div>'
       f'</dl>'
-      + mg_note('The list that matters',
-                'Four reasons to stay exactly where you are are at the foot of '
-                'this section. A page with nine benefits and no costs is an '
-                'advertisement.'))}
+      + mg_note('Two routes to metal',
+                'Rent dedicated servers to preserve cash, or colocate hardware you '
+                'own. <a href="cost.html">Compare the purchase costs and monthly '
+                'bills &rarr;</a>'))}
 
 {band('how-long',
       'How long it takes',
@@ -1080,12 +1075,12 @@ def build_cost(moves, T):
     body = f"""{bar(0, first, 'cost.html')}
 <main id="main" class="shell">
 {hero('What it costs',
-      f'{mny(bill)} a month becomes {mny(owned["total"])}, the extra ops time already '
-      f'in it. That is {mny(T["year"])} a year, or {T["pct"]:.0f} per cent of everything '
+      f'{mny(bill)} a month becomes {mny(owned["total"])}, with the same operations '
+      f'hours. That saves {mny(T["year"])} a year, or {T["pct"]:.0f} per cent of everything '
       f'you spend on it now, with {mny(T["cloud_people"])} of salary counted on both sides.',
-      f'The reference build is {REFERENCE["nodes"]} machines and a spare on the shelf, '
-      f'in one cage. Every figure below is a public list price observed while writing, '
-      f'against a bill this size. Substitute your own and the shape does not change.',
+      f'The reference build is {REFERENCE["nodes"]} machines and {REFERENCE["spares"]} '
+      f'spares, in one colocation rack. Prices are dated model assumptions. Compare '
+      f'your own cloud rate and provider quotes, with the existing team in every column.',
       'page',
       figs([(mny(bill), 'Cloud, a month'),
             (mny(owned['total']), 'What the bill becomes'),
@@ -1093,31 +1088,29 @@ def build_cost(moves, T):
             (f'{T["pct"]:.0f}%', 'Off what you pay now')]))}
 
 {band('compare', 'The comparison, with the salary in it',
-      f'<p>Three ways to buy the same computers, with every column carrying its own '
-      f'people. The cloud column used to say the salary was already in the bill. It '
-      f'is not: an invoice bills for machines, and the person who upgrades the '
-      f'managed cluster and carries the pager is paid by you either way. Counting '
-      f'them on one side only is the error this whole page exists to avoid, and it '
-      f'does not stop being an error when it flatters the answer we prefer.</p>'
-      f'<p>Read down a column and it adds up. That is the only claim being made '
-      f'here: not that the number is right for you, but that the arithmetic is '
-      f'checkable and the assumptions are named.</p>'
+      f'<p>Three ways to run the same workload, with the same operations team and '
+      f'monthly hours in every column. Cloud-ops engineers transition into on-prem '
+      f'ops: deployment, monitoring, patching and recovery remain their work. '
+      f'Colocation remote hands handles physical interventions; rented-metal '
+      f'providers maintain their hardware under the support agreement.</p>'
+      f'<p>The savings come from the infrastructure bill. The model retains the '
+      f'existing salary, budgets remote hands in the facility cost, and counts '
+      f'migration effort separately in the plan. Replace these assumptions with '
+      f'your measured hours and quotes before choosing a route.</p>'
       ,
       margin=mg_note('The people row',
-                     f'Both columns carry it, because both have it. A cloud invoice '
+                     f'All three columns carry it. A cloud invoice '
                      f'bills for machines, not for whoever upgrades the managed '
                      f'cluster and carries the pager &mdash; about '
                      f'{COSTS.PEOPLE["cloud_ops_hours_month"]} hours a month, or '
                      f'{mny(COSTS.cloud_people_month())}.')
-      + mg_note('Why owning is booked as dearer',
-                'Every first-hand account says the difference is nought &mdash; '
-                'the same people, before and after. The only estimate that is '
-                'not nought is an outside one at ten to twenty hours, and this '
-                'takes the top of it. We make OneUptime and we made this move, '
-                'and we measured our own larger fleet at fourteen &mdash; that '
-                'is us showing our working, not an independent source. The book '
-                'is declining the most favourable reading of its own evidence, '
-                'not reporting that a rack is harder work than an invoice.')
+      + mg_note('Remote hands at the rack',
+                'Disk swaps, cabling and power cycles can be carried out by the '
+                'facility team under your runbooks. Agree coverage, response times '
+                'and charges in the contract. Your engineers remain responsible '
+                'for the platform and application. '
+                '<a href="https://docs.equinix.com/smart-hands/">Example: Equinix '
+                'Smart Hands scope &rarr;</a>')
       ,
       full=cmp_html
       + f'<p class="cost-key"><span><i class="k-i"></i>Infrastructure</span> '
@@ -1138,21 +1131,18 @@ def build_cost(moves, T):
       f'the life of one generation of machines, with the salary counted on all three '
       f'sides and the capital on the line where it actually happens.</p>'
       ,
-      margin=mg_note('Level, not a winner',
-                     'The two metal columns are within one per cent of each '
-                     'other, and both numbers behind that margin are marked '
-                     'in the model as not re-verified: the rent per machine, '
-                     'and how many hours renting actually saves. Treat them '
-                     'as the same answer with different cash flows, and let '
-                     'your own quote break the tie.')
+      margin=mg_note('Choose the cash flow',
+                     'Rented metal preserves the cash you would spend buying '
+                     'servers. Colocation trades that purchase for lower running '
+                     'costs and ownership of the fleet. Both use the same operations '
+                     'hours here. Let your runway, workload and provider quotes '
+                     'decide which route fits.')
       + mg_note('The residual', 'After sixty months the '
-      f'owned machines are five years old and still working &mdash; hardware of this class '
-      f'is routinely run for seven or eight. What you hold is a fleet with years left in '
-      f'it, counted here at a conservative fifteen per cent of what it cost. It is also '
-      f'the whole of the difference between owning and renting at this size: strip the '
-      f'residual out and the two columns are the same number. You do not own hardware to '
-      f'save money against renting it. You own it when the fleet is big enough to carry '
-      f'the room, and to stop asking somebody else for permission.'),
+      f'owned machines remain yours. The model credits a residual value of '
+      f'{FY["rows"][2]["residual"] / FY["rows"][2]["capex"] * 100:.0f} per cent of the purchase '
+      f'price; actual resale value and useful life will vary. The table includes '
+      f'that credit as well as the different running costs, so compare both with '
+      f'the quotes you receive.'),
       full=fy_table(FY)
       + cost_bars([('Cloud', FY['rows'][0]['total'], 0, 0),
                    ('Rented metal', FY['rows'][1]['total'], 0, 0),

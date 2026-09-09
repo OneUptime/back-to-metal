@@ -75,7 +75,7 @@ AWS = {
 HARDWARE = {
     # ALSO NOT RE-PRICED THIS EDITION. It sits on the same memory and NVMe
     # market that moved the on-ramp node from $420 to $950, so it is the most
-    # likely stale figure here, and it drives both the $3,235 and the $87,000.
+    # likely stale figure here, and it drives the owned infrastructure price.
     'node_capex': 13000,
     'node_life_years': 5,
     'switch_capex': 14000,            # per pair, 25 GbE, enough ports for 18
@@ -95,138 +95,37 @@ HARDWARE = {
 }
 
 # --- people ---------------------------------------------------------------
-# The line every comparison omits, and the largest line in the right-hand
-# column. Loaded cost, not salary: employer taxes, equipment, benefits and the
-# recruiter you paid once.
+# Loaded cost includes employer taxes, equipment and benefits. Every option
+# carries the same existing operations team in this reference model: cloud ops
+# transitions to operating the platform on colocation or rented metal.
 #
-# Sixteen machines in one cage is not an enterprise
-# platform team, and a book that asks a company to hire two people to save
-# $3,000 of hardware is asking it to lose money. Move 03 makes the reader write
-# this number down before the arithmetic, so the arithmetic cannot be argued
-# into the answer somebody wanted.
-# THE NUMBER THIS BOOK'S HEADLINE TURNS ON, so it is argued rather than
-# asserted, and the argument includes the evidence against it.
+# This is a steady-state planning assumption for the standardised stack in the
+# book, not a promise that every migration keeps the same workload. The cloud
+# already needs upgrades, credentials, capacity planning and incident response.
+# On metal that attention shifts to the platform; contracted colocation remote
+# hands or the dedicated provider carry out the covered physical interventions.
+# Their work remains priced in facility charges or the server rental.
 #
-# It was half an extra engineer - 0.5 FTE, $7,917 a month, fifty-nine per cent
-# of the whole owned column. That is about eighty-seven engineer-hours a month
-# of incremental work on the fleet: fourteen hours per machine per month,
-# for ever. Nothing published supports it at this fleet size, and it was a
-# guess sitting in the load-bearing position.
-#
-# THE OUTSIDE ANCHOR, and the one the number actually rests on - the only
-# estimate of the DELTA we could find that is not selling something adjacent: ten to twenty additional operations hours a month
-# for a production stack self-hosting its database, cluster and cache instead
-# of renting them managed. This book takes TWENTY - the top of that range.
-#
-# CORROBORATION, at a hundred times the scale: 37signals moved off the cloud
-# and reported no change in the size of the ops team - "the same people who
-# were operating HEY and Basecamp and the other apps in the cloud are now
-# operating them on our own hardware" - across four thousand vCPUs and 384 TB
-# of NVMe. Ahrefs reports the same at eight hundred and fifty machines. A delta
-# of zero at that size does not prove a delta of zero at this one; it does make
-# half an engineer for a fleet this size very hard to believe.
-#
-# OUR OWN NUMBER, SAID PLAINLY. We make OneUptime, we made this move, and we
-# measured our own fleet: about fourteen engineer-hours a month across two
-# sites, dual EPYC with a terabyte a node, over two years. That is a bigger
-# fleet than the one this book is written against.
-#
-# It is not an independent source and it is not offered as one. A book that
-# quietly used its own authors' experience to move its own headline in its own
-# favour would deserve everything it got, so: it is named here, it is named in
-# the prose on the cost page, and the twenty hours below would stand on the
-# outside estimate without it. We are showing our working, not citing a
-# stranger.
-#
-# THE EVIDENCE AGAINST, which is real: vendors selling managed Kubernetes put
-# self-hosting at anywhere from half an engineer to two. The rebuttal is not
-# that they are biased - so is everybody here - it is that their itemised
-# effort is SETUP. A fortnight for etcd backup automation, a week for the
-# network layer, a fortnight for logging: this book already prices all of that,
-# once, as the eighty person-days in the roadmap. Counting it again as a
-# monthly line charges the reader twice for the same work.
-#
-# So: twenty hours, at the top of the independent range, against the sixty the
-# cloud estate was already taking. If your own number is different, Move 03
-# asks you to write it down before the arithmetic rather than after.
+# Setup, automation, training and cutover are one-time labour in the Move effort
+# figures and roadmap. Do not add that work again as a permanent monthly hire.
+# Move 03 asks readers to validate the recurring hours against their own team,
+# stack and support contract before relying on this assumption.
+STEADY_STATE_OPS_HOURS_MONTH = 160
 PEOPLE = {
     'platform_engineer_year': 190000,
     'hours_month': 173,               # a working month, near enough
-    # What the cloud estate costs in engineer time. NOT ZERO, which is what a
-    # comparison that puts "already in the bill" in this cell is claiming: an
-    # AWS invoice contains no salary. Somebody upgrades the managed cluster,
-    # rotates the credentials, chases the bill, answers the quota refusal,
-    # re-architects around a service limit and carries the pager.
-    #
-    # WHY THIS IS SIXTY AND NOT SMALLER, since it looks at first like the book
-    # flattering itself: it does the opposite. The dollar saving is a delta and
-    # does not move with this number at all - it cancels, because owned is
-    # cloud plus twenty. What it moves is the DENOMINATOR, so a larger cloud
-    # figure makes the headline percentage SMALLER:
-    #
-    #     cloud ops    saving        headline
-    #      0 h/mo      $16,625       69 per cent
-    #     30 h/mo      $16,625       62 per cent
-    #     60 h/mo      $16,625       56 per cent
-    #
-    # THESE HOURS SCALE WITH THE ESTATE, and holding them fixed across a
-    # re-basing is the first thing that goes wrong: it leaves the same person
-    # notionally running ten times the services. They do not scale LINEARLY
-    # either - a tenfold bill is about four times the operational load, because
-    # the second copy of a thing costs far less attention than the first.
-    # A hundred and sixty hours is a little under one full-time engineer
-    # against a $100,000 estate, which is what such a company actually staffs.
-    'cloud_ops_hours_month': 160,
-    # What the owned platform costs on top of that.
-    #
-    # AND WHY OWNING IS BOOKED AS DEARER AT ALL, which is the fair question:
-    # every primary account this file cites says the delta is ZERO. 37signals -
-    # "the same people who were operating HEY and Basecamp"; our own fleet -
-    # "the toil moved; it did not multiply". The only estimate that is not zero
-    # is an outside one at ten to twenty hours, and the book takes twenty, the
-    # top of it. So this is not a finding that colocation is harder work. It is
-    # the book declining to take the most favourable reading of its own
-    # evidence, on the number its whole argument turns on.
-    #
-    # Forty hours over the cloud, because the delta is driven by the MACHINES
-    # and there are eighteen of them now rather than four. Per machine it is
-    # almost exactly what it was.
-    'owned_ops_hours_month': 200,
+    'cloud_ops_hours_month': STEADY_STATE_OPS_HOURS_MONTH,
+    'owned_ops_hours_month': STEADY_STATE_OPS_HOURS_MONTH,
+    'rented_ops_hours_month': STEADY_STATE_OPS_HOURS_MONTH,
 }
 
-# Dedicated hosts by the month, for the reader who wants the saving without the
-# cage. Roughly a comparable machine at a European provider, list, ex-VAT.
-#
-# At eighteen machines - which is what every caller passes, the sixteen racked and the
-# one on the shelf - this comes out BELOW owning rather than close to it,
-# because a quarter rack's fixed costs (space, transit, cross-connect, hands)
-# do not amortise over a fleet this small. Move 07 says so rather than hiding
-# it: you own hardware when the fleet is big enough to carry the room, and
-# before that you rent it.
-#
-# NOT RE-VERIFIED THIS EDITION, AND THE ONLY NUMBER IN THIS FILE THAT CHANGES A
-# CONCLUSION. The fact-check could not settle it: the cheapest European provider
-# lists a 48-core / 128 GB / 2 x 3.84 TB machine around $371, and the reference
-# spec is double that RAM and double that disk; a survey of three providers put
-# the class nearer $1,100, but its cheapest citation was a desktop part with a
-# server's name. At $420 renting is well under owning. Near $1,100 it is level.
-# The book will not pick between those on a number nobody could source, so the
-# figure stands as last observed, it is labelled here, and the prose around it
-# no longer draws a conclusion that needs it to be exact. Price it against a
-# real quote before you decide anything; that is what Move 07 step 6 is for.
+# Dedicated hosts by the month, for the reader who wants the saving without
+# buying the fleet. The rental includes the provider's facility and physical
+# hardware support; it does not replace the reader's platform operations team.
+# This is an indicative European rate, ex-VAT, retained from the prior edition
+# rather than a current quotation. Compare matching CPU, RAM, storage, network
+# and support terms against a real quote in Move 07 before deciding.
 DEDICATED = {
-    # WAS 420, WHICH MADE RENTING LOOK CHEAPER THAN OWNING AND SHOULD HAVE BEEN
-    # THE GIVEAWAY. Renting a machine for five years cannot beat buying the same
-    # machine unless the landlord is losing money: at $420 a month you hand over
-    # $25,200 over sixty months for a box that costs $13,000 to buy, and the
-    # model still came out ahead because the rented column also drops the cage.
-    # Two errors cancelling into a plausible-looking answer.
-    #
-    # $650 is the cheapest European provider's list for a machine that actually
-    # meets the reference specification. Their published 48-core / 128 GB /
-    # 2 x 3.84 TB box is about $371; this one carries twice the memory and twice
-    # the disk. A US provider is two to three times that again. See
-    # rent_vs_own_5yr() for what either does over the life of the machine.
     'node_month': 650,                # 32 core / 256 GB / 4 x 3.84 TB NVMe class
     'traffic_included_tb': 20,
     'extra_traffic_gb': 0.0011,
@@ -308,8 +207,13 @@ def owned_people_month(p=PEOPLE):
     return p['owned_ops_hours_month'] * hourly(p)
 
 
+def dedicated_people_month(p=PEOPLE):
+    """What running the RENTED platform costs in salary every month."""
+    return p['rented_ops_hours_month'] * hourly(p)
+
+
 def people_month(p=PEOPLE):
-    """The difference between the two - the extra salaried time owning costs."""
+    """Owned salary minus cloud salary; zero under the shared-hours assumption."""
     return owned_people_month(p) - cloud_people_month(p)
 
 
@@ -339,36 +243,14 @@ def owned_month(nodes, spares=1, retained=DEFAULT_RETAINED):
             'total': infra + people + retained}
 
 
-# Renting the metal removes the hardware-specific work: firmware, disk swaps,
-# capacity planning against a rack, and the coordination with remote hands. It
-# removes none of the platform work - the cluster, the storage, the upgrades
-# and the pager are identical whoever owns the box.
-#
-# Ten hours, not twenty. Racking is a one-off (Move 09), not a monthly cost,
-# and the measured hardware intervention rate on a fleet this size is two
-# call-outs in twenty-four months. Ten hours a month is already generous.
-#
-# AND THIS NUMBER, WITH node_month ABOVE, DECIDES WHICH COLUMN WINS - which is
-# why neither the book nor this file claims one does. Sweeping both across
-# their defensible ranges flips the answer:
-#
-#     rent/node   hours saved   owned      rented     winner
-#     $650        0             $12,866    $13,532    owning
-#     $650        10            $12,866    $12,617    renting, by $249
-#     $800        10            $12,866    $13,517    owning
-#     $1,100      20            $12,866    $14,401    owning
-#
-# A margin of a couple of hundred dollars on this bill is inside noise, and both inputs behind it
-# are marked NOT RE-VERIFIED. So the honest statement is that at this size the
-# two are level and the difference is inside the error bars, and the book says
-# that rather than picking the winner its own uncertainty cannot support.
-RENT_SAVES_HOURS = 10
+# Physical support is included in the rented infrastructure price, just as
+# remote hands is included in colocation's facility line. Both options retain
+# the existing team's platform responsibilities and the same recurring hours.
 
 
 def dedicated_month(nodes, retained=DEFAULT_RETAINED, d=DEDICATED, p=PEOPLE):
     infra = nodes * d['node_month']
-    people = ((p['owned_ops_hours_month'] - RENT_SAVES_HOURS)
-              - p['cloud_ops_hours_month']) * hourly(p)
+    people = dedicated_people_month(p) - cloud_people_month(p)
     # The retained line is the same either way: a content delivery network does
     # not care whose rack the origin is in.
     return {'infrastructure': infra, 'people': people, 'retained': retained,
@@ -387,20 +269,14 @@ def control_plane_month(a=AWS):
 
 
 def rent_vs_own_5yr(nodes, h=HARDWARE, d=DEDICATED):
-    """The question everybody asks, answered on the hardware alone.
+    """Hardware purchase versus the rental payments over its planned life.
 
-    "How is renting cheaper than owning over five years?" It is not, and any
-    model that says otherwise has a number wrong somewhere. A landlord buys the
-    same machine you would, finances it, racks it, powers it, insures it and
-    takes a margin - so the rent has to exceed the amortised purchase or there
-    is no business. This function exists so the book can show that rather than
-    assert it, and so a rent figure that has drifted low fails a sanity check
-    instead of quietly flattering the wrong column.
-
-    What renting genuinely buys is not a lower hardware cost. It is no capital
-    outlay, no lead time, no cage, no contract and no racking day - which is a
-    real answer for a company with eighteen months of runway, and a different
-    answer from "it is cheaper"."""
+    Rental pays for more than the machine: it also includes a facility and
+    physical support. This narrow comparison shows the rental premium over purchase in the
+    reference quote; five_year() compares the complete operating options.
+    Renting keeps hardware capital available and hands procurement and physical
+    maintenance to the provider, subject to the quoted capacity and terms.
+    """
     months = h['node_life_years'] * 12
     own = nodes * h['node_capex']
     rent = nodes * d['node_month'] * months
@@ -431,12 +307,12 @@ def five_year(nodes, spares=1, retained=DEFAULT_RETAINED,
     sixty months the owned machines are five years old and still working:
     hardware of this class is routinely run for seven or eight, so what you
     hold is a fleet with years left, not scrap. It is counted conservatively at
-    fifteen per cent of capital, and it is the whole of the difference between
-    owning and renting at this size.
+    fifteen per cent of capital. This is an assumption to revisit against the
+    expected useful life and resale value, rather than a guaranteed return.
     """
     months = h['node_life_years'] * 12
     people = owned_people_month(p) + retained
-    rent_people = ((p['owned_ops_hours_month'] - RENT_SAVES_HOURS) * hourly(p)) + retained
+    rent_people = dedicated_people_month(p) + retained
 
     # --- the cloud: no capital, and the largest running cost -------------
     cloud_m = BILL_MONTH + cloud_people_month(p)
@@ -510,9 +386,8 @@ if __name__ == '__main__':
           f'  total ${d["total"]:>9,.0f} /month')
     # THE SAME FRAMING THE SITE AND THE BOOK USE, or this self-test prints a
     # headline that contradicts them. Both columns carry their own people: the
-    # cloud's operational load is real and is not on its invoice, so leaving it
-    # off the left while charging the right is what makes 79 per cent out of
-    # what is honestly 56.
+    # cloud's operational load is real and is not on its invoice. The same
+    # salary is counted in every option even when the hours do not change.
     cp = cloud_people_month()
     cloud_total = BILL_MONTH + cp
     save = cloud_total - (o['total'] + cp)

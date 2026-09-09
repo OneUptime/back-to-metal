@@ -10,7 +10,7 @@
 - **Azure:** Azure Backup and Azure Monitor alerts — a Recovery Services vault protects only resources in its own region, and soft delete holds removed items for fourteen days.
 
 ## Why this works
-Two failures end a company here: the data cannot be got back, and nobody was woken. Schedules are cheap and worthless until somebody has rebuilt from them, so the deliverable is the drill — an estate reconstructed from the repository and the object store while production carries on untouched, with a stopwatch running. That figure is the recovery time objective, and it is usually several times the number in the plan. Monitoring runs on hardware you own; the alerting deliberately does not, because a cluster that has failed cannot report its own failure.
+Two failures end a company here: the data cannot be got back, and nobody was woken. Schedules are cheap and worthless until somebody has rebuilt from them, so the deliverable is the drill — an estate reconstructed from the repository and the object store while production carries on untouched, with a stopwatch running. That figure is the recovery time objective, and it is usually several times the number in the plan. Monitoring runs on your platform; the alerting runs outside it, because a failed cluster cannot report its own failure. The existing cloud operations rota transitions with the services. Physical faults go to the contracted remote hands team or rental provider; your engineers retain software recovery and incident command within the same recurring-hours budget, validated during the pilot.
 
 ## Before you start
 
@@ -24,7 +24,8 @@ Two failures end a company here: the data cannot be got back, and nobody was wok
 - Prometheus and Loki with a series budget agreed before the first scrape
 
 **People**
-- A named second person behind the escalation, and a rule about what waits until morning
+- The existing operations rota, a named second escalation contact and a rule about what waits until morning
+- The facility or rental provider's physical-support escalation and approved intervention runbooks
 
 ## The runbook
 1. Schedule `velero` nightly for cluster objects, and let the Barman Cloud plugin archive the database from Move 16 continuously, both into the Ceph object gateway built in Move 12.
@@ -32,7 +33,7 @@ Two failures end a company here: the data cannot be got back, and nobody was wok
 3. Do the drill. On the spare machine from Move 06, from the Git repository and those backups alone, build a cluster, restore the database and bring one service up, with nothing touching the original. Time it: that number is the recovery time objective, and the plan that disagrees is wrong.
 4. Stand Prometheus and Loki up on your own nodes against the series budget, with drop rules at scrape time. A monitoring bill that outgrows the estate it watches is a cloud habit that follows you home.
 5. Put the alerting where the cluster cannot take it down. OneUptime runs the probes, the rota, the escalation and the status page from outside; the author of this book founded OneUptime, and the copyright page says so. Add a dead-man's-switch heartbeat.
-6. Write the rota. Three engineers is the minimum that survives leave and illness; most teams here have two. Name the second person, buy a hardware support contract, and record which alerts may wait until morning.
+6. Transition the existing cloud rota to the new platform. Route physical faults to remote hands or the rental provider under the support contract; keep software recovery with the operations team. Test both escalation paths, name a backup contact, record what waits until morning and measure the hours against Move 03's budget.
 
 ## Operator's notes
 - **Swap:** If the drill on the spare machine is disruptive, rent a dedicated server by the month and rebuild into that instead.

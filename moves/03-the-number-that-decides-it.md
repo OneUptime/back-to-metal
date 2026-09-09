@@ -2,7 +2,7 @@
 
 **Layer:** Decide · **Leaving:** — · **Risk:** Medium · **Cutover:** 0 min · **Reversible:** Immediately
 
-> Two columns, five years of amortisation and one salary line. If owned is not a third under rented, the answer is to stop, and stopping here is cheap.
+> Three columns, the same operations team and five years of costs. Put colocation and rented metal beside the cloud bill and choose the margin worth moving for.
 
 ## Leaving from
 - **AWS:** AWS Pricing Calculator — two tools now carry that name, and only the one inside the billing console can see the Savings Plans your account already holds.
@@ -10,33 +10,33 @@
 - **Azure:** Azure Pricing Calculator — signing in and selecting the Enterprise Agreement licensing programme rewrites every price on the page, so an anonymous quote is retail and not yours.
 
 ## Why this works
-Moves 01 and 02 produced a grouped bill and an inventory that accounts for it. This Move sets the two candidate estates beside each other. The arithmetic is not hard; the discipline is refusing to leave anything out of the owned column, because an omitted line is what somebody finds in month five with two platforms running. The rule goes in before the numbers, so they cannot be argued into the answer somebody wanted. Nothing has been bought and no traffic has moved; two days of somebody's time is the whole exposure.
+Moves 01 and 02 produced a grouped bill and an inventory that accounts for it. This Move compares three ways to run that estate: the cloud, rented dedicated servers and owned hardware in colocation. Both metal options can keep the existing operations team while reducing the infrastructure bill; renting also keeps the hardware purchase off the opening budget. Put support, retained services and one-time migration work into the comparison, then apply a margin chosen before the figures. Two days of analysis gives the team a decision it can fund and defend.
 
 ## Before you start
 
 **Access**
 - Three recent invoices at the rate you actually paid, not list
-- A written quote for the sixteen machines and one for a full rack
+- Quotes for sixteen active machines, two spares and a full rack, plus an equivalent dedicated-server rental
 
 **Software**
-- One spreadsheet, two columns: owned on the left, rented on the right
+- One spreadsheet, three columns: cloud, rented metal and colocation
 
 **People**
-- Whoever carries the pager, because the salary line here is theirs
+- The existing cloud operations lead, to map the team's work onto the new platform
 
 ## The runbook
-1. Write the decision rule before any figure goes in: owned must land at least a third under rented, or the programme stops here. A thinner margin sits inside your own forecasting error.
-2. Fill the rented column from the three invoices at the rate you actually paid, discounts in and tax out on both sides. One monthly number, checkable against Move 01.
-3. Fill the owned column from the hardware quote and the facility quote: sixteen machines and two spares over sixty months, the full rack, committed power, transit, the cross-connects, remote hands.
-4. Add the salary line to BOTH columns, because both columns have one. The cloud estate already costs somebody sixty hours a month — the managed cluster upgrades itself on somebody's Tuesday, the credentials rotate, the bill gets argued with, the pager gets carried — and a cloud invoice bills for none of it. Owning adds about twenty hours a month on top of that, not a second person. Write both down. A column with the salary on one side only is not a comparison, whichever side it is missing from.
-5. Add the line that does not come home. Move 04 settles which capabilities you keep renting — the edge, outbound mail, scrubbing — and there is a residue besides: archived object storage nobody will pay the egress to extract, a registry, a queue, an off-site backup copy. It is inside the rented column already, so it has to be inside the owned column too. Leaving it out is the same error as leaving out the salary, and it is worth about a tenth of the bill.
-6. Total both columns and apply the rule. If owned is not a third under rented, stop and keep the spreadsheet. Stopping costs three Moves and a week, against a programme abandoned in month five with two estates billing.
-7. If it clears, put the capital question to the founder who signs. About $248,000 leaves the bank before anything serves a request — eighteen machines and a pair of switches, and on eighteen months of runway that is a fair refusal; renting dedicated machines by the month is the way round it, in Move 07.
+1. Write the decision rule in the spreadsheet before any figure goes in: a metal option must land at least a third under the current cloud cost to justify this programme. Apply the same margin to rented metal and colocation.
+2. Fill the cloud column from the three invoices at the rate you actually paid, discounts in and tax out across all columns. One monthly number, checkable against Move 01.
+3. Fill the colocation column from the hardware and facility quotes: sixteen machines and two spares over sixty months, the full rack, power, transit, cross-connects and remote hands. Beside it, quote the equivalent rented fleet with its traffic allowance and hardware support included.
+4. Carry the existing operations salary into all three columns. This reference model budgets the same 160 hours a month for each: cloud ops transitions to platform ops, with physical work assigned to the facility's remote hands or the rental provider under the support contract. Validate that assumption with the pilot and the people doing the work. Price setup, training and migration once in the project budget; any measured recurring difference belongs in the monthly line.
+5. Add the services that stay rented. Move 04 identifies the edge, outbound mail and scrubbing; later Moves retain archived object storage, a registry, a queue and an off-site backup copy. Their cost is already in the cloud invoice and must remain in both metal columns.
+6. Total the three columns and apply the rule. If either metal option clears it, compare the five-year totals and the monthly cash requirement. If neither clears, keep the sheet and revisit it when the estate or quotes change.
+7. Choose how to fund the move. Colocation buys the fleet and carries its value forward; rented metal pays monthly and keeps that capital available. Put the actual purchase quote, one-time migration effort and overlap with the cloud bill in front of whoever signs. Move 07 settles the facility and rental terms.
 
 ## Operator's notes
 - **Swap:** Price the three largest lines only; that lands within about ten per cent in an afternoon.
-- **Do it faster:** Use one calculator, not three. The comparison is owned against what you pay now, not a cheaper landlord.
-- **Watch out:** The ops-hours line moves the answer further than anything else in the sheet, and it is the one people guess at. Amortisation over seven years instead of five shifts the total by about three per cent; doubling the hours you think owning will take shifts it by ten times that. Put your own number in before you argue with the conclusion.
+- **Do it faster:** Use one sheet with the same capacity, support and retained-service assumptions in every column; compare it with the cloud rate you actually pay.
+- **Watch out:** Equal recurring hours assumes a team that already operates production, a standardised platform and contracted physical support. Check that scope, then vary hours, rental rates and hardware life in the sheet. A migration task becomes a monthly cost only if it actually recurs.
 - **Leftovers:** The committed-spend agreement bills to the end of its term, and that renewal date is the deadline.
 
 ## Rollback

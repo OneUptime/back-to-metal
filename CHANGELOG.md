@@ -5,6 +5,32 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [6.3.0] - 2026-09-09
+
+Two practical routes off the cloud, with the existing operations team.
+
+### Changed
+
+- The opening page presents rented dedicated servers alongside colocation and
+  removes the upfront capital amount. Purchase costs remain in the detailed
+  comparison and decision runbook.
+- The reference model budgets the same monthly operations hours for cloud,
+  rented metal and owned colocation. Cloud ops transitions into on-prem ops;
+  remote hands performs contracted physical work. Recurring support costs and
+  one-time migration effort remain counted.
+- The guide, cost comparison and operations runbooks explain how to split
+  responsibilities between the existing team and the provider, and how to
+  choose between preserving cash with rented metal and owning the fleet.
+- Regenerated the website, print and Kindle editions, covers and README with
+  the updated savings and consistent operating assumptions.
+
+### Fixed
+
+- Removed stale extra-hours and rented-metal staffing discounts, and the
+  claim that residual hardware value was the only difference between routes.
+- The colocation runbook now uses the current reference fleet and facility
+  cost instead of figures from the smaller earlier edition.
+
 ## [6.2.0] - 2026-09-09
 
 The website redesign and the release pipeline that publishes it.

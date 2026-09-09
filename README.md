@@ -45,9 +45,11 @@ Each is a business other people run better than you will, and each is cheap next
 replaces. Move 03 gives you permission to read three Moves, do the arithmetic and stop, which
 is a cheaper outcome than a programme abandoned in month five with two platforms running.
 
-And the comparison counts the salary. Half an engineer of ongoing work is a larger line than
-the hardware, and a comparison that omits it is the reason repatriations get approved and then
-regretted.
+The comparison keeps the existing operations salary in all three options. Cloud ops
+transitions into on-prem ops with the same monthly hours in the reference model; colocation
+remote hands handles contracted physical work, and rented-metal providers maintain their
+hardware. Migration effort is budgeted separately. Rent to preserve cash, or colocate owned
+machines for lower running costs and control over the fleet.
 
 ## Three clouds, one runbook
 
@@ -160,8 +162,8 @@ give credit.
 | Cannot be undone | 0 |
 | Risk | 3 low, 7 medium, 10 high |
 | Dependencies | 31, every one pointing backwards |
-| Line savings across the Moves | $89,420 a month, before the salary and the cage |
-| Saving, with everything counted | $77,224 a month &mdash; $926,688 a year, 67 per cent of a $114,644 bill with the salary on both sides |
+| Line savings across the Moves | $86,320 a month, after the facility line, before other platform costs |
+| Saving, with everything counted | $80,885 a month &mdash; $970,620 a year, 71 per cent of a $114,644 bill with the salary on both sides |
 
 Every Move names the real service on AWS, Google Cloud and Azure, and the one thing that differs on each.
 

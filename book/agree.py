@@ -79,14 +79,14 @@ CHECKS = [
         (SITE / 'index.html', rf'class="tot"><dt>What the bill becomes</dt>\s*<dd>{MONEY}'),
         (SITE / 'cost.html',
          rf'fig-n">{MONEY}</b><span class="lbl">What the bill becomes'),
-        (BOOK, rf'Those three are <b>{MONEY}</b> a month'),
+        (BOOK, rf'Those three are <b>{MONEY}</b>\s+a month'),
     ]),
     ('person-days', [
-        (SITE / 'index.html', rf'About {PCT} days of work'),
+        (SITE / 'index.html', rf'The labour is about {PCT} person-days'),
         (README, rf'\| Work \| {PCT} person-days \|'),
     ]),
     ('weeks end to end', [
-        (SITE / 'index.html', rf'days of work\s+spread across {PCT}\s+weeks'),
+        (SITE / 'index.html', rf'engineers it lands in roughly {PCT} weeks'),
         (README, rf'End to end, two engineers \| {PCT} weeks'),
     ]),
 ]

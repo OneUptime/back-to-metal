@@ -354,10 +354,9 @@ def build(moves):
     # question everybody actually asks answered nowhere in the printed book
     # while the website answered it on its front page.
     #
-    # Every figure interpolates the same dict the website's section uses, so
-    # the two cannot drift; and the four reasons NOT to do this are on the
-    # page, at the same length, because a page of nine benefits and no costs
-    # is an advertisement and this book has spent four editions refusing.
+    # Every figure interpolates the same values the website's section uses.
+    # The routes, support arrangements and reasons to stay follow the gains,
+    # so the reader can choose a route that fits their workload and team.
     # Computed here rather than reused from the cost page below, because this
     # page comes BEFORE it: the reader is asked why before being shown the
     # arithmetic, which is the right order. Same functions, so same figures.
@@ -370,12 +369,8 @@ def build(moves):
         'five_year_saved': _m(_own['saved']),
         'five_year_pct': f"{_own['pct']:.0f}",
         'egress_100tb': _m(COSTS.egress_month(100)),
-        'capex': _m(_own['capex']),
         'weeks': f"{RM.schedule(moves, 2)['weeks']:.0f}",
         'days': f"{sum(RM.effort_days(m) for m in moves):.0f}",
-        'ops_hours': (COSTS.PEOPLE['owned_ops_hours_month']
-                      - COSTS.PEOPLE['cloud_ops_hours_month']),
-        'owned_hours': COSTS.PEOPLE['owned_ops_hours_month'],
         'cloud_hours': COSTS.PEOPLE['cloud_ops_hours_month'],
         'retained': _m(_ret),
     }
@@ -391,11 +386,9 @@ def build(moves):
         f'<b>{esc(h)}</b>{esc(b)}</div></div>'
         for i, (h, b) in enumerate(WHY.costs(wf)))
 
-    # TWO PAGES, and it is a spread rather than an overflow. One page held the
-    # lede, our own record, five gains, four costs and four reasons not to,
-    # and ran 236px past the trim - the case FOR on the recto and the case
-    # AGAINST on the verso is the better shape anyway, because a reader who
-    # turns the page has to turn it past the costs to get to the Moves.
+    # TWO PAGES: the reasons to move, followed by how to choose the route.
+    # Keeping the gains and the practical decisions on separate pages leaves
+    # room for both without forcing the justifier to compress the text.
     pages.append(page('', '#14655A', f"""
     <div class="pkicker">{esc(WHY.KICKER)}</div>
     <h2 class="ptitle d">Why Leave At All</h2>
@@ -407,7 +400,7 @@ def build(moves):
     <div class="keylist">{gains}</div>""", 'WHY LEAVE AT ALL'))
 
     pages.append(page('', '#A32E1F', f"""
-    <div class="pkicker">The other half of the same page</div>
+    <div class="pkicker">Two routes, one operations team</div>
     <h2 class="ptitle d">{esc(WHY.COSTS_HEADING)}</h2>
     <div class="fw"><p class="lede">{esc(WHY.COSTS_LEDE)}</p></div>
     <div class="hrule" style="margin:4.5mm 0 4mm"></div>
@@ -417,7 +410,7 @@ def build(moves):
       <div class="pkicker" style="margin-bottom:2.5mm">{esc(WHY.STAY_HEADING)}</div>
       <ul class="stayl">{stay}</ul>
       <p class="legend-note" style="margin:3mm 0 0">{esc(WHY.CLOSER)}</p>
-    </div>""", 'AND WHAT IT COSTS YOU'))
+    </div>""", WHY.COSTS_HEADING.upper()))
 
     pages.append(page('', '#6B5344', f"""
     <div class="pkicker">Before you start &nbsp;·&nbsp; {n_items} things</div>
@@ -471,10 +464,10 @@ def build(moves):
       it in a way that looks like a Kubernetes bug for a day and a half. Buy small enterprise
       NVMe with the protection, second-hand if you like, and put the money you saved on the
       chassis into the disks.</p></div>
-      <div class="pcard"><h4>If three machines at home is not possible</h4><p>Rent three of the
-      cheapest dedicated hosts you can find, by the month, and run exactly the same experiment.
+      <div class="pcard"><h4>If three machines at home is not possible</h4><p>Rent three
+      suitable dedicated hosts available on monthly terms and run the same experiment.
       It costs more than electricity and less than being wrong, it gives you real addresses and
-      a real network, and you can hand it all back at the end of the month. What it will not
+      a real network, and you can end the rental under the provider's notice terms. What it will not
       give you is a machine you can physically pull a disk out of.</p></div>
     </div>
     <div class="kitwrap">
@@ -537,7 +530,6 @@ def build(moves):
     cloud_total = COSTS.BILL_MONTH + cloud_people
     save = cloud_total - (o['total'] + cloud_people)
     infra_save = COSTS.BILL_MONTH - (o['infrastructure'] + o['retained'])
-    rvo = COSTS.rent_vs_own_5yr(n_nodes + R['spares'])
     fy = COSTS.five_year(R['nodes'], R['spares'], retained)
     capex = ((n_nodes + R['spares']) * COSTS.HARDWARE['node_capex']
              + COSTS.HARDWARE['switch_capex'])
@@ -547,10 +539,10 @@ def build(moves):
     pages.append(page('', '#8A6112', f"""
     <div class="pkicker">The arithmetic, with the salary in it</div>
     <h2 class="ptitle d">What It Actually Costs</h2>
-    <p class="pintro">The comparison that gets a repatriation approved and then regretted is the
-    one that counts the hardware and forgets the people. This one counts both, at list price and
-    with no commitment discount on either side, for the reference build opposite. Substitute your
-    own effective rate; the shape does not change.</p>
+    <p class="pintro">Cloud ops transitions into on-prem ops, with
+    {COSTS.PEOPLE['cloud_ops_hours_month']} hours a month in every option. Remote hands or the
+    rental provider covers physical work. Every column counts the salary. Substitute your
+    own rates and hours; migration effort is separate.</p>
     <div class="hrule" style="margin:5.5mm 0"></div>
     <div class="pan">
       <div class="pcard"><h4>On AWS, compute alone</h4><p>{vcpu:,} vCPU of current-generation
@@ -558,32 +550,29 @@ def build(moves):
       gigabyte of storage, a load balancer or a byte of egress. Egress is the line that ends most
       arguments: 100 TB a month is {money(COSTS.egress_month(100))}, every month, for the privilege
       of your own traffic leaving.</p></div>
-      <div class="pcard"><h4>Owned, in one quarter rack</h4><p>{money(o['infrastructure'])} of
-      infrastructure - metal amortised over five years, the spare, power, the space, transit, the
-      cross-connect and remote hands - plus {money(o['people'])} of additional salaried time and
-      {money(o['retained'])} that never comes home at all: the edge, the outbound mail and the
-      scrubbing of Move 04, and the residue five later Moves leave behind. That salary line is
-      the largest number in this column, the retained line is the one every other comparison
-      forgets, and a table without either is the reason repatriations get approved and then
-      regretted. Those three are <b>{money(o['total'])}</b> a month: what the
-      {money(COSTS.BILL_MONTH)} line becomes, base salary unchanged on both sides.</p></div>
-      <div class="pcard"><h4>Rented by the month</h4><p>The same class of machine from a
-      dedicated-host provider is {money(d['infrastructure'])} &mdash; MORE than owning, not less,
-      and it should be: over {rvo['months']} months you hand over {money(rvo['rent_total'])} for
-      machines that cost {money(rvo['own_capex'])} to buy, which is
-      {rvo['multiple']:.1f} times the purchase price. A landlord buys the same box you would and
-      takes a margin. What renting actually buys is no capital, no lead time, no cage and no
-      contract, and it lands within a few hundred dollars a month of owning because it drops the
-      facility. On eighteen months of runway that is the right trade; it is not a cheaper
-      one.</p></div>
+      <div class="pcard"><h4>Owned, in colocation</h4><p>{money(o['infrastructure'])} of
+      infrastructure covers metal amortised over five years, the spares, power, a full rack,
+      transit, the cross-connect and remote hands. Add {money(o['people'])} of additional
+      salaried time and {money(o['retained'])} of retained services: the edge, outbound mail,
+      scrubbing and the residue of later Moves. Those three are <b>{money(o['total'])}</b>
+      a month: what the {money(COSTS.BILL_MONTH)} line becomes, base salary unchanged on both
+      sides. Remote hands performs the agreed physical interventions; your existing team
+      runs the platform and applications within the same monthly hours.</p></div>
+      <div class="pcard"><h4>Rented by the month</h4><p>{money(d['infrastructure'])} buys the
+      reference fleet from a dedicated-host provider, with the machines, power, space, network
+      and physical maintenance in the rental. You keep the capital available and avoid a
+      separate facility lease. With retained services and no increase in operations hours,
+      the cloud bill line becomes <b>{money(d['total'])}</b> a month, base salary unchanged.
+      Available stock can shorten the move. Confirm delivery, bandwidth, support and notice
+      terms in the quote. Rent when preserving cash matters more than owning the fleet.</p></div>
       <div class="pcard"><h4>What the difference buys</h4><p>{money(save)} a month, or
       {money(save * 12)} a year, for a capital outlay of {money(capex)} &mdash; {R['nodes'] + R['spares']} machines and
       a pair of switches &mdash; which pays for itself in about
       {capex / max(save, 1):.0f} months. That is {save / cloud_total * 100:.0f} per cent of a
       fully loaded {money(cloud_total)}, with the salary counted on both sides; on the
       infrastructure line alone, which is what every other comparison quotes, it is
-      {infra_save / COSTS.BILL_MONTH * 100:.0f} per cent. Both are true and the difference
-      between them is the people.</p></div>
+      {infra_save / COSTS.BILL_MONTH * 100:.0f} per cent. The dollar saving is the same;
+      counting the existing salary increases the baseline.</p></div>
     </div>
     <div class="chartwrap">
       <div class="pkicker" style="margin-bottom:4mm">One estate, three ways, per month</div>
@@ -607,11 +596,11 @@ def build(moves):
     pages.append(page('', '#8A6112', f"""
     <div class="pkicker">The same decision, over the life of the machines</div>
     <h2 class="ptitle d">Five Years,<br>Three Ways</h2>
-    <p class="pintro">A month is the wrong window for a capital decision. Owning is capital on
-    day one and cheap running afterwards; renting is no capital and dearer running; the cloud is
-    no capital and dearest running. Compared a month at a time the capital either vanishes into
-    an amortisation line or sits there looking like the whole story, and neither is what somebody
-    signing the cheque is choosing between.</p>
+    <p class="pintro">Both metal options cut the cost of this reference estate over the life
+    of the machines. Renting keeps the server purchase off the opening cash flow; colocation
+    trades that purchase for lower monthly infrastructure costs. The table separates capital
+    from running costs and counts the same operations hours in all three options, so you can
+    choose the cash flow that suits the business.</p>
     <div class="hrule" style="margin:5mm 0"></div>
       <div class="pkicker" style="margin-bottom:3mm">The same computers, three ways, over
       {fy['months'] // 12} years</div>
@@ -627,12 +616,13 @@ def build(moves):
                       else money(r['saved']) + ' (' + f"{r['pct']:.0f}" + '%)') + '</td></tr>'
           for r in fy['rows'])}</tbody>
       </table>
-    <p class="legend-note" style="margin:4mm 0 0">Over five years the two metal columns land
-    within {money(abs(fy['rows'][1]['total'] - fy['rows'][2]['total']))} of each other, and the
-    whole of that difference is the residual: machines of this class run seven or eight years, so
-    after sixty months you still hold a working fleet, counted here at a conservative fifteen per
-    cent of what it cost. You do not own hardware to beat renting it. You own it when the fleet
-    is big enough to carry the room.</p>""", 'FIVE YEARS, THREE WAYS'))
+    <p class="legend-note" style="margin:4mm 0 0">In this model, colocation costs
+    {money(fy['rows'][1]['total'] - fy['rows'][2]['total'])} less than rented metal over five
+    years. That includes lower infrastructure costs and {money(fy['rows'][2]['residual'])}
+    of estimated fleet value at the end, counted at fifteen per cent of the purchase price.
+    Renting preserves that opening capital and puts physical maintenance with the provider.
+    Replace both quotes and the residual estimate with your own; location, bandwidth and
+    support can change which route wins.</p>""", 'FIVE YEARS, THREE WAYS'))
 
     # ---------- the equivalence table, two pages
     def eq_page(rows, roman, kicker, intro, folio):

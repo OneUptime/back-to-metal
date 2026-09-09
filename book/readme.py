@@ -86,7 +86,7 @@ def main():
                f'pointing backwards |')
     if line_saved:
         out.append(f'| Line savings across the Moves | ${line_saved:,.0f} a month, '
-                   f'before the salary and the cage |')
+                   f'after the facility line, before other platform costs |')
     if saved:
         out.append(f'| Saving, with everything counted | ${saved:,.0f} a month '
                    f'&mdash; ${saved * 12:,.0f} a year, {saved / loaded * 100:.0f} '
