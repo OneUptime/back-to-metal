@@ -21,9 +21,10 @@ EPUB and on the website. The final local build confirms 76 pages.
 | Kindle | Reflowable EPUB with colour artwork | Not applicable | $8.99 | Delivery based on converted file |
 
 Estimated print margins are 26.2% and 25.5%. Confirm the final costs and royalty
-in KDP before submission. The hardcover needs an official Cover Calculator
-template for 8.25 × 11 in, 76 pages, case laminate, premium colour on white paper.
-`HC` remains unset until those dimensions have been read; its cover is not generated.
+in KDP before submission. The hardcover uses the official Cover Calculator
+template downloaded on 2026-09-09 for 8.25 × 11 in, 76 pages, case laminate,
+premium colour on white paper. `book/cover.py` records the measured guide geometry;
+the generated case cover has a blank spine and reserves KDP's barcode area.
 
 Rates checked on 2026-09-09 against KDP's public tables:
 [paperback printing](https://kdp.amazon.com/en_US/help/topic/G201834340),
@@ -66,27 +67,45 @@ EUR7.99 or CAD11.99 to meet the 20% requirement; check other markets individuall
 | Editions | Paperback, hardcover, Kindle |
 | Print trim | 8.25 × 11 in; bleed on top, bottom and outer edge |
 | Cover finish | Matte; hardcover case laminate |
-| ISBNs | Not allocated or registered in this attempt |
-| Print preparation | 76-page interior; hardcover template and KDP previews pending |
+| Paperback ISBN | 978-1-950600-03-8 — submitted to Bowker; dashboard status Pending |
+| Hardcover ISBN | 978-1-950600-04-5 — submitted successfully; Bowker processing and dashboard verification pending |
+| Bowker publisher | HackerBay, Inc. — exact account and fixed publisher-field spelling |
+| Print preparation | Final 6.4.6 files validated locally; KDP uploads and previews pending |
+| KDP Kindle draft | AZTAAK7S3HZ0G — details complete; content settings saved |
+| KDP paperback draft | YHJP6H3BSP1 — details saved; print setup pending |
 | Amazon ASINs | Not published |
 | EPUB identifier | `urn:uuid:f021e81e-4b5f-4ecc-bc23-402193edac60` — never change |
 | KDP Select | Do not enroll: the ebook is openly available elsewhere |
 | DRM | Do not apply; the text is CC BY 4.0 |
 
-No Bowker record or KDP draft has been created in this attempt. Chrome account
-access failed with “Codex auth token is unavailable”; reconnection is pending.
+Direct computer access to Chrome is working. On 2026-09-09, both print records
+were submitted successfully in the **HackerBay, Inc.** Bowker account. The paperback
+dashboard shows **Back to Metal / Paperback / Pending**. The hardcover form confirmed
+a successful save; its dashboard status remains to be verified. These are submitted
+ISBN filings, not completed Bowker validation or Amazon publication. No KDP submission
+or ASIN has been confirmed in this record; KDP setup is ongoing.
 
-The prepared files passed `make verify audit artefacts pricing releasable`:
+The final 6.4.6 files, including the filed ISBNs and exact publisher spelling, passed
+`make verify audit artefacts pricing releasable amazon`:
 41 tests, zero content findings, print geometry and embedded-font checks,
 rendered typography and safe-area checks, website checks and agreement across
 all editions. EPUBCheck 5.3.0 reported zero errors or warnings. The regenerated
 cover and affected interior pages, including all four worksheets, were visually
-reviewed. These local checks do not replace KDP's ingestion and previews.
+reviewed. The hardcover was also overlaid against the official template guides.
+These local checks do not replace KDP's ingestion and previews.
+
+The saved Kindle draft has the matching title, subtitle, author, first-edition
+number, description and seven keywords. It records author-owned rights, no
+sexually explicit content, no AI-generated content, no DRM, and publisher
+HackerBay, Inc. No ISBN is assigned to Kindle. The linked paperback inherited
+the matching title, author, description and keywords; its edition number is 1.
+Amazon requested a fresh sign-in when opening the paperback content page after
+saving its details. Neither format has been submitted for publication.
 
 Amazon Kindle Previewer 3.107 was obtained from KDP's official download and its
 Apple signature was verified. Its command-line startup produced no conversion
 output in this environment, so Kindle conversion is not marked as validated.
-Use KDP's online previewer after browser access is restored.
+Use KDP's online previewer during title setup before submission.
 
 On 2026-09-09 the author confirmed that the original manuscript and artwork were
 not AI-generated; AI helped with editing. Worksheets reformat existing manuscript
@@ -94,34 +113,81 @@ excerpts. Answer the current KDP disclosure form using this provenance.
 
 ## ISBNs
 
-The repository previously recorded these unused numbers in HackerBay, Inc.'s
-owned block. Their current availability has not been checked in Bowker.
+The live Bowker inventory was inspected on 2026-09-09 in the **HackerBay, Inc.**
+account. The publisher field uses that exact spelling and is fixed; the imprint
+dropdown has no custom entries.
 
-| Format | Candidate number | Status |
+| ISBN | Title / intended format | Observed status |
 |---|---|---|
-| Paperback | 978-1-950600-03-8 | Unverified inventory; not allocated |
-| Hardcover | 978-1-950600-04-5 | Unverified inventory; not allocated |
+| 978-1-950600-00-7 | Simplified JavaScript | Existing incomplete record |
+| 978-1-950600-01-4 | The 20-Minute Table | Already assigned to that title |
+| 978-1-950600-02-1 | The 20-Minute Table | Already assigned to that title |
+| 978-1-950600-03-8 | Back to Metal — Paperback | Submitted successfully; Pending |
+| 978-1-950600-04-5 | Back to Metal — Hardback | Submitted successfully; dashboard verification pending |
 
-The block's first two numbers were recorded as assigned to *The 20-Minute Table*.
-Check the actual inventory before assigning either candidate. Kindle needs no ISBN.
-After registration, record the account, filing date, exact metadata, publication
-date, format, page count and price here, then set `imprint.ISBN`.
+The earlier inventory history incorrectly described the block's first two
+numbers as belonging to *The 20-Minute Table*: that title uses **01-4 and 02-1**,
+while **00-7** belongs to *Simplified JavaScript*. Kindle needs no ISBN.
+Both print entries in `imprint.ISBN` now hold their submitted numbers. The hardcover
+number was verified unused before the paperback record was cloned into it.
 
-## Metadata to file
+## Paperback metadata filed with Bowker — 2026-09-09
 
 | Field | Value |
 |---|---|
 | Title | Back to Metal |
 | Subtitle | How a company leaves the cloud, one move at a time |
-| Author | Nawaz Dhandala |
-| Publisher | HackerBay — verify the owned Bowker imprint spelling |
+| Contributor | Nawaz Dhandala — Author |
+| Publisher | HackerBay, Inc. |
 | Language | English |
-| Edition | First edition |
-| Copyright | 2026, Nawaz Dhandala |
-| Licence | CC BY 4.0 (text), MIT (software) |
-| Rights | Author-owned copyright; not public-domain content |
-| Audience | Adult technical nonfiction |
-| Publication date | Set during actual submission; not filed yet |
+| Copyright year | 2026 |
+| Format | Print — Paperback |
+| Pages | 76 |
+| Dimensions | Inches; Length 11, Width 8.25; depth and weight left blank |
+| Genre | COMPUTERS |
+| Audience | Scholarly & Professional |
+| Planned publication date | September 9, 2026 |
+| Publication status | Forthcoming |
+| US retail price | $11.99 |
+| Front-cover image | Existing `dist/cover-kindle.jpg`, uploaded successfully |
+| Dashboard result | Back to Metal / Paperback / Pending |
+
+The planned publication date and Forthcoming status were filed metadata, not
+evidence that an edition was released that day. The publication remains the
+first edition, with author-owned copyright, CC BY 4.0 text and MIT software;
+it is not public-domain content. These rights and edition statements remain
+the metadata basis for the KDP setup.
+
+## Hardcover metadata filed with Bowker — 2026-09-09
+
+The paperback record was cloned into the verified unused ISBN
+**978-1-950600-04-5**. Bowker confirmed
+`Congratulations! Your form is complete and has been saved successfully!`
+after submission. The record is submitted and awaiting Bowker processing;
+the dashboard status has not yet been verified.
+
+| Field | Value |
+|---|---|
+| Title | Back to Metal |
+| Subtitle | How a company leaves the cloud, one move at a time |
+| Description and short author bio | Same as the paperback filing, retained through Clone |
+| Contributor | Nawaz Dhandala — Author |
+| Publisher | HackerBay, Inc. |
+| Language | English, explicitly set |
+| Copyright year | 2026, explicitly set |
+| Format | Print — Hardback |
+| Pages | 76, explicitly set |
+| Dimensions and weight | Left blank; the physical hardcover case has not been measured |
+| Genre | COMPUTERS |
+| Audience | Scholarly & Professional |
+| Planned publication date | September 9, 2026 |
+| Publication status | Forthcoming |
+| US retail price | $33.99 |
+| Front-cover image | Same `dist/cover-kindle.jpg`, uploaded with success confirmation |
+| Submission result | Form saved successfully; dashboard verification pending |
+
+The 8.25 × 11 in interior trim is not a filed hardcover case dimension. The
+planned publication date and Forthcoming status do not establish a live edition.
 
 ## Description prepared for KDP
 
@@ -142,8 +208,12 @@ Attribution 4.0.
 
 ## Categories and keywords
 
-Select the closest available KDP categories to cloud computing, distributed
-systems and Linux. No categories have been filed yet.
+Bowker's submitted genre is COMPUTERS. The saved KDP categories are:
+
+- Kindle: Computers & Technology → Networking & Communications → Cloud Computing;
+  Computer Science → Systems Analysis & Design; Operating Systems → Linux.
+- Paperback: Computers & Technology → Networking & Cloud Computing → Cloud Computing;
+  Operating Systems → Linux → Networking & System Administration and Servers.
 
 Prepared search phrases:
 
@@ -155,13 +225,14 @@ Prepared search phrases:
 - cloud cost comparison
 - colocation planning
 
-## Before submitting
+## Remaining submission work
 
-1. Restore the Chrome connection and inspect both accounts for existing records.
-2. Register one owned ISBN per print format and update this record and `imprint.py`.
-3. Read the official hardcover template dimensions into `cover.py`.
-4. Regenerate all editions and the website; run `make amazon` and the agreement gates.
-5. Run EPUBCheck on the final EPUB and inspect KDP's ebook and print previews.
+1. Confirm the hardcover record's actual dashboard status and any Bowker processing updates.
+2. Keep this record and `imprint.py` aligned with the filed metadata; inspect KDP
+   for existing drafts before creating another.
+3. Resume the saved KDP drafts after the fresh Amazon sign-in; create the linked hardcover.
+4. Upload the validated 6.4.6 files with standard-colour paperback and premium-colour hardcover settings.
+5. Inspect KDP's ebook and print previews.
 6. Verify each marketplace's royalty, tax handling and .99 price. Automatic currency
    conversion may violate either the margin or the Kindle-to-print price relationship.
 7. Submit all formats, record the actual statuses and add ASIN links once live.

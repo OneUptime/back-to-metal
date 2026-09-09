@@ -1540,7 +1540,7 @@ def build_about(moves, T):
       f'<dl class="colo">{colophon}</dl>',
       margin=mg_note('Set in two families',
                      f'{esc(IMP.TYPE_NOTE)} Written by {esc(IMP.AUTHOR)} and '
-                     f'published by {esc(IMP.PUBLISHER)}. '
+                     f'published by {esc(IMP.PUBLISHER.rstrip("."))}. '
                      f'{esc(IMP.DISCLAIMER)}'))}
 </main>
 {foot(0)}"""

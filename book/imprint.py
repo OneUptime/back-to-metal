@@ -14,7 +14,7 @@ import re
 TITLE = 'Back to Metal'
 SUBTITLE = 'How a company leaves the cloud, one move at a time'
 AUTHOR = 'Nawaz Dhandala'
-PUBLISHER = 'HackerBay'
+PUBLISHER = 'HackerBay, Inc.'
 PUBLISHER_SITE = 'HackerBay.io'
 YEAR = 2026
 EDITION = 'First edition'
@@ -46,19 +46,20 @@ def wordmark_html(sep='<br>', accent='em'):
     return sep.join(f'<{accent}>{t}</{accent}>' if hot else t for t, hot in WORDMARK)
 
 # --- identifiers -----------------------------------------------------------
-# DELIBERATELY UNSET. Registering an ISBN means entering real publication
-# metadata under a real Bowker account, so it stays a human step and never
-# happens from a build. The copyright page omits an empty entry rather than
-# printing a placeholder, so the book is correct to print as it stands.
+# Set an ISBN only after its record exists in the owned Bowker account; builds
+# never allocate one. The copyright page omits entries still left empty.
 #
-# The next two free numbers in HackerBay, Inc.'s own block (prefix 978-1-950600)
-# are 978-1-950600-03-8 (paperback) and 978-1-950600-04-5 (hardback); the sibling
-# title took -01-4 and -02-1. Check digits computed, allocation NOT made and
-# nothing registered. Fill these in only after the records exist at Bowker, and
-# record what was filed in PUBLISHING.md at the same time.
+# Paperback 978-1-950600-03-8 was submitted on 2026-09-09 under HackerBay, Inc.
+# Bowker's dashboard shows Back to Metal / Paperback / Pending. Hardcover
+# 978-1-950600-04-5 was submitted the same day and its form confirmed a successful
+# save; dashboard verification is pending. These are submitted records, not
+# confirmation of completed Bowker processing or KDP publication.
+# In the same block, -00-7 belongs to incomplete Simplified JavaScript metadata;
+# -01-4 and -02-1 belong to The 20-Minute Table.
+# The exact filing and observed status are recorded in PUBLISHING.md.
 ISBN = {
-    'paperback': None,
-    'hardback': None,
+    'paperback': '978-1-950600-03-8',
+    'hardback': '978-1-950600-04-5',
 }
 
 # The Kindle edition's publication identifier, for the EPUB's dc:identifier.

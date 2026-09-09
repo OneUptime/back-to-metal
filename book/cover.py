@@ -52,10 +52,14 @@ SPINE_PER_PAGE = {
     'premium colour':  0.002347,
 }
 
-# The hardcover case. UNSET until it has been measured, because KDP publishes no
-# formula and the numbers are only correct at one page count. Once the interior's
-# page count is settled, open KDP's Cover Calculator, enter 8.25x11 at that page
-# count in premium colour on white paper, and fill these in:
+# The hardcover case, measured from KDP's official template downloaded 2026-09-09:
+# CASE_LAMINATE_8.250x11.000_76_PREMIUM_WHITE_en_US.pdf
+# https://kdp.amazon.com/cover-calculator
+# Hardcover, premium colour, white paper, left to right, 8.25x11in, 76 pages.
+# Values below preserve the PDF's drawn guides (points / 72); its MediaBox is
+# separately rounded to 1328x894pt and the calculator display to three decimals.
+# These dimensions are valid only at this page count and stock. Re-measure if
+# either changes; the paperback spine formula does not describe a hardcover.
 #
 #   sheet_w/sheet_h  the full printed sheet
 #   panel_w/panel_h  one cover panel
@@ -63,9 +67,23 @@ SPINE_PER_PAGE = {
 #   wrap             the turn-in - nothing here survives on the visible face
 #   hinge            the channel either side of the spine, where type creases
 #
-# Check the arithmetic before trusting it: 2*panel_w + spine + 2*wrap should
-# equal sheet_w, and panel_h + 2*wrap should equal sheet_h.
-HC = None
+# The panel includes the hinge. The barcode is measured from the artwork's
+# bottom-left corner, not from the paperback's bleed or safe margin.
+HC = {
+    'pages': 76,
+    'sheet_w': 1327.8348 / 72,
+    'sheet_h': 894.0472 / 72,
+    'panel_w': 608.1732 / 72,
+    'panel_h': 809.0078 / 72,
+    'spine': 26.44907 / 72,
+    'wrap': 42.51968 / 72,
+    'hinge': 28.34646 / 72,
+    'margin': 0.125,
+    'barcode_x': 460.3464 / 72,
+    'barcode_y': 69.51967 / 72,
+    'barcode_w': 2.0,
+    'barcode_h': 1.2,
+}
 
 PDF = ROOT / 'dist' / IMP.PDF_NAME
 INK = '#14171C'
@@ -252,7 +270,8 @@ def hardback_html(moves, h):
     .back .inner{{position:absolute;inset:0;
       padding:{vert_pad + 0.2}in {hinge_pad}in {vert_pad}in {outer_pad}in;
       display:flex;flex-direction:column}}
-    .barcode{{position:absolute;right:{outer_pad}in;bottom:{vert_pad}in;width:2in;height:1.2in}}
+    .barcode{{position:absolute;left:{h['barcode_x']}in;bottom:{h['barcode_y']}in;
+      width:{h['barcode_w']}in;height:{h['barcode_h']}in}}
     """ + panel_css(mid, faint, blurb_rule)
     spine_txt = spine_text(h['pages'], h['spine'], preferred_pt=15)
     return (f'<!doctype html><html><head><meta charset="utf-8">'
@@ -402,12 +421,15 @@ def main():
     if g['pages'] != HC['pages']:
         sys.exit(f"cover: the hardback case was measured at {HC['pages']} pages but the book "
                  f"is now {g['pages']}. Re-measure it in KDP's Cover Calculator and update HC.")
+    if (abs(2 * HC['panel_w'] + HC['spine'] + 2 * HC['wrap'] - HC['sheet_w']) > 0.001
+            or abs(HC['panel_h'] + 2 * HC['wrap'] - HC['sheet_h']) > 0.001):
+        sys.exit('cover: the hardcover panels do not match its measured sheet dimensions')
     hb = ROOT / 'dist' / 'cover-hardback.pdf'
     spine_l = HC['wrap'] + HC['panel_w']
     spine_r = spine_l + HC['spine']
     asyncio.run(render(hardback_html(moves, HC), hb,
                        {'width': HC['sheet_w'], 'height': HC['sheet_h']},
-                       safe={'edges': (HC['wrap'],) * 4,
+                       safe={'edges': (HC['wrap'] + HC['margin'],) * 4,
                              'keepout': [(spine_l - HC['hinge'], spine_l),
                                          (spine_r, spine_r + HC['hinge'])]},
                        label='cover-hardback'))

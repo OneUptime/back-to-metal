@@ -59,6 +59,11 @@ jobs:
       - name: Build and check all artefacts
         run: make artefacts
 
+      # upload-artifact only fails when none of its paths exist, so require
+      # the hardcover separately before bundling the editions.
+      - name: Check the hardcover cover is present
+        run: test -s dist/cover-hardback.pdf
+
       # The site and the README's figures are generated from the sources.
       # Regenerating them must reproduce what was committed. The PDF and EPUB
       # are excluded: both carry a build timestamp and are not byte-reproducible.
@@ -84,16 +89,16 @@ jobs:
           if-no-files-found: error
 
       # The Amazon artefacts share the same sources and have their own gates:
-      # kdpcheck.py on the interior, a safe-area check on the wrap, and a
-      # structural check on the EPUB. The hardback case is skipped here — it
-      # needs dimensions measured by hand from KDP's Cover Calculator, and
-      # cover.py refuses to guess.
+      # kdpcheck.py on the interior, safe-area checks on both print covers, and
+      # a structural check on the EPUB. The hardcover uses the dimensions
+      # recorded from KDP's Cover Calculator; cover.py refuses to guess.
       - name: Upload the Amazon artefacts
         uses: actions/upload-artifact@v4
         with:
           name: amazon-editions
           path: |
             dist/cover-paperback.pdf
+            dist/cover-hardback.pdf
             dist/cover-kindle.jpg
             dist/Back-to-Metal.epub
           if-no-files-found: error
