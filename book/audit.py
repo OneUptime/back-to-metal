@@ -38,6 +38,7 @@ TOOLS = {
     'skopeo': 'skopeo', 'crane': 'crane', 'oras': 'oras',
     'openssl': 'openssl', 'cmctl': 'cmctl', 'step': 'step-cli',
     'dig': 'dig', 'mtr': 'mtr', 'ipmitool': 'ipmitool', 'ceph': 'ceph',
+    'qm': 'qm', 'vzdump': 'vzdump', 'qmrestore': 'qmrestore',
     'vault': 'vault', 'sops': 'sops', 'age': 'age',
     'promtool': 'promtool', 'logcli': 'logcli', 'vector': 'vector',
     'kafka-topics.sh': 'kafka', 'rpk': 'redpanda', 'nats': 'nats',

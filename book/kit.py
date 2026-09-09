@@ -60,9 +60,22 @@ HOMELAB_KIT = [
     'A domain you own, for real certificates rather than self-signed ones',
 ]
 
+COST_SCOPE = (
+    'These figures price the container reference build. For VMs, include '
+    'hypervisor support, guest licences and VM backup capacity, and replace the '
+    'reference operating hours with your measured budget in Move 03.'
+)
+
+PLATFORM_SCOPE = (
+    'Cloud VMs move to KVM guests on Proxmox VE hosts; several guests share each '
+    'physical machine. Already-containerised workloads use Talos and Kubernetes, '
+    'directly on hardware or in guests when sharing a VM estate. Classify the '
+    'workloads in Move 02 before assigning hosts in Move 11. ' + COST_SCOPE
+)
+
 SHELVES = [
     ('Compute', [
-        'Five 1U dual-socket servers, and a sixth on the shelf',
+        f'{REFERENCE["nodes"]} 1U dual-socket servers, and {REFERENCE["spares"]} on the shelf',
         '32 physical cores a node, current-generation EPYC or Xeon',
         '256 GB ECC memory a node, all channels populated',
         'Redundant hot-swap power supplies, each fed from a different strip',
@@ -84,15 +97,16 @@ SHELVES = [
         'An out-of-band line that works when the main path does not',
     ]),
     ('The software stack', [
-        'Talos Linux on every node - no shell, no package manager, no drift',
+        'Proxmox VE on VM hosts, with KVM guests for Linux and Windows workloads',
+        'Talos Linux for Kubernetes nodes, on hardware or in KVM guests',
         'Kubernetes, on a version at least one minor behind the newest',
         'Cilium for the cluster network, with kube-proxy replaced',
-        'Rook, and the Ceph cluster it manages',
+        'Ceph owned by Proxmox for VM disks or by Rook on direct Talos nodes',
         'CloudNativePG, on local NVMe rather than on Ceph',
         'cert-manager and Envoy Gateway',
         'Argo CD, with the cluster state in Git',
         'Prometheus and Loki for the stores, OneUptime for what wakes somebody',
-        'Velero, and a restore you have actually performed',
+        'Velero for Kubernetes; separate whole-VM backups, each restore rehearsed',
     ]),
     ('Access', [
         'An identity provider that is not the cluster',
@@ -137,7 +151,7 @@ RULES = [
      'migration becomes an outage a fortnight later.'),
     ('Buy the second of everything, and one spare.',
      'Two switches, two power feeds, two people who can get into the building, and '
-     'a sixth machine that is already burned in. Every single point of failure you '
+     'spare machines that are already burned in. Every single point of failure you '
      'accept at the start becomes an incident you attend in person, at night, in a '
      'year.'),
     ('Count the salary.',

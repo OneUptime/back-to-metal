@@ -27,7 +27,7 @@ sys.path.insert(0, str(HERE))
 from parse import load_all, LAYERS, ORDER, inline
 from icons import risk_bars
 from deps import needs as dep_needs, unlocks as dep_unlocks
-from kit import SHELVES, RULES, KIT, REFERENCE, HOMELAB, HOMELAB_KIT
+from kit import SHELVES, RULES, KIT, REFERENCE, HOMELAB, HOMELAB_KIT, PLATFORM_SCOPE, COST_SCOPE
 from rollback_data import intro as rb_intro, POINTS as RB_POINTS, DISCLAIMER as RB_DISC
 from equivalents import ROWS as EQ_ROWS, CLOUDS as EQ_CLOUDS
 from symptoms import SYMPTOMS
@@ -1080,7 +1080,8 @@ def build_cost(moves, T):
       f'you spend on it now, with {mny(T["cloud_people"])} of salary counted on both sides.',
       f'The reference build is {REFERENCE["nodes"]} machines and {REFERENCE["spares"]} '
       f'spares, in one colocation rack. Prices are dated model assumptions. Compare '
-      f'your own cloud rate and provider quotes, with the existing team in every column.',
+      f'your own cloud rate and provider quotes, with the existing team in every column. '
+      f'{COST_SCOPE}',
       'page',
       figs([(mny(bill), 'Cloud, a month'),
             (mny(owned['total']), 'What the bill becomes'),
@@ -1367,13 +1368,14 @@ def build_start(moves, T):
       f'{REFERENCE["ram_gb_per_node"]} GB a node, on a '
       f'{REFERENCE["uplink_gbps"]} GbE uplink. Scale the numbers; do not scale away the '
       f'redundancy. Tick it off against a quote.</p>'
+      f'<p>{esc(PLATFORM_SCOPE)}</p>'
       f'<div class="shelves">{shelves}</div>'
       f'<h3 class="d sub-h">On the laptop of whoever is running a Move</h3>'
       f'<ul class="tools">'
       + ''.join(f'<li>{esc(t)}</li>' for t in KIT) + '</ul>'
       f'<h3 class="d sub-h">The on-ramp, under a desk</h3>'
       f'<p>{HOMELAB["nodes"]} refurbished machines, {HOMELAB["cores_per_node"]} cores '
-      f'and {HOMELAB["ram_gb_per_node"]} GB each, prove the whole stack for about '
+      f'and {HOMELAB["ram_gb_per_node"]} GB each, let you rehearse your platform for about '
       f'{mny(COSTS.homelab_capex())} once and {mny(COSTS.homelab_month())} a month in '
       f'electricity. What it cannot teach you is the cage: one power feed, one switch, '
       f'no cross-connect.</p>'
@@ -1633,13 +1635,19 @@ def build_move(m, prev, nxt, by, moves, T):
     # The numeric address. `m/16.html` is typeable, speakable over a phone in a
     # datacentre, and resolves with no script at all - the refresh does the work
     # and the link in the body catches anybody whose browser refuses it.
-    (SITE / 'm' / f'{m["num"]}.html').write_text(
+    redirect = (
         f'<!doctype html><html lang="en-GB"><head><meta charset="utf-8">\n'
         f'<title>{esc(m["num"])} \u00b7 {esc(m["title"])}</title>\n'
         f'<link rel="canonical" href="{page(m)}">\n'
         f'<meta http-equiv="refresh" content="0;url={page(m)}">\n'
         f'</head><body><a href="{page(m)}">Move {esc(m["num"])} &mdash; '
-        f'{esc(m["title"])}</a></body></html>\n', encoding='utf-8')
+        f'{esc(m["title"])}</a></body></html>\n')
+    aliases = [f'{m["num"]}.html']
+    # Keep published bookmarks working when a Move is retitled.
+    if m['num'] == '11':
+        aliases.append('11-a-cluster-in-an-afternoon.html')
+    for alias in aliases:
+        (SITE / 'm' / alias).write_text(redirect, encoding='utf-8')
     return idx
 
 

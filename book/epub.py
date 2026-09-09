@@ -28,7 +28,7 @@ sys.path.insert(0, str(HERE))
 
 from parse import load_all, LAYERS, ORDER, inline
 from deps import DEPS
-from kit import SHELVES, KIT, RULES
+from kit import SHELVES, KIT, RULES, PLATFORM_SCOPE
 from rollback_data import intro as rb_intro, POINTS as RB_POINTS, DISCLAIMER as RB_DISC
 from equivalents import ROWS as EQ_ROWS, CLOUDS
 from version import VERSION
@@ -175,6 +175,7 @@ def build():
     files['OEBPS/kit.xhtml'] = XHTML.format(
         title='The reference build', up='',
         body=('<h1>The reference build</h1>'
+              + f'<p>{esc(PLATFORM_SCOPE)}</p>'
               + ''.join(f'<h3>{esc(n)}</h3><ul>'
                         + ''.join(f'<li>{esc(i)}</li>' for i in items) + '</ul>'
                         for n, items in SHELVES)
