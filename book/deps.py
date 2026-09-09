@@ -39,12 +39,12 @@ DEPS = {
     '11': ['10'],
     '12': ['11'],
 
-    # Stage 4 - Move. Postgres needs an object store to back up into, which is
-    # why 16 waits on 15 and not just on the cluster.
+    # Stage 4 - Move. The backup object gateway is built in 12. PostgreSQL does
+    # not need unrelated bucket, cache and queue migrations in 15 to finish.
     '13': ['11', '12'],
     '14': ['13'],
     '15': ['12', '14'],
-    '16': ['12', '13', '15'],
+    '16': ['12', '13'],
 
     # Stage 5 - Run. The edge is built beside the cloud edge before anything is
     # cut over, and the account is closed only once the pager has been proved.

@@ -31,18 +31,26 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from parse import LAYERS, ORDER
 from deps import DEPS
 
-# A five-day week: the schedule is quoted in working weeks because that is how the
-# question is asked ("how long will this take?"), not in elapsed days.
+# A five-day working week, with calendar waits mapped onto the same scale.
+# This is an approximate planning timeline, not a dated calendar: weekends are
+# averaged into waits and public holidays are not modelled.
 WEEK = 5.0
 
 
-def _days(s):
-    """'3 days', '2 weeks', '6 months', '< 1 day' -> a number of working days."""
+def _days(s, *, calendar=False):
+    """Duration on the five-day schedule scale, preserving labour-day units.
+
+    Effort days are working days. Wait days are calendar days, so seven wait
+    days and one wait week both occupy five schedule days. A calendar month is
+    approximated as 30.4 days; a labour month retains the 21-day convention.
+    """
     if not s or s.strip() in ('—', '-', ''):
         return 0.0
     s = s.strip()
+    units = ({'day': WEEK / 7, 'week': WEEK, 'month': 30.4 * WEEK / 7}
+             if calendar else {'day': 1, 'week': WEEK, 'month': 21})
     if s.startswith('<'):
-        return 0.5
+        return 0.5 * units['day']
     # "6 to 12 weeks" is a real answer; take the pessimistic end, because a
     # schedule that quotes the optimistic one is the failure this field exists
     # to prevent.
@@ -50,7 +58,7 @@ def _days(s):
     if not mm:
         return 0.0
     n = float(mm.group(1))
-    return n * {'day': 1, 'week': 5, 'month': 21}[mm.group(2)]
+    return n * units[mm.group(2)]
 
 
 def effort_days(m):
@@ -59,13 +67,13 @@ def effort_days(m):
 
 
 def wait_days(m):
-    """Calendar days that must pass before a dependent Move can start, over and
-    above the labour: a sampling window, a circuit order, an RIR queue, a
-    procurement cycle. Nobody is working during it, so it lengthens the
-    programme without consuming anybody's time - which is precisely why a
-    schedule built from effort alone under-forecasts, and why this is a field
-    rather than a footnote."""
-    return _days(m['figures'][5]) if len(m['figures']) > 5 else 0.0
+    """Calendar wait expressed in schedule days, additional to the labour.
+
+    A sampling window, circuit order or procurement cycle delays dependents
+    without occupying the engineer. Converting its units separately avoids
+    interpreting '30 days' as six working weeks while '1 month' is about four.
+    """
+    return _days(m['figures'][5], calendar=True) if len(m['figures']) > 5 else 0.0
 
 
 def _graph(moves):
@@ -110,15 +118,23 @@ def schedule(moves, workers=2):
     free = [0.0] * max(1, workers)
     wait = {m['num']: wait_days(m) for m in moves}
     start, finish, busy_until = {}, {}, {}
-    for m in moves:                      # book order is already topological
-        n = m['num']
-        ready = max([finish[d] for d in deps[n]], default=0.0)
+    remaining = set(by)
+    while remaining:
         w = min(range(len(free)), key=lambda i: free[i])
-        s_ = max(ready, free[w])
+        ready = {n: max((finish[d] for d in deps[n]), default=0.0)
+                 for n in remaining if all(d in finish for d in deps[n])}
+        if not ready:
+            raise ValueError('Move dependencies contain a cycle')
+        # Start the earliest available work, using book order only to break
+        # ties. Reserving a worker for a blocked lower-numbered Move would
+        # prevent independent later Moves from filling its procurement wait.
+        n = min(ready, key=lambda n: (max(ready[n], free[w]), int(n)))
+        s_ = max(ready[n], free[w])
         start[n] = s_
         busy_until[n] = s_ + days[n]          # the engineer is free again here
         finish[n] = busy_until[n] + wait[n]   # dependents may start here
         free[w] = busy_until[n]
+        remaining.remove(n)
     total = max(finish.values(), default=0.0)
     busy = sum(days.values())
     labour = max(busy_until.values(), default=0.0)

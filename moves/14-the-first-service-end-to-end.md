@@ -18,7 +18,7 @@ This Move covers stateless services, including those installed inside VMs. A wri
 
 **Access**
 - Proxmox management access and the VM configuration repository, or write access to the Argo CD application repository
-- Permission to edit weighted DNS records and the required cloud credentials
+- Permission to edit weighted DNS records, a working TLS service endpoint through the existing edge, and the required cloud credentials
 
 **Software**
 - For VMs: the versioned OS template and existing application deployment tooling; `qm` for an optional disk import
@@ -33,7 +33,7 @@ This Move covers stateless services, including those installed inside VMs. A wri
 1. Choose a low-impact stateless service from Move 02. Identify every disk write, scheduled job and metadata dependency. Disable duplicate jobs in the test copy, and keep it isolated from production traffic until the owner confirms it cannot create a second writer.
 2. For a VM, create a KVM guest from the OS template and deploy the pinned application release with its existing tooling. For containers, commit the manifests and let `argocd` sync them. Keep the cloud database endpoint. Replace metadata credentials with an explicit workload identity or scoped credential, and update partner allowlists.
 3. If rebuilding a guest is impractical, check the provider's export restrictions and licence portability first. Take an application-consistent copy of every required disk, export through the provider console, then use `qm disk import` to import a supported image. Attach the disks, match BIOS or UEFI and set boot order. Rehearse this off the live path; an export needing a source shutdown gets a separate downtime window.
-4. Boot the VM on an isolated VLAN and verify VirtIO drivers, networking, DNS, clock and service startup; an imported disk is not evidence of a working application. For either route, send synthetic requests, check cloud API access without metadata, and compare error rates and latency percentiles with the cloud copy.
+4. Boot the VM on an isolated VLAN and verify VirtIO drivers, networking, DNS, clock and service startup. For either route, expose only service ports through the existing edge, verify TLS and health checks, and send synthetic requests. Check cloud access without metadata and compare error rates and latency percentiles with the cloud copy.
 5. Ramp the weighted record: one per cent, ten, fifty, all of it. Hold each step a business day, check resolver answers with `dig` and measure the actual request split in service logs. Stop on the owner's error or latency threshold. DNS weight is approximate and cached clients will lag behind it.
 6. Soak a week at full weight. Watch guest disks through Proxmox and application metrics, or node and pod health with `kubectl`. Exercise a service restart and check that configuration survives; scratch files must not become untracked application state.
 7. Repeat across the stateless inventory, batched by owner. The reference fleet budgets twenty days of work across an eight-week cadence. Measure VM rebuild and export effort separately; do not squeeze stateful disk transfers into that allowance. Retain each cloud copy until its own soak and return-path checks pass.

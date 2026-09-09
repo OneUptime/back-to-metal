@@ -8,8 +8,8 @@ everybody actually asks answered nowhere.
 
 So this is the argument, made once, in the book's own voice. Two rules kept it
 honest. Every gain that can be measured is measured - from the same model the
-cost page computes from, or from our own fleet, and where it is ours it says
-so in the first person rather than hiding behind a citation.
+cost page computes from, or a named technical constraint. Private fleet outcomes need a traceable
+measurement source before they can be presented as evidence.
 And the case against is written by the same hand as the case for, at the same
 length, at the end, where a reader will still be reading. A page that lists
 nine benefits and no costs is an advertisement, and this book has spent three
@@ -19,7 +19,7 @@ Shared by the printed book and the website, like kit and mission, so the two
 cannot drift.
 """
 
-KICKER = 'Before the twenty Moves, the question underneath them'
+KICKER = 'Before the Moves, the question underneath them'
 HEADING = 'Why leave at all'
 
 LEDE = ('Colocation and rented dedicated servers put more of your infrastructure '
@@ -29,23 +29,20 @@ LEDE = ('Colocation and rented dedicated servers put more of your infrastructure
         'over five years, with the same operations hours as the cloud. Your team '
         'brings its skills; the provider supplies the building and physical support.')
 
-# We did this. That is worth more than any argument, and it is the one thing
-# here nobody else can say - so it is said in the first person and it is put
-# where a sceptic will hit it early.
-OURS_HEADING = 'We did this, and here is what actually happened'
+# Measurement criteria replace precise fleet outcomes without a traceable source.
+OURS_HEADING = 'The evidence to collect before claiming a win'
 OURS = [
-    ('730 days', 'at 99.993 per cent measured availability, through a period that '
-                 'included a region-wide outage at the cloud we had left'),
-    ('19%', 'lower latency on the same software, from local NVMe and the absence of '
-            'neighbours. We bought no faster code to get it'),
-    ('2', 'hardware interventions in twenty-four months, both disks, both handled by '
-          'remote hands with a mean response of twenty-seven minutes'),
-    ('0', 'people hired. The toil moved; it did not multiply. We measured it at about '
-          'fourteen engineer-hours a month across two sites'),
+    ('Uptime', 'Measure from outside both estates, with the same service boundary '
+               'and observation window. Count site failures and planned downtime.'),
+    ('Latency', 'Replay representative traffic on both platforms. Compare throughput '
+                'and tail latency at the same offered load.'),
+    ('Repairs', 'Record physical interventions, time to recovery and remote-hands '
+                'charges. A response-time promise is not a repair-time measurement.'),
+    ('Hours', 'Record recurring platform work on both sides. Separate migration '
+              'labour from steady-state operations and on-call coverage.'),
 ]
-OURS_NOTE = ('Our own fleet and our own measurement, not an independent audit, and a '
-             'bigger estate than this book is sized for. The rest of the figures here '
-             'stand on outside sources and on arithmetic you can repeat.')
+OURS_NOTE = ('The financial figures are a worked model. They do not establish an '
+             'availability, performance or staffing result for your estate.')
 
 # --- what you gain --------------------------------------------------------
 # Each is (heading, body, how it is evidenced, the test that would disprove it).
@@ -71,33 +68,33 @@ GAINS = [
 
     ('Egress stops being a tax on your own traffic',
      'Moving your own data to your own users is where the margin lives, and it is the '
-     'line that ends most of these arguments: {egress_100tb} a month to send a hundred '
-     'terabytes out. Transit at a facility is bought by the megabit and costs a small '
-     'fraction of that. Nothing you build gets faster and no code changes; the line '
-     'simply stops being there.',
+     'line to price explicitly: {egress_100tb} a month for 100 TB of AWS internet '
+     'egress at the model\'s US East list rates. Facility transit replaces that '
+     'meter with a bandwidth commitment and possible overage charges. Compare '
+     'the actual traffic pattern and contract on both sides.',
      'computed',
      'Find the data-transfer line on last month\u2019s bill. Divide it by your egress '
-     'in terabytes. If it is anywhere near ninety dollars a terabyte, that line is '
-     'nearly pure margin \u2014 Move 01, then Move 18.'),
+     'in terabytes. Compare that effective rate with a transit quote and the edge '
+     'services you retain \u2014 Move 01, then Move 18.'),
 
     ('The machines are yours, so the performance is yours',
-     'A vCPU is half a core somebody else is also using. Local NVMe is not a network '
-     'service with a queue in front of it and a token bucket on top. The gain is not '
-     'theoretical and it is not small: on identical software we measured nineteen per '
-     'cent, and the noisy-neighbour tail \u2014 the ninety-ninth percentile that '
-     'wakes people \u2014 improves more than the mean does.',
-     'measured, our own fleet',
+     'A vCPU can be an SMT thread or a whole physical core; the instance family '
+     'decides. Dedicated hardware gives you control over placement and contention, '
+     'and local NVMe changes the storage path. Neither guarantees faster queries: '
+     'CPU generation, memory, disks and workload still decide the result.',
+     'architecture, to be measured on the reader\'s workload',
      'Compare your ninety-ninth percentile against your median for a week. If the gap '
-     'is wide and unexplained by your own code, some of it is not yours \u2014 '
-     'Move 14 measures it on real hardware before anything moves.'),
+     'is wide, investigate contention and application behaviour. Replay the same '
+     'load on real hardware in Move 14 before attributing the gap to the cloud.'),
 
-    ('Nobody deprecates your hardware',
+    ('You control the upgrade window',
      'A managed service is somebody else\u2019s roadmap running inside your product. '
      'Instance families are retired, versions go end-of-life on a date you did not '
      'pick, a control plane upgrades on its own release channel, and the longest you '
-     'can hold it is ninety days. A machine you own runs the version you chose until '
-     'you choose another one, and the migration happens when you have time rather '
-     'than when the notice arrives.',
+     'can defer an upgrade depends on the service and support policy. On your own '
+     'platform you schedule the upgrade, but software and firmware still reach '
+     'end of support. Budget patching and replacement; ownership does not make '
+     'an unsupported version safe.',
      'judgement, sourced in Move 11',
      'Count the forced upgrades and deprecation notices you have absorbed in the last '
      'two years, and what each cost in engineer-days. That is a recurring bill nobody '
@@ -170,9 +167,9 @@ STAY = [
     'workload rather than a spending threshold borrowed from another company.',
 ]
 
-CLOSER = ('If none of those four is true and the arithmetic in Move 03 clears, the rest '
-          'of this book is twenty jobs that get you there, each one done on a Tuesday '
-          'and undone on a Wednesday.')
+CLOSER = ('If those reasons to stay do not apply and the arithmetic in Move 03 clears, '
+          'the remaining Moves provide a staged plan, with a stated rollback limit '
+          'for each job.')
 
 
 def lede(fmt):

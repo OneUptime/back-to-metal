@@ -22,8 +22,9 @@ For an estate already running containers, Talos Linux directly on the hosts rema
 
 **Software**
 - For VMs: the Proxmox VE 9.2-1 installer, its published checksum, and versioned guest OS templates with a matching QEMU guest agent
-- For Kubernetes: a supported Talos release and compatible Kubernetes version pinned exactly in Git; `talosctl` matching Talos, and `kubectl` matching Kubernetes
-- `helm`, the Cilium chart pinned to an exact version, and the `cilium` CLI
+- For Kubernetes: Talos 1.14.0 and Kubernetes 1.35.8 pinned in Git; matching `talosctl` and `kubectl` clients
+- `helm`, Cilium chart 1.20.1, the `cilium` CLI, and cert-manager chart v1.21.1
+- An encrypted credential store outside the platform for Talos configuration and recovery keys
 
 **People**
 - A platform owner and someone to disconnect a host while the owner watches recovery
@@ -33,9 +34,10 @@ For an estate already running containers, Talos Linux directly on the hosts rema
 2. For that pool, verify the Proxmox VE 9.2-1 checksum and each empty boot pair's serial before the installer erases it. Apply security updates in the lab, record the tested package versions, then roll that set to the hosts. Create a Proxmox cluster and join the empty hosts; use at least three for quorum.
 3. Create test KVM guests from the versioned OS templates on the local datastore reserved during host installation. Set CPU, RAM, boot mode, VirtIO disks and VLAN bridges; enable and test the QEMU guest agent. Pick a CPU model supported by every migration destination. Keep HA disabled: Move 12 moves ordinary guest disks to shared storage before production.
 4. Where Kubernetes is needed, allocate three control-plane nodes on separate physical hosts, whether they are Talos guests or physical machines. For Talos guests, include the `siderolabs/qemu-guest-agent` extension in the pinned installer image. Distribute workers across hosts and reserve etcd memory and disk I/O. Guests on one host share its failure; keep capacity available for recovery.
-5. Generate the pinned Kubernetes configuration with `talosctl gen config` and commit it. Confirm the installation disk on each node before applying it, because Talos repartitions that disk. Set the API endpoint to the virtual address, apply the configurations, then run `talosctl bootstrap` on one control-plane node and join the workers.
-6. Install Cilium with `helm install` at the pinned chart version, with kube-proxy replacement enabled and the API host set to the virtual address. Disable kube-proxy in the same configuration change. Verify its absence with `kubectl`, then run the `cilium` connectivity test. Skip the Kubernetes steps for a VM-only estate.
-7. Disconnect one physical host while only test workloads run. Kubernetes must retain API quorum and reschedule replaceable pods; its local guest disks remain unavailable with that host, so expect no VM failover yet. In Move 12, repeat with shared storage and VM HA, enforcing negative resource-affinity rules to keep control planes apart. A failed VM restarts; it does not live-migrate from a dead host.
+5. Generate configuration with `talosctl gen config --kubernetes-version 1.35.8`. Keep generated files and their private keys in the encrypted store; commit only non-secret patches. Confirm each installation disk before Talos repartitions it. Set the API virtual address, disable the default CNI and kube-proxy, apply configuration, then run `talosctl bootstrap` on one control plane.
+6. Install Cilium with `helm install` at chart version 1.20.1, using its documented Talos capabilities and cgroup settings. Set `ipam.mode=kubernetes`, `kubeProxyReplacement=true`, and the API to KubePrism at `localhost:7445`. Verify kube-proxy is absent with `kubectl`, then run the `cilium` connectivity test. Save the complete Helm values in Git.
+7. Install cert-manager with `helm install` at chart version v1.21.1, enabling `crds.enabled=true`. With `kubectl`, wait for its controller, webhook and cainjector deployments to become available. Later database and edge Moves need these certificate services. A VM-only estate skips the Kubernetes steps.
+8. Disconnect one physical host while only test workloads run. Kubernetes must retain API quorum and reschedule replaceable pods; local guest disks remain unavailable, so expect no VM failover yet. Move 12 repeats this with shared storage and HA affinity rules. A failed VM restarts; it does not live-migrate from a dead host.
 
 ## Operator's notes
 - **Swap:** A container-only estate can skip Proxmox and boot Talos directly. Choose from the inventory, not from the name of the cloud service on the invoice.
@@ -44,7 +46,7 @@ For an estate already running containers, Talos Linux directly on the hosts rema
 - **Leftovers:** Schedule host and guest patching separately, and rehearse upgrades on the spare. A VM snapshot is not an independent backup.
 
 ## Rollback
-While only test guests and an empty cluster exist, restore the versioned configurations or rebuild from the recorded images. Reverting the kube-proxy setting restores that network path without changing the hosts. The point of no return is the first production disk or application write: after that, rebuilding a host requires preserving its datastore and restoring the affected workloads. Keep cloud production authoritative until the later Moves test migration and recovery.
+While only test guests and an empty cluster exist, restore the recorded configuration or rebuild from the saved images and encrypted keys. Returning to kube-proxy also requires a compatible Cilium configuration and another connectivity test; one flag cannot repair every network failure. The point of no return is the first production disk or application write: after that, rebuilding a host requires preserving its datastore and restoring affected workloads. Keep cloud production authoritative until the later Moves test migration and recovery.
 
 ## The numbers
 

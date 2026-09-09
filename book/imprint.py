@@ -4,22 +4,21 @@ The copyright page omits any field left empty rather than printing a placeholder
 so the book is always correct to print even while something here is unset. Several
 fields below ARE unset on purpose - see the ISBN and Amazon notes.
 
-The pricing figures at the bottom decide whether the book is worth selling. They
-are inherited from the 8.25x11 trim the sibling title was verified against, not
-re-read for this one. `make pricing` reports what they imply; confirm them in
-KDP's own printing-cost calculator before setting a price.
+The pricing figures below use the cited public large-trim rate tables.
+`make pricing` checks page eligibility and margins; confirm the actual title
+configuration in KDP's calculator before setting a price.
 """
 
 import re
 
 TITLE = 'Back to Metal'
-SUBTITLE = 'How a company leaves the cloud, in twenty moves'
+SUBTITLE = 'How a company leaves the cloud, one move at a time'
 AUTHOR = 'Nawaz Dhandala'
 PUBLISHER = 'HackerBay'
 PUBLISHER_SITE = 'HackerBay.io'
 YEAR = 2026
 EDITION = 'First edition'
-SITE = 'backtometal.hackerbay.io'
+SITE = 'backtometal.oneuptime.com'
 REPO = 'github.com/OneUptime/back-to-metal'
 
 # Everything the title touches, derived from it. The title used to be spelled out
@@ -109,21 +108,25 @@ KDP_DELIVERY_PER_MB = 0.15      # USD, charged on the CONVERTED file size, which
 MIN_KINDLE_MARGIN = 0.25        # royalty after delivery, as a share of list price
 
 # --- print economics -------------------------------------------------------
-# KDP pays 60% of list minus the printing cost, so on a colour book the page
+# KDP pays 50% below $9.99 and 60% from $9.99 on Amazon.com, minus print cost.
+# Verified 2026-09-09: https://kdp.amazon.com/en_US/help/topic/G201834330
+# On a colour book the page
 # count sets the floor under the price.
 #
-# INHERITED, NOT RE-VERIFIED. Every figure below was read from KDP's Printing
-# Cost & Royalty Calculator on 2026-08-31 for 8.25x11 on Amazon.com, for the
-# sibling title. The per-page rates are a property of the trim and the ink, not
-# of the page count, so they carry across to this book at the same trim - but
-# re-read them before pricing anything, because rate tables change and nothing
-# here is confirmed against a primary source for THIS title.
+# Public Amazon.com large-trim rates and page bands checked 2026-09-09:
+# https://kdp.amazon.com/en_US/help/topic/G201834340 (paperback)
+# https://kdp.amazon.com/en_US/help/topic/GHT976ZKSKUXBB6H (hardcover)
+# https://kdp.amazon.com/en_US/help/topic/G201834180 (trim/page eligibility)
+# Premium colour has a fixed-price 24-40-page band before the per-page band.
+# Confirm the actual title configuration in KDP before setting list prices.
 #
 # 8.25x11 is a LARGE trim (over 6.12in wide or over 9in tall), the more expensive
 # per-page band. Ink and paper are locked permanently once a title is published:
 # a book cannot be moved between premium colour, standard colour and
 # black-and-white later.
 PRINT_ROYALTY_RATE = 0.60
+PRINT_LOWER_ROYALTY_RATE = 0.50
+PRINT_60_MIN_USD = 9.99
 MIN_PRINT_MARGIN = 0.25
 
 # fixed cost, per-page cost - USD, Amazon.com, large trim
@@ -140,10 +143,12 @@ INK = {
 # manufactured, which is a submission rejected after the covers are drawn.
 # (min pages, max pages), Amazon.com, large trim.
 INK_PAGES = {
-    'premium colour':  (42, 828),
+    'premium colour':  (24, 828),
     'standard colour': (72, 600),
 }
 HARDBACK_PAGES = (75, 550)
+PREMIUM_SHORT_MAX_PAGES = 40
+PREMIUM_SHORT_COST_USD = 4.20
 # The interior is type, rules and flat colour - no photographs anywhere - so
 # premium colour buys this book nothing it can use.
 INK_CHOICE = 'standard colour'

@@ -362,12 +362,12 @@ def foot(depth=0):
         f'<nav class="foot-dir" aria-label="Everything on this site">'
         f'{"".join(cols)}</nav>'
         f'<div class="foot-say">'
-        f'<p class="foot-note">Every Move states its cutover in minutes of '
-        f'user-visible downtime, its risk as blast radius, and how long the thing '
-        f'it replaces must stay warm before you turn it off. The schedule is '
-        f'computed from the Moves&rsquo; own effort figures and the dependency '
-        f'graph rather than asserted, and every price is a public list rate '
-        f'observed while writing.</p>'
+        f'<p class="foot-note">Every Move records an estimated cutover in minutes '
+        f'of user-visible downtime, its risk and the conditions for rollback. '
+        f'The schedule is computed from effort, calendar waits and dependencies. '
+        f'Prices combine dated cloud list rates and illustrative hardware, '
+        f'facility and staffing allowances. Savings are model results, '
+        f'not quotations for a particular estate.</p>'
         f'<p class="foot-go"><a href="{up}start.html">Read the safety page before '
         f'running anything</a></p></div>'
         f'<div class="foot-imp">'
@@ -808,13 +808,14 @@ def build_index(moves, T):
 {band('plan', 'The whole plan, on one page',
       f'<p>{len(T["stages"])} stages, run in order, and every dependency points at a '
       f'lower number. '
-      f'{T["zero"]} of the {T["n"]} Moves are invisible to a user; the whole programme '
-      f'costs {T["cutover"]} minutes of downtime between them{oneway_line}.</p>',
+      f'{T["zero"]} of the {T["n"]} Moves plan for zero downtime; the reference '
+      f'cutovers total {T["cutover"]} minutes{oneway_line}. These estimates depend '
+      f'on each Move\'s prerequisites and a timed rehearsal.</p>',
       margin=stage_key(moves)
       + mg_note('The shape of it',
-                f'The heavy days are in the middle, not at the start. Stage 4 '
-                f'carries the state, and it is the only stage that costs a user '
-                f'anything: {T["cutover"]} minutes, once.'),
+                'Data handoffs and the final edge change need measured windows. '
+                'VM migrations and services that cannot meet a zero-downtime '
+                'Move\'s conditions need separately priced and rehearsed plans.'),
       full=plan_full)}
 
 {band('where', 'Start where it hurts',
@@ -822,9 +823,9 @@ def build_index(moves, T):
       f'that sounds like your week and go straight to the Move.</p>',
       margin=mg_note('If none of these is you',
                      f'That is an answer too. Move 03 gives you permission to do the '
-                     f'arithmetic and stop, and stopping after three Moves costs a '
-                     f'week against a programme abandoned in month five with two '
-                     f'estates billing.'),
+                     f'arithmetic and stop. Finish the sampling window before '
+                     f'committing money; a decision to stay avoids running two '
+                     f'estates without a defensible saving.'),
       full=f'<ul class="symp">{symps}</ul>')}
 
 {band('why', WHY.HEADING, why_section(T),
@@ -845,10 +846,10 @@ def build_index(moves, T):
       f'<p>The labour is about {T["days"]:.0f} person-days. With {DEFAULT_CREW} '
       f'engineers it lands in roughly {T["weeks"]:.0f} weeks, and the shortest it '
       f'could possibly take, with as many people as you care to put on it, is '
-      f'{T["critical_weeks"]:.0f}. The gap between those two numbers is not labour. '
-      f'It is the circuit order, the hardware lead time and the thirty-day windows a '
-      f'Move has to sit through before the next one may start, and nobody is working '
-      f'during any of it.</p>'
+      f'{T["critical_weeks"]:.0f} weeks under these estimates. Limited staffing adds '
+      f'contention for engineers. Even unlimited staffing cannot remove the ordered '
+      f'work, circuit orders, hardware lead times and observation windows on the '
+      f'critical path. Calendar waits consume no engineer-days.</p>'
       ,
       margin=f'<p class="lbl">However many people you put on it</p>'
       f'<dl class="bal-l">'
@@ -858,9 +859,9 @@ def build_index(moves, T):
       + f'<div class="tot"><dt>Unlimited</dt>'
         f'<dd>{T["critical_weeks"]:.0f} wk</dd></div></dl>'
       + mg_note('Why it barely moves',
-                'The gap is not labour. It is the circuit order, the hardware lead '
-                'time and the thirty-day windows a Move sits through before the '
-                'next may start, and nobody is working during any of it.'),
+                'Extra engineers help where independent work can overlap. They '
+                'cannot remove procurement or observation waits, or start a '
+                'dependent Move before its prerequisites finish.'),
       full=RM.svg(moves, DEFAULT_CREW, w=SITE_TRACK, href=lambda m: 'm/' + page(m))
       + f'<p class="note">One bar per Move, drawn from each Move&rsquo;s own effort '
         f'figure and the dependency graph rather than from a plan somebody typed. The '
@@ -1148,7 +1149,9 @@ def build_cost(moves, T):
       f'vanishes into an amortisation line or sits there looking like the whole story, '
       f'and neither is what somebody signing the cheque is choosing between. So here is '
       f'the life of one generation of machines, with the salary counted on all three '
-      f'sides and the capital on the line where it actually happens.</p>'
+      f'sides and the capital on the line where it actually happens. These '
+      f'steady-state totals exclude transition labour, overlapping cloud bills, '
+      f'financing and taxes.</p>'
       ,
       margin=mg_note('Choose the cash flow',
                      'Rented metal preserves the cash you would spend buying '
@@ -1193,10 +1196,10 @@ def build_cost(moves, T):
       f'says keep paying, that is a conclusion rather than a gap: a content delivery '
       f'network, scrubbing capacity at the edge and outbound mail deliverability are '
       f'businesses somebody else already runs better than you will.</p>',
-      margin=mg_note('The three you keep',
-                     f'{mny(T["retained"])} a month of the after state, for ever. '
-                     f'Move 04 is the Move that says so, and it is the one that '
-                     f'stops this book being a sales pitch.'),
+      margin=mg_note('Services retained',
+                     f'{mny(T["retained"])} a month in the reference after state. '
+                     f'This includes Move 04\'s edge and mail services plus '
+                     f'archives, backups and other services kept by later Moves.'),
       full=eq)}
 
 {band('onramp', 'Before you sign anything',
@@ -1204,18 +1207,16 @@ def build_cost(moves, T):
       f'stack once. {HOMELAB["nodes"]} refurbished machines on a managed switch under a '
       f'desk cost about {mny(COSTS.homelab_capex())} once and '
       f'{mny(COSTS.homelab_month())} a month in electricity, and they run the whole of '
-      f'Stage 3 unchanged. It saves nothing, and that is not what it is for: it is the '
+      f'the platform at lab scale. It saves nothing, and that is not what it is for: it is the '
       f'smallest bet that tells you whether the rest of this book is for you.</p>'
-      f'<p class="note">Every figure on this page is a dated list-price observation, '
-      f'not a quotation. Cloud prices are on-demand and undiscounted on purpose; a '
+      f'<p class="note">Figures on this page combine illustrative budgets with dated '
+      f'cloud list prices, not quotations. Cloud prices are on-demand and undiscounted; a '
       f'reader with a commitment discount should substitute their own effective rate, '
-      f'and a reader without one is genuinely paying this.</p>'
+      f'and check the region, service tier and free allowances.</p>'
       f'<p class="callout"><span class="lbl">The rented column, with a warning</span> '
-      f'The monthly rent of one dedicated machine is the single figure in this book '
-      f'that a re-check could not settle: the cheapest European provider and a survey '
-      f'of three others disagree by a factor of two or three on the same specification, '
-      f'which is wide enough to decide the question on its own. The number above is the '
-      f'last one observed and it is not a quotation. Get a quote before you let this '
+      f'The monthly rent, hardware purchase price, power and facility charges are '
+      f'planning assumptions. CPU model, memory, traffic allowance, region and '
+      f'support terms can change the comparison. Get matching quotes before you let this '
       f'column decide anything &mdash; Move 07 step 6 is where to do it.</p>',
       margin=f'<p class="lbl">Under a desk</p><dl class="bal-l">'
       f'<div><dt>Machines</dt><dd>{HOMELAB["nodes"]}</dd></div>'

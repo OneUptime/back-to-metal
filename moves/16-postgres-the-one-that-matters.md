@@ -6,8 +6,8 @@
 
 ## Leaving from
 - **AWS:** RDS for PostgreSQL — the default parameter group cannot be edited, so `rds.logical_replication` needs a custom group and a reboot.
-- **Google Cloud:** Cloud SQL for PostgreSQL — storage auto-grows to hold retained write-ahead log and never shrinks, so it bills at the high-water mark.
-- **Azure:** Database for PostgreSQL flexible server — `CREATE EXTENSION` fails until the name is in the `azure.extensions` allowlist, and anything wanting shared memory needs `shared_preload_libraries` too, which does need a restart.
+- **Google Cloud:** Cloud SQL for PostgreSQL — `cloudsql.logical_decoding` requires a restart; retained write-ahead log can fill storage or trigger a billed increase when automatic growth is enabled.
+- **Azure:** Database for PostgreSQL flexible server — `CREATE EXTENSION` fails until the name is in the `azure.extensions` allowlist, and extensions requiring `shared_preload_libraries` also need a server restart.
 
 ## Why this works
 The application already runs on your hardware from Move 14, in a VM or a container. This Move migrates its managed PostgreSQL service to CloudNativePG on Kubernetes, using Move 12's local NVMe and object gateway. The primary and standbys must occupy different physical hosts even when their Kubernetes nodes are guests. The initial copy runs before the maintenance window; a rehearsed restore and final replication catch-up make the fifteen-minute reference possible.
@@ -22,26 +22,27 @@ A VM-only estate may keep its managed database under Move 04. An existing Postgr
 - The Kubernetes database platform from Moves 11 and 12, including physical-host replica separation
 
 **Software**
-- CloudNativePG 1.25 or newer, failed over by hand at least once already
-- The Barman Cloud plugin for CloudNativePG, pinned, because the operator writes `archive_command` itself and will not take one from you
+- CloudNativePG 1.30.0, with a pinned PostgreSQL image on the source's supported major version and a rehearsed failover
+- Barman Cloud plugin 0.15.0 and the platform's cert-manager 1.21.1; the plugin requires CloudNativePG 1.26 or later
 - `psql` and `pg_dump` no older than the managed server
 
 **People**
 - The application owner, present for the window when writes stop
 
 ## The runbook
-1. List the extensions and roles on the managed instance with `psql`. What exists only on the provider's fork is replaced, re-expressed, or blocks the Move.
-2. Copy the schema with `pg_dump --schema-only` onto a CloudNativePG cluster of one primary and two standbys on local NVMe, deferring the biggest indexes.
-3. Create the logical replication publication and subscription and let it run for days. Read `pg_stat_subscription` each morning: a stalled subscriber fills the source's disk.
-4. Declare the object store as the cluster's backup destination so the Barman Cloud plugin drives it, turn on continuous archiving, watch the first write-ahead log segments arrive in the bucket, and only then take the full backup.
-5. Restore that backup into a scratch cluster, replay to a chosen timestamp, and count rows against production. Time it. The cutover waits until this passes.
-6. Open the window. Stop every writer, including jobs inside VMs. Wait for replication lag to reach zero, compare the final data, advance sequences and switch every application connection string. Start writes only on the destination, then verify both VM and container clients use it.
+1. List extensions, roles, large objects and table replica identities with `psql`. Recreate required roles and grants; provider-only extensions or unsupported objects block the Move until a tested alternative exists. Freeze schema changes and rehearse returning destination writes to the managed instance.
+2. Apply `pg_dump --schema-only` to a CloudNativePG cluster with one primary and two standbys on separate hosts. Preserve primary keys and replica-identity indexes. Confirm every updated or deleted source table has a suitable replica identity; the schema dump does not copy cluster-wide roles.
+3. Create the publication and subscription, keeping application writes off the destination. Monitor `pg_stat_subscription`, table synchronization and retained source WAL continuously. Require every table to finish its initial copy and application queries to pass before booking cutover.
+4. Configure the Barman Cloud plugin's ObjectStore and cluster plugin settings for continuous archiving and scheduled full backups. Keep an independent off-site copy with its keys. Check WAL arrival and archive failures; backups confined to the rack do not survive its loss.
+5. Restore from the off-site copy into isolation and replay to a recorded timestamp. Disable subscriptions and outbound jobs there; compare with checks recorded for that recovery point, not a changing production database. Measure recovery and confirm the recovered application works before allowing destination writes.
+6. Open the window. Stop all source writers and wait for in-flight transactions. Record a final published transaction and confirm the subscriber applies it after every table is synchronized. Compare final data, transfer any separately handled objects and set destination sequences from source values. Abort to the source if checks exceed the rehearsed deadline.
+7. Disable the forward subscription, fence source writers and switch every connection string. Start writes only on the destination, then verify VM and container clients, errors and query latency. Keep destination backups running and preserve the tested return procedure throughout the seven days.
 
 ## Operator's notes
 - **Swap:** A reverse subscription can shorten rollback only if the managed service permits it and its replication loop prevention and sequence repair have been rehearsed. Keeping the old instance alone does not keep its data current.
-- **Do it faster:** Split the publication into several subscriptions grouped by table size, so the initial copy runs in parallel, not table by table.
+- **Do it faster:** Tune `max_sync_workers_per_subscription` within the source's slot and destination's worker budgets. Initial table copies already support parallelism; splitting related tables across subscriptions loses their shared transaction boundary.
 - **Watch out:** Replication carries rows only. Sequences, large objects, schema changes and tuned parameters stay behind, and a sequence left at one collides on the first insert.
-- **Leftovers:** The replication slot on the source outlives its subscription and retains write-ahead log for a reader that has gone.
+- **Leftovers:** A disabled subscription still retains source WAL. Once rollback no longer needs it, remove the subscription and verify slot cleanup; normal subscription removal drops its slot, but a detached or orphaned slot needs separate cleanup.
 
 ## Rollback
 Until destination writes resume, return connection strings to the source and release its write pause. The point of no return for that quick return is the first destination commit. After it, stop writers again and use the rehearsed reverse replication or restore-and-replay procedure to carry those commits back; verify data and sequence positions before reopening the source. A source backup predating cutover cannot recover newer writes. Retain the managed instance and its backups for seven days, and take destination backups throughout that period.
@@ -53,4 +54,4 @@ Until destination writes resume, return connection strings to the source and rel
 | $19,500/mo | $0/mo | 100% | 15 min | 12 days | — |
 
 ## What you can turn off
-The managed instance, its read replicas and their snapshots, after the seven days and once an invoice shows the line gone.
+The managed instance and read replicas after seven days, verified destination recovery and the required snapshot retention. Confirm the resulting charges disappear on the next invoice; an active instance cannot produce that evidence first.

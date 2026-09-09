@@ -1,6 +1,6 @@
 """Structural validation of the built EPUB.
 
-Not a substitute for Adobe's epubcheck or Kindle Previewer — run those before
+Not a substitute for EPUBCheck or Kindle Previewer — run those before
 publishing — but it catches the things that actually break a Kindle conversion
 and it runs in the build with no Java dependency.
 """
@@ -11,11 +11,16 @@ from pathlib import PurePosixPath, Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / 'book'))
 import imprint as IMP
+from parse import load_all, inline
+from kit import RULES
+from equivalents import ROWS as EQ_ROWS
+import why as WHY
 
 EPUB = ROOT / 'dist' / IMP.EPUB_NAME
 OPF_NS = {'o': 'http://www.idpf.org/2007/opf',
           'dc': 'http://purl.org/dc/elements/1.1/'}
 NCX_NS = {'n': 'http://www.daisy.org/z3986/2005/ncx/'}
+HTML_NS = {'h': 'http://www.w3.org/1999/xhtml'}
 
 # RFC 4122: the urn:uuid: scheme has to be followed by an actual UUID. Adobe's
 # epubcheck rejects anything else; this checker used not to, which is how
@@ -36,6 +41,65 @@ def resolve(base, href):
     return '/'.join(parts)
 
 
+def content_problems(documents, moves):
+    """Guard omissions that a valid EPUB package cannot detect."""
+    problems = []
+    for move in moves:
+        name = f'OEBPS/m/{move["num"]}.xhtml'
+        doc = documents.get(name)
+        if doc is None:
+            problems.append(f'{name}: missing Move document')
+            continue
+        text = ' '.join(' '.join(doc.itertext()).split())
+        for origin in move['origins']:
+            # Render only the shared inline syntax, not an EPUB template, so a
+            # missing provider block remains visible to this check.
+            fields = [origin['cloud'], origin['service'], origin['note']]
+            for field in fields:
+                fragment = ET.fromstring('<p>' + inline(field).replace('<br>', '<br/>') + '</p>')
+                expected = ' '.join(' '.join(fragment.itertext()).split())
+                if expected not in text:
+                    problems.append(f'{name}: missing {origin["cloud"]} extraction content')
+                    break
+
+    kit = documents.get('OEBPS/kit.xhtml')
+    if kit is None:
+        problems.append('missing reference build')
+    else:
+        rules = kit.findall('.//h:ol[@id="rules"]/h:li', HTML_NS)
+        if len(rules) != len(RULES):
+            problems.append(f'reference build has {len(rules)} rules; expected {len(RULES)}')
+        heading = f'{len(RULES)} rules for leaving the cloud'
+        if not any(heading == ''.join(h.itertext()) for h in kit.findall('.//h:h2', HTML_NS)):
+            problems.append('reference build rule heading disagrees with the rule count')
+
+    equivalents = documents.get('OEBPS/replaces.xhtml')
+    links = [] if equivalents is None else [a.get('href') for a in
+                                             equivalents.findall('.//h:a', HTML_NS)]
+    for number in {row[4] for row in EQ_ROWS if row[4]}:
+        if f'm/{number}.xhtml' not in links:
+            problems.append(f'equivalence table does not link Move {number}')
+
+    decision = documents.get('OEBPS/decision.xhtml')
+    if decision is None:
+        problems.append('missing shared decision guidance')
+    else:
+        decision_text = ' '.join(decision.itertext())
+        for heading in [WHY.HEADING, WHY.OURS_HEADING, WHY.COSTS_HEADING, WHY.STAY_HEADING]:
+            if heading not in decision_text:
+                problems.append(f'decision guidance omits {heading!r}')
+    costs = documents.get('OEBPS/costs.xhtml')
+    if costs is None:
+        problems.append('missing financial comparison')
+    else:
+        ids = {node.get('id') for node in costs.iter() if node.get('id')}
+        for route in ('cloud', 'owned', 'rented'):
+            for prefix in ('monthly', 'cash'):
+                if f'{prefix}-{route}-total' not in ids:
+                    problems.append(f'financial comparison omits {prefix} total for {route}')
+    return problems
+
+
 def main():
     if not EPUB.exists():
         sys.exit('epubcheck: build the epub first (make epub)')
@@ -43,7 +107,8 @@ def main():
     # validating that would report success for a file nobody just built. Compare
     # against the newest input instead of trusting whatever is on disk.
     built = EPUB.stat().st_mtime
-    sources = list((ROOT / 'moves').glob('*.md')) + list((ROOT / 'book').rglob('*.py'))
+    sources = (list((ROOT / 'moves').glob('*.md')) + list((ROOT / 'book').rglob('*.py'))
+               + [ROOT / 'package.json'])
     cover = ROOT / 'dist' / 'cover-kindle.jpg'
     if cover.exists():
         sources.append(cover)
@@ -64,12 +129,15 @@ def main():
     if z.read('mimetype') != b'application/epub+zip':
         problems.append('mimetype content is wrong')
 
+    documents = {}
     for n in names:
         if n.endswith(('.xhtml', '.opf', '.ncx', '.xml')):
             try:
-                ET.fromstring(z.read(n))
+                documents[n] = ET.fromstring(z.read(n))
             except ET.ParseError as e:
                 problems.append(f'{n} is not well-formed XML: {e}')
+
+    problems.extend(content_problems(documents, load_all()))
 
     pub_uid = None
     if 'OEBPS/content.opf' in names:
@@ -83,6 +151,11 @@ def main():
                     if r.get('idref') not in ids]
         if dangling:
             problems.append(f'spine points at unknown ids: {dangling[:4]}')
+        spine_ids = {r.get('idref') for r in root.findall('.//o:spine/o:itemref', OPF_NS)}
+        for name in ('decision.xhtml', 'costs.xhtml'):
+            matches = [i for i in items if i.get('href') == name]
+            if len(matches) != 1 or matches[0].get('id') not in spine_ids:
+                problems.append(f'{name} must appear in the manifest and reading order')
         navs = [i for i in items if 'nav' in (i.get('properties') or '')]
         if len(navs) != 1:
             problems.append(f'{len(navs)} items declare properties="nav"; EPUB3 needs exactly one')
@@ -141,7 +214,7 @@ def main():
         sys.exit(1)
     print(f'epubcheck: OK — {len(names)} entries, {sum(n.endswith(".xhtml") for n in names)} documents, '
           f'{mb:.2f} MB')
-    print('           still run Adobe epubcheck and Kindle Previewer 3 before publishing')
+    print('           still run EPUBCheck and Kindle Previewer 3 before publishing')
 
 
 if __name__ == '__main__':

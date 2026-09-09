@@ -2,46 +2,46 @@
 
 **Layer:** Move · **Leaving:** Managed registries, secret stores and hosted CI runners · **Risk:** Medium · **Cutover:** 0 min · **Reversible:** Immediately
 
-> Three pieces of plumbing, then staging moves onto them: the first real workload on hardware you own, and the only one whose bad afternoon costs you nothing.
+> Registry, secrets and deployments are proved together in staging, before customers depend on the new platform.
 
 ## Leaving from
-- **AWS:** ECR and Secrets Manager — the registry token expires every twelve hours, and a secret you remove holds its name for thirty days unless you ask for the seven-day minimum.
+- **AWS:** ECR and Secrets Manager — registry tokens last twelve hours; scheduled secret deletion has a seven-to-thirty-day recovery window, with thirty days the default.
 - **Google Cloud:** Artifact Registry and Secret Manager — values are immutable, so every rotation leaves a billable version until destroyed.
-- **Azure:** Container Registry and Key Vault — soft-delete cannot be switched off, and purge protection, once on, holds the name ninety days.
+- **Azure:** Container Registry and Key Vault — soft-delete cannot be switched off once enabled; purge protection holds deleted names for the configured seven-to-ninety-day retention period.
 
 ## Why this works
-Nothing real has moved yet, so this is the moment for plumbing. Container workloads use a registry and Kubernetes manifests reconciled by Argo CD. VM workloads keep versioned OS templates and their existing application deployment recipes in Git; the hypervisor does not replace that tooling. Secrets encrypted under a key held outside the platform let either kind of workload recover its credentials. The detailed registry and runner steps below are the container reference. A VM-only estate can retain its existing artifact store and runner service while proving the same deployment and recovery checks.
+Containers use Harbor and Argo CD; VMs keep versioned templates and existing deployment tools. Either route must recover credentials using a key held outside the platform. VM-only estates can retain their artifact store and runners.
 
-Staging goes before customers do. Exercise the same VM templates or container images, secret delivery and deployment path production will use, against staging's own data. A guest that loses its configuration on reboot and a pod whose volume will not bind both belong here. Keep staging on the new platform for a fortnight of real branch deployments before Move 14 introduces production traffic.
+Staging exercises production's templates, images, secrets and deployment path against its own data. A fortnight of branch deployments, plus a rebuild and restore, tests recovery before Move 14 introduces customer traffic.
 
 ## Before you start
 
 **Access**
-- A Git repository the deployment tooling can read, with a deploy key held outside the platform
-- Access to the existing image registry or VM artifact store and the Proxmox templates
+- A deployment repository, with its deploy key held outside the platform
+- Registry or VM artifact access and CI credentials
 
 **Software**
-- For containers: Argo CD 3.0 and Harbor 2.12, installed with `helm` at pinned chart versions, and an ephemeral runner controller
-- For VMs: the existing versioned application deployment and runner tooling
-- `sops` and `age` for encrypting secrets, with the private key kept outside the platform
+- For containers: `helm`, Argo CD and Harbor at the pinned versions below
+- For GitHub Actions: Actions Runner Controller and isolated build infrastructure
+- For VMs: versioned deployment and runner tooling
+- `sops` and `age`, with the private key held externally
 
 **People**
-- One engineer who owns the repository layout; two owners produce two conventions
+- One engineer responsible for the deployment and recovery conventions
 
 ## The runbook
-1. For container workloads, stand the registry up as a cache. `helm install` Harbor at chart version 1.16.2 on the Ceph object store from Move 12, proxying the registry you use today. Repoint pulls and confirm workloads still start. A VM-only estate skips the registry steps and retains its artifact store.
-2. Make it where images are pushed. Move the pipeline's push target across and mirror ninety days of tags, so both registries hold the same images while yours is on trial.
-3. For Kubernetes, `helm install` Argo CD at chart version 8.1.3 so the repository rebuilds namespaces, deployments, network policy and storage classes. For VMs, record template checksums, guest resource settings and the pinned application deployment recipe there instead. Bootstrap credentials stay outside the platform.
+1. For containers, use `helm install` to deploy Harbor 2.15.2 at chart version 1.19.2, storing image blobs on Move 12's Ceph object gateway. Back its database separately. Configure a proxy project only where the upstream adapter supports it; test private-image authentication before repointing pulls. VM-only estates can retain their artifact store.
+2. Create a separate normal Harbor project for pushes; a proxy-cache project cannot accept them. Move the push target, mirror retained releases and verify image digests. Keep the cloud registry current during the trial so either deployment path can use the same release.
+3. For Kubernetes, `helm install` Argo CD 3.5.2 at chart version 10.8.4 and configure applications with automated sync and self-healing, including namespace creation. For VMs, record template checksums, resource settings and the pinned deployment recipe in Git. Bootstrap credentials stay outside the platform.
 4. Encrypt every secret into the repository with `sops`, under an `age` key kept in a password manager and one offline copy. Feed decrypted secrets through the existing VM deployment tool or the Kubernetes bootstrap path. Limit the bootstrap key to that process; never bake it into a template or image.
 5. After backing up staging data, rebuild a disposable VM from its template and deployment recipe, or delete a non-production namespace and let the reconciler recreate it. Check that the workload and its secrets return; restore the staging data and verify its contents.
-6. For Kubernetes runners, install the ephemeral controller at chart version 0.12.1 and route builds to it by label. VM deployments can keep their current runners. Test both routes by changing one line: the pipeline must build the pinned artifact and deploy to the intended guest or namespace without manual repair.
+6. For GitHub Actions, install both Actions Runner Controller and its runner scale-set chart at version 0.14.2 on isolated build infrastructure. Set the repository URL, credential-secret reference and runner image digest; route jobs by scale-set name. Other CI services and VM deployments can retain existing runners. Test a commit through build and deployment.
 7. Move staging and review environments to their assigned guests or namespaces, update DNS, and use them for a fortnight of branch deployments. Their data may remain in the cloud, but only in staging's own stores. Reboot a guest or redeploy a container for each route in use; neither passes until its configuration survives.
 
 ## Operator's notes
 - **Swap:** A plain registry over the same object store drops the database and cache Harbor needs, and with them projects, quotas and scanning.
-- **Do it faster:** Do the cache in an afternoon and leave the registry of record a fortnight; most of the benefit arrives with the first half.
-- **Watch out:** The registry has to run for the cluster to start, and the cluster for the registry to serve. Power the rack down and up once, deliberately, before an outage asks it.
-- **Watch out:** Staging that still talks to production data stores has not moved, it has been relocated. Point it at its own copies before step seven.
+- **Do it faster:** Prove the image pull path first, then switch pushes after the restore test passes.
+- **Watch out:** Keep bootstrap images independent of Harbor and prove recovery from a full rack restart with test workloads. Staging must use its own data copies before step seven; a registry cache does not break every dependency loop.
 - **Leftovers:** The cloud registry bills storage and egress until its images go, a Move 20 decision, and hosted runner minutes continue for anything still routed at them.
 
 ## Rollback

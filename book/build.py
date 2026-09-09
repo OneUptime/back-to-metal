@@ -159,7 +159,7 @@ def cover_front_html(moves):
     stages_n = len({m['layer'] for m in moves})
     keep = sum(1 for m in moves if 'keep paying' in (m['why'] + ' ' + m['hook']).lower())
     stats = [(str(len(moves)), 'Moves'), (str(stages_n), 'Stages'),
-             (str(zero), 'At zero downtime'), (str(len(CLOUDS)), 'Clouds, every Move')]
+             (str(zero), 'Plan zero downtime'), (str(len(CLOUDS)), 'Clouds, every Move')]
     return f"""
     <div class="cover-rule"></div>
     <div style="margin-top:5mm" class="eyebrow">{len(moves)} Moves &nbsp;·&nbsp; AWS, Google Cloud and Azure out</div>
@@ -169,8 +169,8 @@ def cover_front_html(moves):
     <div style="flex:1"></div>
     <div class="promise d">
       <p>One Move, <em>one job, one stated cutover</em>.</p>
-      <p>A rollback <em>that has been rehearsed</em>.</p>
-      <p>And <em>{cover_effort:.0f} days of work</em>, not four years.</p>
+      <p>Rollback <em>with explicit limits</em>.</p>
+      <p>An estimated <em>{cover_effort:.0f} person-days of work</em>.</p>
     </div>
     <div style="flex:.5"></div>
     <div class="stats">{''.join(
@@ -310,15 +310,14 @@ def build(moves):
       whether it was going well.</p>
       <p>This book takes the opposite shape. It is {len(moves)} Moves, in five stages. Each is
       one job with a stated cutover, a stated risk and a rollback that has been thought about.
-      Each can be done on a Tuesday and undone on a Wednesday. You can stop after any of them
-      and still be in a coherent place, which is the only property that matters in a project
-      measured in quarters.</p>
+      Rehearse the return path before moving traffic or data. Some commitments and deletions
+      cannot be undone; each Move states the conditions for stopping safely.</p>
 
       <p>It is deliberately small. The first edition had a hundred and twenty-two Moves and,
       computed from its own files, 975 person-days and four and a half years. That was correct
       and useless. This is {total_effort:.0f} person-days and about {total_weeks:.0f} weeks for
-      two people, most of it hardware lead time rather than work. Hiring does not shorten
-      it.</p>
+      two people. Procurement and observation windows extend the calendar without consuming
+      engineer-days; extra people cannot remove those waits.</p>
       <p>They are ordered so that a reader who starts at Move 01 and works forward has, by
       construction, met every prerequisite of the Move in front of them. That is not a
       stylistic choice; the build refuses to compile a book where it does not hold.</p>
@@ -330,7 +329,7 @@ def build(moves):
       content delivery network, scrubbing capacity at the edge and outbound email are businesses
       other people run better than you will, and each is cheap next to what it replaces. The aim
       was never to own everything. And Move 03 gives you permission to stop: if the arithmetic
-      does not clear a third, three Moves and a week is the whole cost of finding out.</p>
+      does not clear a third, stop after the invoice, inventory and measurement work.</p>
       <p class="sign">Rehearse everything, and read the Rollback before the first step of every
       Move &mdash; including the ones that look like nothing.</p>
     </div>
@@ -460,11 +459,11 @@ def build(moves):
       non-production cluster the rest of the book keeps asking for &mdash; the one you restore
       etcd onto, rehearse an upgrade on, and point a load generator at. Every estate needs a
       cluster it is allowed to destroy, and this is the cheapest one you will ever own.</p></div>
-      <div class="pcard"><h4>The one part to buy new</h4><p>The drives. A consumer SSD without
-      power-loss protection will corrupt etcd the first time the power flickers, and it will do
-      it in a way that looks like a Kubernetes bug for a day and a half. Buy small enterprise
-      NVMe with the protection, second-hand if you like, and put the money you saved on the
-      chassis into the disks.</p></div>
+      <div class="pcard"><h4>The part to check carefully</h4><p>The drives. Without
+      power-loss protection, a sudden outage can lose acknowledged writes or damage data.
+      Use enterprise NVMe with that protection for durable state, check drive health,
+      and rehearse recovery. A UPS helps with interruptions but does not replace
+      the drive's guarantees or independent backups.</p></div>
       <div class="pcard"><h4>If three machines at home is not possible</h4><p>Rent three
       suitable dedicated hosts available on monthly terms and run the same experiment.
       It costs more than electricity and less than being wrong, it gives you real addresses and
@@ -545,8 +544,8 @@ def build(moves):
     transitions to on-prem work; provider charges cover physical support. {esc(COST_SCOPE)}</p>
     <div class="hrule" style="margin:5.5mm 0"></div>
     <div class="pan">
-      <div class="pcard"><h4>On AWS, compute alone</h4><p>{vcpu:,} vCPU of current-generation
-      general purpose instances, on demand, is <b>{money(aws_compute)}</b> a month before a single
+      <div class="pcard"><h4>On AWS, compute alone</h4><p>{vcpu:,} vCPU priced at the model's
+      m7i Linux rate in US East, on demand, is <b>{money(aws_compute)}</b> a month before a single
       gigabyte of storage, a load balancer or a byte of egress. Egress is the line that ends most
       arguments: 100 TB a month is {money(COSTS.egress_month(100))}, every month, for the privilege
       of your own traffic leaving.</p></div>
@@ -566,8 +565,9 @@ def build(moves):
       lease. Confirm delivery, bandwidth, support and notice terms against your quote.</p></div>
       <div class="pcard"><h4>What the difference buys</h4><p>{money(save)} a month, or
       {money(save * 12)} a year, for a capital outlay of {money(capex)} &mdash; {R['nodes'] + R['spares']} machines and
-      a pair of switches &mdash; which pays for itself in about
-      {capex / max(save, 1):.0f} months. That is {save / cloud_total * 100:.0f} per cent of a
+      a pair of switches. Capital divided by the steady-state saving is about
+      {capex / max(save, 1):.0f} months; actual payback also includes migration and overlap.
+      That is {save / cloud_total * 100:.0f} per cent of a
       fully loaded {money(cloud_total)}, with the salary counted on both sides; on the
       infrastructure line alone, which is what every other comparison quotes, it is
       {infra_save / COSTS.BILL_MONTH * 100:.0f} per cent. The dollar saving is the same;
@@ -585,10 +585,9 @@ def build(moves):
       <div class="hrule" style="margin:0 0 4.5mm"></div>
       <p class="legend-note" style="margin:0">Every AWS figure is a public list price for
       us-east-1 observed while writing, before any Savings Plan, private pricing agreement or
-      credit. Every hardware figure is a mid-market street price for the specification opposite.
-      Both will drift. The comparison is a method you can repeat against your own invoice, not a
-      quotation - and if your effective rate is half of list, halve the left-hand column and read
-      the conclusion again.</p>
+      credit. Hardware and facility costs are planning allowances requiring matched quotes.
+      The comparison is a method you can repeat against your own invoice. Replace each cloud
+      line with its effective rate; a compute discount does not also discount traffic or salary.</p>
     </div>""", 'WHAT IT ACTUALLY COSTS'))
 
 
@@ -622,7 +621,8 @@ def build(moves):
     of estimated fleet value at the end, counted at fifteen per cent of the purchase price.
     Renting preserves that opening capital and puts physical maintenance with the provider.
     Replace both quotes and the residual estimate with your own; location, bandwidth and
-    support can change which route wins.</p>""", 'FIVE YEARS, THREE WAYS'))
+    support can change which route wins. These steady-state totals exclude transition labour,
+    overlapping cloud bills, financing and taxes.</p>""", 'FIVE YEARS, THREE WAYS'))
 
     # ---------- the equivalence table, two pages
     def eq_page(rows, roman, kicker, intro, folio):
@@ -672,7 +672,7 @@ def build(moves):
 
     LEGEND = {
         'Decide': 'The invoice, the inventory and the comparison with the salary line in '
-                  'it. Three Moves, about a week, and permission to stop.',
+                  'it. Finish the measurements before deciding; stopping is an outcome.',
         'Buy': 'The specification, the machines, the space and everything with a lead '
                'time. The stage where a mistake costs a lorry rather than a deploy.',
         'Build': 'Racking, the network, the cluster and the disks. Nothing here moves a '
@@ -695,10 +695,11 @@ def build(moves):
         tail = (f'<div class="legend-wrap"><div class="legend">{legend}</div>'
                 f'<p class="legend-note">Every Move states its cutover in minutes of '
                 f'user-visible downtime, its risk as blast radius rather than difficulty, and '
-                f'how long the thing it replaced must stay warm before you turn it off. '
+                f'the conditions for retaining or retiring the source. '
                 f'{sum(1 for m in moves if m["cutover"] == 0)} of the {len(moves)} Moves in this '
-                f'book cost no downtime at all; the whole book, executed end to end, costs '
-                f'{hours_saved(moves)} minutes.</p></div>') if last else ''
+                f'book plan for zero downtime; reference cutovers total '
+                f'{hours_saved(moves)} minutes, subject to each Move\'s prerequisites '
+                f'and a timed rehearsal.</p></div>') if last else ''
         pages.append(page('', info['color'], f"""
         <div class="pkicker">Stage {info['stage']} of {len(keys)} &nbsp;·&nbsp;
           {info['roman']} &nbsp;·&nbsp; {plural(len(ms), 'Move')} &nbsp;·&nbsp;
@@ -857,7 +858,8 @@ def build(moves):
             <span class="mf-off">{inline(m['turnoff'])}</span></div>
         </div>""", f"{num} &nbsp;·&nbsp; RUNBOOK", slot, tabtext)
 
-        return [page_a, page_b]
+        return [p.replace('<section class="page ', f'<section data-move="{num}" class="page ', 1)
+                for p in (page_a, page_b)]
 
     TRIOS = {}  # filled from part_trios.py if present, else derived
     try:
@@ -913,56 +915,58 @@ def build(moves):
     KNOW = [
         ('The bill lags the change by a month',
          'A resource stopped on the third still bills for the first two days, and a reservation '
-         'you no longer use bills for a year. Judge a Move by the invoice after next, never by '
+         'you no longer use can bill until its term ends. Reconcile the later invoices, not only '
          'the console.'),
         ('Capacity you own is capacity you have',
          'The cloud taught a generation to treat headroom as waste. On your own metal, idle '
-         'capacity is the thing that absorbs a bad deploy at four in the afternoon. Buy thirty '
-         'per cent more than the model says.'),
+         'capacity absorbs failures and growth. Price the measured peak, platform reserves '
+         'and loss of the largest host, as Moves 05 and 06 require.'),
         ('Two people know, or nobody does',
-         'The single most common failure mode of a self-run platform is not hardware. It is one '
-         'engineer who understands the network, and a holiday.'),
-        ('Hardware fails predictably and boringly',
-         'Disks, fans, PSUs, optics, in that order, at a rate you can put in a spreadsheet. It '
-         'is not the drama people expect. The drama is in the change you made on Friday.'),
+         'A platform that only one engineer can recover has a staffing failure domain. '
+         'Have the second operator follow the written recovery procedure without prompting.'),
+        ('Plan for hardware failures',
+         'Track disk, fan, PSU and optic failures against your actual fleet. Keep spares, '
+         'response terms and recovery drills; an average failure rate does not predict '
+         'which component fails next.'),
         ('Keep one foot in the cloud on purpose',
          'An account with a working credential, a Terraform state and a warm standby is not a '
-         'failure of nerve. It is the cheapest disaster recovery site you will ever have.'),
-        ('The saving is real; the freedom is the point',
-         'Most teams start this for the bill and finish it for the other thing: being able to '
-         'answer a question about your own system without opening a support case.'),
+         'failure of nerve. Price that recovery option against its restore time and ongoing '
+         'support, and retain the account deliberately if it meets the requirement.'),
+        ('Measure the saving after the move',
+         'Reconcile the new invoices and recorded operating hours against the original '
+         'decision. Control over the platform is useful, but it does not prove a saving.'),
         ('Write the runbook before you need it',
          'Every Move in this book is a runbook because that is the artefact that survives the '
          'person who wrote it. A migration that leaves no runbooks behind has to be done again '
          'by whoever comes next.'),
         ('You can go back',
          'The industry talks about repatriation as though it were one-way. It is not. '
-         f'{oneway} of the {len(moves)} Moves here are genuinely irreversible and the other '
-         f'{len(moves) - oneway} are not, and knowing which is which is most of the skill.'),
+         f'{oneway} of the {len(moves)} Moves here are labelled irreversible. The other '
+         f'{len(moves) - oneway} have conditions on return; read those before starting.'),
     ]
     pages.append(page('', '#14655A', f"""
     <div class="pkicker">Afterwards</div>
     <h2 class="ptitle d">A Few Things<br>Worth Knowing</h2>
-    <p class="pintro">None of these is a Move. They are the ten things that make the other
+    <p class="pintro">None of these is a Move. They are the {len(KNOW)} things that make the other
     {len(moves)} work, and most of them are the things people learn in the second year rather
     than the first.</p>
     <div class="hrule" style="margin:6mm 0"></div>
     <div class="pan">{''.join(
         f'<div class="pcard"><h4>{esc(t)}</h4><p>{esc(b)}</p></div>' for t, b in KNOW)}</div>
     <div class="colophon">
-      <p class="signoff">The best infrastructure decision you make this year will probably be
-      unglamorous, take a fortnight, save a five-figure sum and never be written up anywhere.
-      That is rather the point.</p>
+      <p class="signoff">A useful infrastructure decision may be unglamorous: a smaller bill,
+      a restore that works, or a service that is easier to run. Record what changed and
+      measure the result.</p>
       <div class="hrule" style="margin:0 0 5mm"></div>
       <div class="colo-grid">
-        <div><h6>The book</h6><p>{len(moves)} Moves across five stages.
-        {zero} cost no downtime at all, {oneway} cannot be undone, and the whole book executed
-        end to end costs {hours_saved(moves)} minutes of user-visible outage.</p></div>
+        <div><h6>The book</h6><p>{len(moves)} Moves across {len(LAYERS)} stages.
+        {zero} plan for zero downtime and {oneway} cannot be undone. Reference cutovers
+        total {hours_saved(moves)} minutes; rehearse each against your own estate.</p></div>
         <div><h6>The type</h6><p>Set in Archivo, drawn by Omnibus-Type, and JetBrains Mono,
         drawn by Philipp Nurullin and Konstantin Bulenkov. Both are open source. Every number
         in this book is set in the mono.</p></div>
-        <div><h6>The numbers</h6><p>Every price is a public list rate observed while writing,
-        before any discount, and every saving is illustrative of a shape rather than a quotation.
+        <div><h6>The numbers</h6><p>Prices combine dated cloud list rates and illustrative
+        hardware, facility and staffing allowances. Savings are model results, not quotations.
         Check the arithmetic against your own invoice.</p></div>
       </div>
       <p class="colo-disc">{IMP.DISCLOSURE}</p>
@@ -993,7 +997,7 @@ def build(moves):
     def stamp(p, i):
         # Page 1 is a recto; odd folios are right-hand pages.
         side = 'recto' if (i + 1) % 2 else 'verso'
-        p = p.replace('<section class="page', f'<section data-side="{side}" class="page', 1)
+        p = p.replace('<section ', f'<section data-side="{side}" ', 1)
         return p.replace('{{PN}}', str(i + 1), 1)
 
     pages = [stamp(p, i) for i, p in enumerate(pages)]

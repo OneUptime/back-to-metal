@@ -28,12 +28,15 @@ sys.path.insert(0, str(HERE))
 
 from parse import load_all, LAYERS, ORDER, inline
 from deps import DEPS
-from kit import SHELVES, KIT, RULES, PLATFORM_SCOPE
+from kit import SHELVES, KIT, RULES, PLATFORM_SCOPE, COST_SCOPE, REFERENCE
 from rollback_data import intro as rb_intro, POINTS as RB_POINTS, DISCLAIMER as RB_DISC
 from equivalents import ROWS as EQ_ROWS, CLOUDS
 from version import VERSION
 import imprint as IMP
 import mission as MISSION
+import costs as COSTS
+import roadmap as RM
+import why as WHY
 
 OUT = ROOT / 'dist' / IMP.EPUB_NAME
 
@@ -60,7 +63,7 @@ def rich(s):
 
 CSS = """/* Reflowable: never set an absolute body size, and set the family on body only.
    Kindle's defaults differ from a browser's, so headings state their alignment. */
-body { font-family: serif; font-size: 1em; line-height: 1.5; margin: 0 5%; }
+body { font-family: sans-serif; font-size: 1em; line-height: 1.5; margin: 0 5%; }
 h1, h2, h3 { font-family: sans-serif; text-align: left; page-break-after: avoid; }
 h1 { font-size: 1.5em; line-height: 1.25; margin: 1em 0 0.2em; }
 h2 { font-size: 1.1em; margin: 1.6em 0 0.4em; text-transform: uppercase;
@@ -89,6 +92,9 @@ th, td { text-align: left; padding: 0.25em 0.5em 0.25em 0; vertical-align: top;
 
 
 def move_xhtml(m):
+    origins = '<ul>\n' + ''.join(
+        f'<li><strong>{esc(o["cloud"])}:</strong> {rich(o["service"])} '
+        f'&#8212; {rich(o["note"])}</li>\n' for o in m['origins']) + '</ul>\n'
     pres = ''
     for g in m['pre_groups']:
         if g['name']:
@@ -98,18 +104,20 @@ def move_xhtml(m):
     notes = ''.join(f'<p class="note"><b>{esc(t)}:</b> {rich(b)}</p>\n' for t, b in m['notes'])
     was, now, saved, cut, eff, wait = m['figures']
     deps = DEPS.get(m['num'], [])
-    depline = (f'<p class="small">Needs first: '
-               f'{", ".join("Move " + d for d in deps)}.</p>\n') if deps else ''
+    deplinks = ', '.join(f'<a href="{d}.xhtml">Move {d}</a>' for d in deps)
+    depline = f'<p class="small">Needs first: {deplinks}.</p>\n' if deps else ''
     body = f"""<h1>{esc(m['num'])} &#183; {esc(m['title'])}</h1>
 <p class="meta">{esc(m['layer'])} &#183; leaving {esc(m['leaving'])} &#183;
  {esc(m['risk'])} risk &#183; {esc(m['cutover'])} min cutover &#183;
- back out for {esc(m['reversible'])}</p>
+ reversible: {esc(m['reversible'])}</p>
 <p class="hook">{rich(m['hook'])}</p>
-{depline}<h2>Why this works</h2>
+{depline}<h2>Leaving from</h2>
+{origins}<h2>Why this works</h2>
 <p>{rich(m['why'])}</p>
 <div class="rollback">
 <h3>Rollback &#8212; read this first</h3>
 <p>{rich(m['rollback'])}</p>
+<p class="small"><a href="../rollback.xhtml">Before you touch anything</a></p>
 </div>
 <h2>Before you start</h2>
 {pres}<h2>The runbook</h2>
@@ -119,6 +127,108 @@ def move_xhtml(m):
  &#183; cutover {esc(cut)} &#183; effort {esc(eff)} &#183; wait {esc(wait)}</p>
 <p class="turnoff">What you can turn off: {rich(m['turnoff'])}</p>"""
     return XHTML.format(title=esc(m['title']), up='../', body=body)
+
+
+def financials(moves):
+    """Use the same rounded components as print and web, then sum the parts."""
+    retained = sum(m['now'] for m in moves
+                   if m['was'] is not None and m['now'] is not None)
+    cloud_people = round(COSTS.cloud_people_month())
+    bill = COSTS.BILL_MONTH
+    cloud_total = bill + cloud_people
+    rows = [{'key': 'cloud', 'label': 'Cloud', 'infrastructure': bill,
+             'people': cloud_people, 'retained': 0, 'total': cloud_total}]
+    for key, label, parts in (
+        ('owned', 'Colocation', COSTS.owned_month(
+            REFERENCE['nodes'], REFERENCE['spares'], retained)),
+        ('rented', 'Rented metal', COSTS.dedicated_month(
+            REFERENCE['nodes'] + REFERENCE['spares'], retained)),
+    ):
+        infra, delta, kept = (round(parts[k]) for k in
+                              ('infrastructure', 'people', 'retained'))
+        people = cloud_people + delta
+        rows.append({'key': key, 'label': label, 'infrastructure': infra,
+                     'people': people, 'retained': kept,
+                     'total': infra + people + kept})
+    for row in rows:
+        row['saved'] = cloud_total - row['total']
+    return {'retained': retained, 'rows': rows,
+            'five_year': COSTS.five_year(REFERENCE['nodes'], REFERENCE['spares'], retained),
+            'days': sum(RM.effort_days(m) for m in moves),
+            'weeks': RM.schedule(moves, 2)['weeks']}
+
+
+def money(value):
+    return f'${value:,.0f}'
+
+
+def decision_xhtml(facts):
+    owned = next(r for r in facts['five_year']['rows'] if r['key'] == 'owned')
+    fmt = {'five_year_saved': money(owned['saved']),
+           'five_year_pct': f'{owned["pct"]:.0f}',
+           'egress_100tb': money(COSTS.egress_month(100)),
+           'weeks': f'{facts["weeks"]:.0f}', 'days': f'{facts["days"]:.0f}',
+           'cloud_hours': COSTS.PEOPLE['cloud_ops_hours_month'],
+           'retained': money(facts['retained'])}
+    body = (f'<h1>{esc(WHY.HEADING)}</h1><p>{esc(WHY.lede(fmt))}</p>'
+            f'<h2>{esc(WHY.OURS_HEADING)}</h2>'
+            + ''.join(f'<h3>{esc(h)}</h3><p>{esc(b)}</p>' for h, b in WHY.OURS)
+            + f'<p>{esc(WHY.OURS_NOTE)}</p>'
+            + ''.join(f'<h2>{esc(h)}</h2><p>{esc(b)}</p><p>{esc(test)}</p>'
+                      for h, b, test in WHY.gains(fmt))
+            + f'<h2>{esc(WHY.COSTS_HEADING)}</h2><p>{esc(WHY.COSTS_LEDE)}</p>'
+            + ''.join(f'<h3>{esc(h)}</h3><p>{esc(b)}</p>' for h, b in WHY.costs(fmt))
+            + f'<h2>{esc(WHY.STAY_HEADING)}</h2><ul>'
+            + ''.join(f'<li>{esc(p)}</li>' for p in WHY.STAY)
+            + f'</ul><p>{esc(WHY.CLOSER)}</p>'
+            + '<p><a href="costs.xhtml">Read the financial comparison</a>.</p>')
+    return XHTML.format(title=esc(WHY.HEADING), up='', body=body)
+
+
+def costs_xhtml(facts):
+    # Two-column tables remain readable on narrow e-readers. Stable IDs let the
+    # cross-output agreement gate check the displayed financial values.
+    body = ('<h1>What it costs</h1>'
+            f'<p>{esc(COST_SCOPE)}</p>'
+            '<p>These are worked assumptions, not quotations. Replace cloud list '
+            'rates with your effective invoices, and hardware, facility, support '
+            'and rental allowances with matching current quotes. The model keeps '
+            'the same operations hours and loaded pay in every option; validate '
+            'those hours with your team.</p><h2>Monthly comparison</h2>'
+            '<p>The colocation infrastructure line includes amortised capital. '
+            'Retained third-party charges come from the Moves and are already '
+            'inside the cloud bill.</p>')
+    for row in facts['rows']:
+        values = [('Infrastructure', 'infrastructure'), ('People', 'people'),
+                  ('Retained third-party charges', 'retained'),
+                  ('Total a month', 'total'), ('Saved a month', 'saved')]
+        body += f'<h3>{esc(row["label"])}</h3><table><tbody>'
+        for label, key in values:
+            value = ('Already in the bill' if row['key'] == 'cloud' and key == 'retained'
+                     else money(row[key]))
+            body += (f'<tr><th scope="row">{esc(label)}</th>'
+                     f'<td id="monthly-{row["key"]}-{key}">{esc(value)}</td></tr>')
+        body += '</tbody></table>'
+    fy = facts['five_year']
+    body += (f'<h2>The full {fy["months"]}-month cash comparison</h2>'
+             '<p>Here capital appears once at purchase, so monthly running cost '
+             'excludes amortisation. The residual is an assumed credit at the '
+             'end, not guaranteed resale proceeds. These steady-state figures '
+             'exclude migration labour, overlap, financing and taxes.</p>')
+    for row in fy['rows']:
+        body += f'<h3>{esc(row["label"])}</h3><table><tbody>'
+        for label, key in [('Capital at purchase', 'capex'), ('Running a month', 'month'),
+                           ('Residual credit', 'residual'), ('Total over the period', 'total'),
+                           ('Saved against cloud', 'saved')]:
+            body += (f'<tr><th scope="row">{esc(label)}</th>'
+                     f'<td id="cash-{row["key"]}-{key}">{money(row[key])}</td></tr>')
+        body += '</tbody></table>'
+    body += (f'<p>The reference plan estimates {facts["days"]:.0f} person-days '
+             f'across {facts["weeks"]:.0f} weeks with two engineers. Calendar waits '
+             'extend that schedule without consuming engineer-days. Price migration '
+             'labour and the overlapping estates separately in '
+             '<a href="m/03.xhtml">Move 03</a>.</p>')
+    return XHTML.format(title='What it costs', up='', body=body)
 
 
 def build():
@@ -163,6 +273,10 @@ def build():
               + ''.join(f'<p>{rich(p)}</p>' for p in MISSION.paras(IMP.REPO, len(moves)))
               + '</div>')).encode()
 
+    facts = financials(moves)
+    files['OEBPS/decision.xhtml'] = decision_xhtml(facts).encode()
+    files['OEBPS/costs.xhtml'] = costs_xhtml(facts).encode()
+
     # The safety page goes early and is linked from every Move's rollback note.
     oneway = sum(1 for m in moves if m['oneway'])
     files['OEBPS/rollback.xhtml'] = XHTML.format(
@@ -179,14 +293,16 @@ def build():
               + ''.join(f'<h3>{esc(n)}</h3><ul>'
                         + ''.join(f'<li>{esc(i)}</li>' for i in items) + '</ul>'
                         for n, items in SHELVES)
-              + '<h2>Ten rules for leaving the cloud</h2><ol>'
+              + f'<h2>{len(RULES)} rules for leaving the cloud</h2><ol id="rules">'
               + ''.join(f'<li><b>{esc(t)}</b> {esc(b)}</li>' for t, b in RULES)
               + '</ol><h2>On the laptop</h2><p>'
               + ', '.join(esc(k) for k in KIT) + '.</p>')).encode()
 
     eqrows = ''.join(
         f'<tr><td>{esc(r[0])}</td><td>{esc(r[1])}</td><td>{esc(r[2])}</td>'
-        f'<td>{esc(r[3])}</td></tr>' for r in EQ_ROWS)
+        f'<td>{esc(r[3])}</td><td>'
+        + (f'<a href="m/{r[4]}.xhtml">Move {esc(r[4])}</a>' if r[4] else '&#8212;')
+        + '</td></tr>' for r in EQ_ROWS)
     files['OEBPS/replaces.xhtml'] = XHTML.format(
         title='What replaces what', up='',
         body=('<h1>What replaces what</h1>'
@@ -194,7 +310,7 @@ def build():
               'differs on each, so this table is the map rather than the content. Find the row '
               'you are paying for and then read the Move.</p>'
               f'<table><tr><th>{CLOUDS[0]}</th><th>{CLOUDS[1]}</th><th>{CLOUDS[2]}</th>'
-              f'<th>What you run instead</th></tr>{eqrows}</table>')).encode()
+              f'<th>What you run instead</th><th>Move</th></tr>{eqrows}</table>')).encode()
 
     for m in moves:
         files[f"OEBPS/m/{m['num']}.xhtml"] = move_xhtml(m).encode()
@@ -214,6 +330,7 @@ def build():
         nav_items += (f'<li><a href="m/{rs[0]["num"]}.xhtml">{LAYERS[k]["roman"]} &#183; '
                       f'{esc(k)}</a>\n<ol>\n{kids}</ol>\n</li>\n')
     FRONT = [('titlepage.xhtml', 'Title page'), ('why.xhtml', MISSION.KICKER),
+             ('decision.xhtml', WHY.HEADING), ('costs.xhtml', 'What it costs'),
              ('rollback.xhtml', 'Before you touch anything'),
              ('kit.xhtml', 'The reference build'),
              ('replaces.xhtml', 'What replaces what')]
@@ -222,11 +339,12 @@ def build():
                 + nav_items + '</ol>\n</nav>')
     files['OEBPS/nav.xhtml'] = XHTML.format(title='Contents', up='', body=nav_body).encode()
 
+    ncx_entries = FRONT + [(f'm/{m["num"]}.xhtml', f'{m["num"]} - {m["title"]}')
+                           for m in moves]
     ncx_points = ''.join(
-        f'<navPoint id="n{i}" playOrder="{i}"><navLabel><text>{esc(m["num"])} - '
-        f'{esc(m["title"])}</text></navLabel>'
-        f'<content src="m/{m["num"]}.xhtml"/></navPoint>\n'
-        for i, m in enumerate(moves, 1))
+        f'<navPoint id="n{i}" playOrder="{i}"><navLabel><text>{esc(title)}</text></navLabel>'
+        f'<content src="{href}"/></navPoint>\n'
+        for i, (href, title) in enumerate(ncx_entries, 1))
     # Stable for the life of the work, and deliberately not derived from VERSION:
     # see EPUB_ID in imprint.py.
     uid = IMP.EPUB_ID

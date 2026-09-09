@@ -6,8 +6,8 @@
 
 ## Leaving from
 - **AWS:** EBS and EFS — a gp3 volume lives in one Availability Zone and its provisioned throughput is separate from capacity; EFS in bursting mode spends credits that run out.
-- **Google Cloud:** Persistent Disk and Filestore — Persistent Disk performance scales with provisioned size and the attached machine's vCPU count, and a Filestore instance grows but never shrinks.
-- **Azure:** Managed Disks and Azure Files — Premium SSD steps in fixed tier sizes rather than a dial, and premium file shares need a FileStorage account that standard shares cannot move into.
+- **Google Cloud:** Persistent Disk and Filestore — Persistent Disk performance depends on disk type, size and VM limits; Filestore basic tiers can grow but cannot shrink, unlike zonal, regional and enterprise tiers.
+- **Azure:** Managed Disks and Azure Files — Premium SSD v1 uses performance tiers; Premium SSD v2 configures IOPS and throughput separately, and SSD file shares use a FileStorage account.
 
 ## Why this works
 A VM needs a datastore before it needs Kubernetes. On the Proxmox path, the hosts own Ceph and present shared block storage to guests. On the direct Talos path, Rook manages Ceph on physical disks. Running another replicated Ceph inside guests whose disks already sit on host Ceph multiplies copies and hides the physical failure domains. Choose one owner per device.
@@ -21,8 +21,8 @@ PostgreSQL can use local NVMe because it replicates to its own standbys. That sa
 - Proxmox storage administration or the Talos configuration from Move 11, according to the chosen platform
 
 **Software**
-- The Proxmox-supported Ceph package version pinned across hosts on the VM path
-- `helm` and `kubectl` for the Talos path or external Ceph clients, with Rook 1.16.9 and a compatible Ceph image pinned in the deployment configuration
+- The Proxmox-supported Ceph package version pinned across hosts, including current security fixes
+- `helm` and `kubectl` for Talos or external Ceph clients, with Rook 1.20.7 and Ceph 20.2.4 pinned in the deployment configuration
 - `ceph` for health, capacity and recovery output during the drive-pull test
 
 **People**
@@ -30,7 +30,7 @@ PostgreSQL can use local NVMe because it replicates to its own standbys. That sa
 
 ## The runbook
 1. Record each disk's owner and confirm the selected devices are empty before provisioning. On direct Talos, reserve three data drives per participating node for Rook and the fourth for local PostgreSQL; exclude shelf spares. On Proxmox, assign host datastore disks separately from any local database devices.
-2. For Proxmox, use its Ceph wizard with the pinned package version, monitors on separate physical hosts, and only the recorded datastore devices. Add an RBD pool as VM storage. For direct Talos, install Rook using `helm install rook-ceph rook-release/rook-ceph --version 1.16.9`, then apply the pinned CephCluster configuration selecting the inventoried raw disks.
+2. For Proxmox, use its Ceph wizard with the pinned packages, monitors on separate physical hosts, and only the recorded datastore devices. Add an RBD pool as VM storage. On Talos, add the official Rook chart repository and use `helm install rook-ceph rook-release/rook-ceph --version 1.20.7`. Apply a CephCluster configuration pinning Ceph 20.2.4 and the inventoried raw disks.
 3. Set replicated pools to three copies and `min_size 2`, with the failure domain at the physical host. Use `ceph df` and model redistribution after losing the largest storage host; keep utilisation below 70 per cent and verify recovery still has room. Guest count is not a count of independent replicas.
 4. Provision the shared filesystem and object gateway required by Moves 15 and 16. Rook creates these on direct Talos. For host-owned Ceph, its owner provisions CephFS and a separate RADOS gateway service; an RBD datastore alone supplies neither an S3 endpoint nor its credentials. Connect Kubernetes through Rook's external-cluster mode, with restricted client keys and the existing gateway endpoint, never guest OSD disks.
 5. Keep each local PostgreSQL copy on a different physical host, with placement rules enforced during failover. If passing a disk or controller into a guest, give it exclusive ownership and exclude it from host Ceph. That guest loses ordinary live migration; database replication and a tested restore provide its recovery path.
@@ -53,4 +53,4 @@ Before test data lands, backing out means removing the empty pools and restoring
 | $9,400/mo | $850/mo | 91% | 0 min | 6 days | — |
 
 ## What you can turn off
-Nothing this week. The managed disks and shares carry production until Stage 4 moves what is on them; the line dies in Move 15 for the buckets and Move 16 for the database.
+Nothing this week. Retire each managed disk or share only after its workload, data and rollback copy have moved. Object migration in Move 15 does not retire block volumes or file shares; VM disks and shared files need their own acceptance checks before Move 20 removes the leftovers.

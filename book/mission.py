@@ -31,8 +31,8 @@ PARAS = [
     'Repatriation is written about as a decision and executed as a crisis, which is why '
     'so many attempts stall halfway, with two platforms live and nobody able to say '
     'whether it is going well. This is the other thing: {count} Moves, in five stages, '
-    'each one a single job with a stated cutover, a stated risk and a rollback that '
-    'works. An earlier edition of this book had a hundred and twenty-two of them and '
+    'each one a single job with an estimated cutover, a stated risk and explicit '
+    'limits on reversal. An earlier edition of this book had a hundred and twenty-two of them and '
     'took four years. Nobody has four years.',
 
     'It is honest about the parts that do not pay. One whole Move ends by telling you to '
