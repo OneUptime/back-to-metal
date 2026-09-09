@@ -22,12 +22,12 @@ cannot drift.
 KICKER = 'Before the twenty Moves, the question underneath them'
 HEADING = 'Why leave at all'
 
-LEDE = ('A cloud bill is rent on somebody else\u2019s margin, charged by the byte, '
-        'for as long as you exist. On the estate this book is written against it '
-        'comes to {five_year_saved} over the life of one generation of machines \u2014 '
-        'which is two engineers, or a year of runway, or the difference between '
-        'raising again and not. That is the whole argument. Everything below is '
-        'either a way of checking it or a reason it might not apply to you.')
+LEDE = ('Colocation and rented dedicated servers put more of your infrastructure '
+        'budget into capacity you can use. Rent the machines to preserve cash, or '
+        'own them in a colocation facility for lower running costs and control over '
+        'the hardware. In this reference model, colocation saves {five_year_saved} '
+        'over five years, with the same operations hours as the cloud. Your team '
+        'brings its skills; the provider supplies the building and physical support.')
 
 # We did this. That is worth more than any argument, and it is the one thing
 # here nobody else can say - so it is said in the first person and it is put
@@ -58,9 +58,10 @@ GAINS = [
     ('The bill stops being a percentage of your growth',
      'This is the one that matters and the rest are consequences of it. A cloud bill '
      'is a toll on activity: more users, more bytes, more bill, for ever, at a margin '
-     'somebody else sets and can change. A rack is a fixed cost. It costs the same in '
-     'the month you double as in the month you do not, and the only thing that grows '
-     'is the power draw, by the watt rather than by the invoice line. Over five years '
+     'somebody else sets and can change. A rack or a dedicated-server contract buys '
+     'capacity at a predictable price. While your workload fits that capacity and '
+     'your power and traffic allowances, more users need not mean more infrastructure '
+     'rent. Add machines when demand calls for them. Over five years '
      'the difference here is {five_year_saved}, and the machines are still working at '
      'the end of it.',
      'computed',
@@ -102,46 +103,46 @@ GAINS = [
      'two years, and what each cost in engineer-days. That is a recurring bill nobody '
      'invoices you for.'),
 
-    ('You can be told no, and it stops mattering',
-     'Capacity in your region, a quota nobody will raise, a region-wide outage you can '
-     'do nothing about except write a status update. Owning hardware does not make you '
-     'immune to failure \u2014 it makes the failure yours to fix, at three in the '
-     'morning, without a support tier and without waiting. Whether that reads as a '
-     'gain or a cost depends entirely on whether you would rather be working or '
-     'waiting, and you already know which you are.',
+    ('Your team runs the platform; remote hands look after the rack',
+     'Your cloud-ops engineers already deploy, monitor, patch and recover services. '
+     'Those skills move with the workload. Colocation remote hands carry out disk '
+     'swaps, cabling and power cycles under your runbooks; a rented-metal provider '
+     'maintains its hardware under the support agreement. The reference model keeps '
+     'the same team and monthly operations hours across all three options.',
      'judgement',
-     'Look up the last provider incident that hurt you. Ask what you could have done '
-     'differently with root on the machines. If the answer is nothing, this one is '
-     'worth real money to you.'),
+     'Agree the physical tasks, coverage and response times with the provider, then '
+     'rehearse an incident together. Measure your team\u2019s hours before and after '
+     'the move \u2014 Moves 07 and 19.'),
 ]
 
 # --- what it costs you ----------------------------------------------------
-COSTS_HEADING = 'And what it costs you'
-COSTS_LEDE = ('All of that is real and none of it is free. Four things get worse, '
-              'and a comparison that leaves them out is the reason repatriations '
-              'get approved and then regretted.')
+COSTS_HEADING = 'Choose how you move'
+COSTS_LEDE = ('Both routes can lower the bill. Choose the purchasing and support '
+              'arrangements that fit your cash flow and the team you already have.')
 
 COSTS = [
-    ('Capital, on day one',
-     'About {capex} leaves the bank before anything serves a request. On eighteen months '
-     'of runway that is a fair refusal, and Move 07 tells you what to do instead.'),
+    ('Rent first, or own in colocation',
+     'Rented metal lets you move without buying the servers upfront. Colocation lets '
+     'you own the hardware and spread its purchase cost over years of use. Compare '
+     'both cash flows in Move 03 and choose the route in Move 07.'),
 
-    ('Lead time you cannot compress',
-     'Hardware is ordered, not provisioned. A cage is signed, a circuit is delivered, and '
-     'the calendar for this programme is mostly waiting: of the {weeks} weeks end to end, '
-     'only {days} days are anybody working.'),
+    ('A timetable that fits the route',
+     'Available rented servers can avoid the hardware purchase and facility setup '
+     'lead times. The colocation plan includes ordering machines, signing space and '
+     'waiting for circuits: {days} person-days of work across {weeks} weeks. Both '
+     'routes keep the migration rehearsals and rollback windows.'),
 
-    ('The pager, and about {ops_hours} more hours a month',
-     'Somebody carries it, and it is now a machine rather than a ticket. We measured our '
-     'own two-site fleet, which is larger than the one this book is written against, at '
-     'fourteen engineer-hours a month; the book books {owned_hours} against the '
-     '{cloud_hours} the cloud estate was already taking, because we had done it once '
-     'before and you will not have.'),
+    ('The same team, the same operations hours',
+     'Cloud ops transitions into on-prem ops. Remote hands handles the physical '
+     'interventions; your engineers keep responsibility for the platform and '
+     'application. The model budgets {cloud_hours} hours a month in every option, '
+     'with remote hands in the facility bill. Migration work is counted separately.'),
 
     ('Three things that never come home',
      'A content delivery network, outbound mail deliverability and scrubbing at the edge '
      'are businesses other people run better than you will. Move 04 tells you to keep '
-     'paying for all three, and they are {retained} a month of the after state for ever.'),
+     'paying for all three. These and the services retained in later Moves total '
+     '{retained} a month in the reference model.'),
 ]
 
 # --- when not to ----------------------------------------------------------
@@ -156,16 +157,14 @@ STAY = [
     'database, a hosted stream, a workflow engine - and replacing them is a rewrite '
     'rather than a migration. Move 02 will tell you this in an afternoon.',
 
-    'Nobody on the team wants to run infrastructure. This is a trade, not a free lunch, '
-    'and it is paid for in attention. A team that resents the pager will run the platform '
-    'badly and blame the hardware.',
+    'You have no team to own the platform and no managed operations partner. Remote '
+    'hands covers physical work; application recovery and platform decisions still '
+    'need an owner. An existing cloud-ops team can transition into that role.',
 
-    'The bill is small. This edition is written against ten thousand dollars a month, '
-    'which is close to the floor: the quarter rack costs $1,400 whether it holds three '
-    'machines or thirty, so the saving falls faster than the bill does and Move 03\u2019s '
-    'rule stops clearing at about nine thousand. Below that the saving is real and the '
-    'distraction is larger; Move 03 gives you permission to do the arithmetic and stop, '
-    'and stopping is a perfectly good outcome.',
+    'Your effective cloud bill is too small to cover migration and the capacity you '
+    'need. Price rented metal as well as a colocation rack: renting can suit a smaller '
+    'estate. Move 03 compares your own quotes and hours, so the decision rests on your '
+    'workload rather than a spending threshold borrowed from another company.',
 ]
 
 CLOSER = ('If none of those four is true and the arithmetic in Move 03 clears, the rest '

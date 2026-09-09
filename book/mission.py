@@ -18,10 +18,11 @@ HEADING_LINES = ['You are allowed to', 'run your own computers']
 PARAS = [
     'A generation of engineers has now been trained to believe that owning a server is a '
     'kind of professional failure. It is not. It is a trade, and like every trade it has '
-    'terms: you take on hardware, capacity and a pager, and in exchange you stop paying a '
-    'margin on every byte you move and every hour you idle. For a company spending real '
-    'money on one cloud, that trade is usually worth making, and the arithmetic is not '
-    'close.',
+    'terms: you choose dedicated capacity, rented or owned in colocation, and keep '
+    'more of the budget as your workload grows. The cloud-ops team transitions to '
+    'on-prem ops with the same planned hours, while remote hands handles physical '
+    'interventions. For a company with steady demand and a substantial cloud bill, '
+    'both routes deserve a serious comparison.',
 
     'What has been missing is not the argument. It is a plan short enough to finish. '
     'Repatriation is written about as a decision and executed as a crisis, which is why '

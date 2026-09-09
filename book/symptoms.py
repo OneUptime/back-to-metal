@@ -27,8 +27,8 @@ SYMPTOMS = [
      '07 09 11'),
     ('Something has to move this quarter and nothing may break',
      '14 17 18'),
-    ('Nobody wants to be on call for a machine',
-     '09 19 06'),
+    ('We want remote hands to handle the hardware calls',
+     '07 19 06'),
     ('We were told we cannot leave, and nobody has checked',
      '04 15 20'),
 ]
