@@ -5,6 +5,30 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [6.2.0] - 2026-09-09
+
+The website redesign and the release pipeline that publishes it.
+
+### Changed
+
+- The website uses a light palette with stage colours chosen for that background,
+  revised page layouts, and a footer directory linking the guide, safety page,
+  checklist and downloadable editions.
+- The header fits its five page links on one desktop row. Move pages include
+  navigation through the runbook, and the schedule uses the website's actual
+  content width so its labels retain their intended size.
+- CI builds the interior, covers, Kindle edition and website in one ordered
+  invocation. The browser and figure-agreement checks run against those outputs,
+  and both workflows check the generated README as well as the website for drift.
+
+### Fixed
+
+- The redesign was merged with the already-published version number, so the
+  release gate correctly refused to replace that release with different content.
+  This edition has its own version and regenerated print, Kindle and web files.
+- CI no longer rebuilds the interior six times or checks the website before
+  producing its current Kindle download.
+
 ## [6.1.2] - 2026-09-08
 
 The cost page printed two different answers to "what does owning cost a month".

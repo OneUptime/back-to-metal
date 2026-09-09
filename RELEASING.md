@@ -11,7 +11,7 @@
    the website ships whichever one was committed last.
 4. `make releasable` — the release gate. It is not part of `make`, because CI has to stay green
    while work is in progress and this is the one check that must not pass until it should.
-5. Commit the regenerated `dist/` and `site/` along with the sources.
+5. Commit the regenerated `dist/`, `site/` and `README.md` along with the sources.
 6. Merge to the `release` branch and push. **That is the release**: pushing to `release` runs
    `.github/workflows/release.yml`, which does everything below on its own.
 
@@ -40,10 +40,15 @@ release is made from. The notes are never typed twice.
 from a laptop with the commands in this file.
 
 **Build and check** runs `make verify`, `make audit`, `make releasable`, then
-`make artefacts` in one invocation, then the same committed-site comparison CI
-runs — releasing from a drifted commit would publish a site nobody reviewed. What it built is
+`make artefacts` in one invocation, then the same comparison of the committed site and README
+that CI runs — releasing from a drifted commit would publish output nobody reviewed. What it built is
 handed to the second job as an artefact, so the bytes that get published are the bytes that
 were checked.
+
+CI also runs `make artefacts` once. This builds the interior and covers once, generates the
+Kindle edition before the site copies it, refreshes the README's figures and runs the browser
+and figure-agreement checks. Both workflows reject changes to generated site files or the
+README after that build; timestamped PDF and EPUB downloads are excluded from the comparison.
 
 **Publish** deploys `site/` to Firebase, fetches the page it has just published and fails
 unless it is serving this version, and then cuts the GitHub release with the interior, the
