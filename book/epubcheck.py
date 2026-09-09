@@ -21,6 +21,7 @@ OPF_NS = {'o': 'http://www.idpf.org/2007/opf',
           'dc': 'http://purl.org/dc/elements/1.1/'}
 NCX_NS = {'n': 'http://www.daisy.org/z3986/2005/ncx/'}
 HTML_NS = {'h': 'http://www.w3.org/1999/xhtml'}
+EPUB_TYPE = '{http://www.idpf.org/2007/ops}type'
 
 # RFC 4122: the urn:uuid: scheme has to be followed by an actual UUID. Adobe's
 # epubcheck rejects anything else; this checker used not to, which is how
@@ -100,6 +101,33 @@ def content_problems(documents, moves):
     return problems
 
 
+def kindle_packaging_problems(documents):
+    """A valid EPUB can still duplicate its cover or disable Kindle's Go To ToC."""
+    problems = []
+    package = documents.get('OEBPS/content.opf')
+    if package is None:
+        return ['missing EPUB package']
+    items = package.findall('.//o:manifest/o:item', OPF_NS)
+    covers = {resolve('OEBPS/content.opf', item.get('href', '')) for item in items
+              if 'cover-image' in item.get('properties', '').split()}
+    for name, doc in documents.items():
+        if name.endswith('.xhtml'):
+            for img in doc.findall('.//h:img', HTML_NS):
+                if resolve(name, img.get('src', '')) in covers:
+                    problems.append(f'{name}: HTML repeats the designated Kindle cover image')
+    for item in items:
+        if 'nav' not in item.get('properties', '').split():
+            continue
+        name = resolve('OEBPS/content.opf', item.get('href', ''))
+        nav = documents.get(name)
+        landmarks = [] if nav is None else [node for node in nav.findall('.//h:nav', HTML_NS)
+                                            if 'landmarks' in node.get(EPUB_TYPE, '').split()]
+        if not any('toc' in link.get(EPUB_TYPE, '').split()
+                   for node in landmarks for link in node.findall('.//h:a', HTML_NS)):
+            problems.append(f'{name}: missing Kindle table-of-contents landmark')
+    return problems
+
+
 def main():
     if not EPUB.exists():
         sys.exit('epubcheck: build the epub first (make epub)')
@@ -138,6 +166,7 @@ def main():
                 problems.append(f'{n} is not well-formed XML: {e}')
 
     problems.extend(content_problems(documents, load_all()))
+    problems.extend(kindle_packaging_problems(documents))
 
     pub_uid = None
     if 'OEBPS/content.opf' in names:

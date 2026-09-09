@@ -1,4 +1,4 @@
-# The only external Python dependency. render.py drives headless Chromium
-# through it to paginate and vertically justify the book, and cover.py uses
-# it to render the wraps as vector.
+# Playwright renders the interior and covers through Chromium. pypdf checks
+# that every referenced PDF font is embedded, including Type 3 glyph streams.
 playwright>=1.40
+pypdf==6.18.0

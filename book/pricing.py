@@ -92,6 +92,26 @@ def kindle_row(mb, listed):
     return r
 
 
+def kindle_price_problems(listed, physical_prices):
+    """The 70% option requires both its price band and a print-edition discount.
+
+    https://kdp.amazon.com/en_US/help/topic/G200634500, section 4 (2026-09-09).
+    Compare prices within the same marketplace, excluding taxes.
+    """
+    problems = []
+    lo, hi = IMP.KDP_70_BAND
+    if not lo <= listed <= hi:
+        problems.append(f'Kindle list ${listed:.2f} is outside the '
+                        f'{IMP.KINDLE_ROYALTY_RATE:.0%} band ${lo:.2f}-${hi:.2f}')
+    for edition, price in physical_prices.items():
+        if price is not None and listed > price * 0.8 + 1e-9:
+            cap = math.floor(price * 0.8 * 100 + 1e-9) / 100
+            problems.append(f'Kindle list ${listed:.2f} must be at least 20% below '
+                            f'the ${price:.2f} {edition} list to qualify for 70% '
+                            f'royalties; maximum ${cap:.2f}')
+    return problems
+
+
 def main():
     n = pages()
     target = IMP.MIN_PRINT_MARGIN
@@ -149,11 +169,7 @@ def main():
         mb = EPUB.stat().st_size / 1e6
         k = kindle_row(mb, IMP.KINDLE_LIST_USD)
         rows.append(k)
-        lo, hi = IMP.KDP_70_BAND
-        if not (lo <= IMP.KINDLE_LIST_USD <= hi):
-            problems.append(f'Kindle list ${IMP.KINDLE_LIST_USD:.2f} is outside the '
-                            f'{IMP.KINDLE_ROYALTY_RATE:.0%} band ${lo:.2f}-${hi:.2f}; '
-                            f'it would earn 35%, not 70%')
+        problems.extend(kindle_price_problems(IMP.KINDLE_LIST_USD, IMP.LIST_USD))
         notes.append('Kindle deducts delivery before applying the royalty percentage. '
                      'KDP charges on the converted file size; the EPUB size here is '
                      'only an estimate. Confirm the converted size and account eligibility.')

@@ -43,8 +43,9 @@ make releasable # the release gate — see RELEASING.md
 Kindle edition out of `dist/` into `site/`, so the EPUB has to exist before the site is
 generated; make walks goals left to right, so the order in that target is load-bearing.
 
-Requires Python 3.9 or newer with `playwright` and a Chromium build available to it. The
-Makefile prefers `.venv/bin/python3` when it exists, so a project virtualenv works without
+Requires Python 3.9 or newer with the packages in `requirements.txt` and Chromium.
+`make deps` installs the packages and browser. The Makefile prefers `.venv/bin/python3`
+when it exists, so a project virtualenv works without
 activating it. `make clean` removes `build/` and `site/`.
 
 `make verify` and `make audit` are the gate. Both must report zero problems before you commit.

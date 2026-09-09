@@ -29,10 +29,14 @@ from parse import load_all
 import build as B
 import imprint as IMP
 from flatten import mix
+from printcheck import check_print
 
 BLEED = 0.125          # inches, all four sides on a cover
 TRIM_W, TRIM_H = 8.25, 11.0
 SAFE = 0.25            # inches: keep all type this far inside the trim
+SPINE_TEXT_MIN_PAGES = 80  # KDP prints spine text only above 79 pages.
+SPINE_TEXT_MARGIN = 0.0625
+SPINE_TEXT_MIN_PT = 7
 
 # Inches of spine per page. KDP publishes one multiplier per interior stock:
 #
@@ -70,7 +74,9 @@ SAFE_AREA_JS = '''() => {
   const IN = 96, sheet = document.querySelector('.sheet');
   const s = sheet.getBoundingClientRect(), out = [];
   sheet.querySelectorAll('*').forEach(e => {
-    const r = e.getBoundingClientRect();
+    const range = document.createRange();
+    range.selectNodeContents(e);
+    const r = range.getBoundingClientRect();
     if (r.width <= 0 || r.height <= 0) return;
     if (e.children.length) return;            // measure leaves, not wrappers
     if (!e.textContent.trim()) return;        // ignore spacers and rules
@@ -80,6 +86,24 @@ SAFE_AREA_JS = '''() => {
   });
   return out;
 }'''
+
+
+def spine_text(pages, width, preferred_pt=12):
+    """Keep text off short/narrow spines, including the binding tolerance.
+
+    KDP's cover guidance requires more than 79 pages and 0.0625in clear on
+    either side. The minimum cover type size is 7pt. Reserve a full line box,
+    rather than sizing from the nominal type height alone.
+    https://kdp.amazon.com/en_US/help/topic/G201857950 (2026-09-09)
+    https://kdp.amazon.com/en_US/help/topic/G201113520 (2026-09-09)
+    """
+    size = min(preferred_pt, (width - 2 * SPINE_TEXT_MARGIN) * 72 / 1.2)
+    if pages < SPINE_TEXT_MIN_PAGES or size < SPINE_TEXT_MIN_PT:
+        return ''
+    author_size = max(SPINE_TEXT_MIN_PT, size * 0.78)
+    return (f'<div class="spine-txt" style="font-size:{size:.3f}pt;line-height:1.2">'
+            f'<span class="t d">{IMP.TITLE}</span>'
+            f'<span class="a" style="font-size:{author_size:.3f}pt">{IMP.AUTHOR}</span></div>')
 
 
 def page_count():
@@ -149,7 +173,8 @@ def panel_css(mid, faint, blurb_rule):
     .bk-os b{{color:#8FB4D6;font-weight:600}}
     .bk-by{{margin-top:auto;padding-top:8mm;font-family:'JetBrains Mono',monospace;
       font-size:8.4pt;letter-spacing:.18em;text-transform:uppercase;color:#8FB4D6}}
-    .bk-foot{{margin-top:5mm;display:flex;justify-content:space-between;align-items:flex-end;
+    .bk-foot{{margin-top:5mm;display:flex;flex-direction:column;gap:1.5mm;align-items:flex-start;
+      padding-right:2.2in;
       font-size:8pt;letter-spacing:.14em;text-transform:uppercase;color:{faint}}}
     .spine-txt{{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(90deg);
       transform-origin:center;white-space:nowrap;display:flex;align-items:baseline;gap:7mm;
@@ -185,8 +210,7 @@ def wrap_html(moves, g):
     .barcode{{position:absolute;right:{BLEED + SAFE}in;bottom:{BLEED + SAFE}in;
       width:2in;height:1.2in}}
     """ + panel_css(mid, faint, blurb_rule)
-    spine_txt = (f'<div class="spine-txt"><span class="t d">{IMP.TITLE}</span>'
-                 f'<span class="a">{IMP.AUTHOR}</span></div>') if g['spine'] >= 0.0625 else ''
+    spine_txt = spine_text(g['pages'], g['spine'])
     return (f'<!doctype html><html><head><meta charset="utf-8">'
             f'<style>{B.FONTS}{B.CSS}{css}</style></head><body>'
             f'<div class="sheet">'
@@ -230,9 +254,7 @@ def hardback_html(moves, h):
       display:flex;flex-direction:column}}
     .barcode{{position:absolute;right:{outer_pad}in;bottom:{vert_pad}in;width:2in;height:1.2in}}
     """ + panel_css(mid, faint, blurb_rule)
-    spine_txt = (f'<div class="spine-txt" style="font-size:15pt">'
-                 f'<span class="t d">{IMP.TITLE}</span>'
-                 f'<span class="a">{IMP.AUTHOR}</span></div>')
+    spine_txt = spine_text(h['pages'], h['spine'], preferred_pt=15)
     return (f'<!doctype html><html><head><meta charset="utf-8">'
             f'<style>{B.FONTS}{B.CSS}{css}</style></head><body>'
             f'<div class="sheet">'
@@ -264,6 +286,7 @@ async def render(html_str, out_pdf, g, safe=None, label='cover'):
         await pg.goto(src.as_uri(), wait_until='networkidle')
         await pg.evaluate('document.fonts.ready')
         await pg.wait_for_timeout(1200)
+        await check_print(pg, label)
         if safe:
             els = await pg.evaluate(SAFE_AREA_JS)
             L, T, R, Bm = safe['edges']
@@ -275,6 +298,14 @@ async def render(html_str, out_pdf, g, safe=None, label='cover'):
                     left, right = e['l'], g['width'] - e['r']
                     if left < x1 - 0.01 and right > x0 + 0.01:
                         viol.append((e, f'in the hinge channel {x0:.3f}-{x1:.3f}in'))
+            barcode = await pg.locator('.barcode').bounding_box()
+            if barcode:
+                x0, y0 = barcode['x'] / 96, barcode['y'] / 96
+                x1, y1 = x0 + barcode['width'] / 96, y0 + barcode['height'] / 96
+                for e in els:
+                    right, bottom = g['width'] - e['r'], g['height'] - e['b']
+                    if e['l'] < x1 and right > x0 and e['t'] < y1 and bottom > y0:
+                        viol.append((e, 'in the reserved ISBN barcode area'))
             if viol:
                 print(f'  {label}: TYPE OUTSIDE THE SAFE AREA, {len(viol)} element(s):')
                 for e, why in viol[:6]:
@@ -305,6 +336,7 @@ async def render_kindle(moves, out_jpg):
         f'.kc .menu-k,.kc .menu{{display:none}}'
         f'.kc h1{{font-size:160pt;margin-top:0}}'
         f'.kc .cover-sub{{font-size:29pt;max-width:none;margin-top:52px}}'
+        f'.kc .cover-author{{font-size:30pt;margin-top:30px}}'
         f'.kc .promise p{{font-size:33pt;line-height:1.6}}'
         f'.kc .stats{{margin-top:20px}}'
         f'.kc .stat{{padding:40px 24px 34px}}'

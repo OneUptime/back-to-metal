@@ -50,9 +50,12 @@ def _dim(color, bg, alpha):
 
 
 def icon(key, size='4.6mm', sw=1.5):
+    # Small stage marks reach 3.4mm in print. Keep their strokes at least one
+    # CSS pixel (0.75pt) after scaling the 24-unit drawing into that space.
+    paths = ICONS[key].replace('/>', ' vector-effect="non-scaling-stroke"/>')
     return (f'<svg class="ico" viewBox="0 0 24 24" width="{size}" height="{size}" fill="none" '
-            f'stroke="currentColor" stroke-width="{sw}" stroke-linecap="round" '
-            f'stroke-linejoin="round">{ICONS[key]}</svg>')
+            f'stroke="currentColor" stroke-width="{max(1, sw)}" stroke-linecap="round" '
+            f'stroke-linejoin="round">{paths}</svg>')
 
 
 def meter(minutes, color, cap=60, w='100%', ink4='#9DA4A8', rule='#B9BFC3'):
@@ -67,20 +70,25 @@ def meter(minutes, color, cap=60, w='100%', ink4='#9DA4A8', rule='#B9BFC3'):
     span = min(max(minutes, 0) / cap, 1.0) * W
     ticks = ''.join(
         f'<line x1="{W * f:.1f}" y1="{y + 3}" x2="{W * f:.1f}" y2="{y + 7}" '
-        f'stroke="{rule}" stroke-width="1"/>' for f in (0.25, 0.5, 0.75))
-    bar = (f'<line x1="0" y1="{y}" x2="{W}" y2="{y}" stroke="{rule}" stroke-width="1.6"/>'
+        f'stroke="{rule}" stroke-width="1" vector-effect="non-scaling-stroke"/>'
+        for f in (0.25, 0.5, 0.75))
+    bar = (f'<line x1="0" y1="{y}" x2="{W}" y2="{y}" stroke="{rule}" stroke-width="1.6" '
+           f'vector-effect="non-scaling-stroke"/>'
            + ticks
-           + f'<line x1="0" y1="{y + 3}" x2="0" y2="{y + 7}" stroke="{color}" stroke-width="1.6"/>'
+           + f'<line x1="0" y1="{y + 3}" x2="0" y2="{y + 7}" stroke="{color}" stroke-width="1.6" '
+             f'vector-effect="non-scaling-stroke"/>'
            + f'<line x1="{W}" y1="{y + 3}" x2="{W}" y2="{y + 7}" stroke="{rule}" '
-             f'stroke-width="1"/>')
+             f'stroke-width="1" vector-effect="non-scaling-stroke"/>')
     if span > 0.5:
         bar += (f'<line x1="0" y1="{y}" x2="{span:.1f}" y2="{y}" stroke="{color}" '
                 f'stroke-width="4.4"/>')
-    labels = (f'<text x="0" y="{y + 15}" font-size="7" fill="{ink4}" '
+    # At the 44mm print width, 12 SVG units render at 7.41pt. The labels need
+    # their own row below the ticks; enlarging type without it makes them touch.
+    labels = (f'<text x="0" y="{y + 21}" font-size="12" fill="{ink4}" '
               f'font-family="JetBrains Mono">0</text>'
-              f'<text x="{W}" y="{y + 15}" font-size="7" fill="{ink4}" text-anchor="end" '
+              f'<text x="{W}" y="{y + 21}" font-size="12" fill="{ink4}" text-anchor="end" '
               f'font-family="JetBrains Mono">{cap}</text>')
-    return (f'<svg viewBox="-1 0 {W + 2} 26" width="{w}" style="display:block;height:auto" '
+    return (f'<svg viewBox="-1 0 {W + 2} 35" width="{w}" style="display:block;height:auto" '
             f'aria-hidden="true">{bar}{labels}</svg>')
 
 
@@ -112,22 +120,23 @@ def anatomy(c='#1F4E79', tint='#E6ECF3', w='64mm', bg='#FBFAF7'):
 
     r = 14
     C = 2 * math.pi * r
+    # The foreword places this diagram at 54mm: 10 units become 7.29pt.
     mk = lambda x, y, n: (
         f'<circle cx="{x}" cy="{y}" r="7.6" fill="{c}"/>'
-        f'<text x="{x}" y="{y + 3.4}" font-size="9.4" font-weight="700" fill="#fff" '
-        f'text-anchor="middle" font-family="Inter">{n}</text>')
+        f'<text x="{x}" y="{y + 3.4}" font-size="10" font-weight="700" fill="#fff" '
+        f'text-anchor="middle" font-family="JetBrains Mono">{n}</text>')
 
     steps = ''
     for i in range(4):
         yy = 138 + i * 21
-        steps += (f'<rect x="91" y="{yy - 6}" width="9" height="9" rx="4.5" fill="{c}"/>'
-                  f'<text x="95.5" y="{yy + .8}" font-size="6.4" font-weight="700" fill="#fff" '
-                  f'text-anchor="middle" font-family="Inter">{i + 1}</text>'
+        # These are schematic ordinals, not a second set of callout numbers.
+        steps += (f'<rect x="93" y="{yy - 4}" width="6" height="2.6" fill="{c}"/>'
                   + bars(105, yy - 4, [88, 74, 52][:2 + (i % 2)], 6.4))
 
     cells = ''.join(
         f'<line x1="{17 + 35.2 * (i + 1)}" y1="258" x2="{17 + 35.2 * (i + 1)}" y2="278" '
-        f'stroke="#fff" stroke-width="1"/>' for i in range(4))
+        f'stroke="#fff" stroke-width="1" vector-effect="non-scaling-stroke"/>'
+        for i in range(4))
     vals = ''.join(
         f'<rect x="{24 + 35.2 * i}" y="263" width="21" height="5" rx="2" '
         f'fill="{mix(c, tint, .55)}"/>'
@@ -135,9 +144,9 @@ def anatomy(c='#1F4E79', tint='#E6ECF3', w='64mm', bg='#FBFAF7'):
         f'fill="{mix("#6B7280", tint, .45)}"/>' for i in range(5))
 
     return f'''<svg viewBox="0 0 210 297" width="{w}" style="height:auto;display:block">
-<rect x=".5" y=".5" width="209" height="296" fill="{bg}" stroke="#DEDCD4"/>
+<rect x="1" y="1" width="208" height="295" fill="{bg}" stroke="#DEDCD4" stroke-width="1" vector-effect="non-scaling-stroke"/>
 <rect width="210" height="7" fill="{c}"/>
-<text x="17" y="45" font-size="24" font-weight="700" fill="{c}" font-family="Georgia">01</text>
+<text x="17" y="45" font-size="24" font-weight="700" fill="{c}" font-family="JetBrains Mono">01</text>
 <rect x="52" y="26" width="100" height="9" rx="3" fill="{mix('#14171C', bg, .85)}"/>
 <rect x="52" y="41" width="27" height="7" rx="3.5" fill="{c}"/>
 <rect x="84" y="42.5" width="30" height="3" rx="1.5" fill="{mix('#6B7280', bg, .42)}"/>
@@ -149,23 +158,23 @@ def anatomy(c='#1F4E79', tint='#E6ECF3', w='64mm', bg='#FBFAF7'):
 <rect x="26" y="72" width="150" height="4" rx="2" fill="{mix(c, bg, .5)}"/>
 <rect x="26" y="81" width="96" height="4" rx="2" fill="{mix(c, bg, .5)}"/>
 <rect x="17" y="94" width="24" height="3.2" rx="1.6" fill="{mix(c, bg, .75)}"/>
-<line x1="17" y1="102" x2="81" y2="102" stroke="#DEDCD4" stroke-width="1"/>
+<line x1="17" y1="102" x2="81" y2="102" stroke="#DEDCD4" stroke-width="1" vector-effect="non-scaling-stroke"/>
 <rect x="17" y="108" width="64" height="112" rx="4" fill="{tint}"/>
 {bars(23, 116, [40, 50, 44, 52, 36, 48, 42, 51, 38, 46, 44, 39, 47, 35], 7.1, 2.7, '#4B5563', .38, 1.3, tint)}
 <rect x="93" y="94" width="24" height="3.2" rx="1.6" fill="{mix(c, bg, .75)}"/>
-<line x1="93" y1="102" x2="193" y2="102" stroke="#DEDCD4" stroke-width="1"/>
+<line x1="93" y1="102" x2="193" y2="102" stroke="#DEDCD4" stroke-width="1" vector-effect="non-scaling-stroke"/>
 {bars(93, 108, [100, 96, 62], 6.6)}
 <rect x="93" y="128" width="20" height="3.2" rx="1.6" fill="{mix(c, bg, .75)}"/>
-<line x1="93" y1="133.5" x2="193" y2="133.5" stroke="#DEDCD4" stroke-width="1"/>
+<line x1="93" y1="133.5" x2="193" y2="133.5" stroke="#DEDCD4" stroke-width="1" vector-effect="non-scaling-stroke"/>
 {steps}
-<line x1="17" y1="230" x2="193" y2="230" stroke="#DEDCD4" stroke-width="1"/>
+<line x1="17" y1="230" x2="193" y2="230" stroke="#DEDCD4" stroke-width="1" vector-effect="non-scaling-stroke"/>
 <rect x="17" y="236" width="18" height="3" rx="1.5" fill="{mix(c, bg, .7)}"/>
 <rect x="110" y="236" width="24" height="3" rx="1.5" fill="{mix(c, bg, .7)}"/>
 {bars(17, 243, [76, 62], 6.2)}{bars(110, 243, [80, 58], 6.2)}
 <rect x="17" y="258" width="176" height="20" rx="3" fill="{tint}"/>{cells}{vals}
 <rect x="17" y="286" width="22" height="3" rx="1.5" fill="{mix(c, bg, .7)}"/>
 <rect x="45" y="286" width="96" height="3" rx="1.5" fill="{mix('#6B7280', bg, .42)}"/>
-{mk(180, 38, 1)}{mk(26, 57, 2)}{mk(49, 164, 3)}{mk(160, 110, 4)}{mk(105, 268, 5)}{mk(37, 286, 6)}
+{mk(180, 38, 1)}{mk(26, 60, 2)}{mk(49, 164, 3)}{mk(160, 110, 4)}{mk(105, 268, 5)}{mk(37, 286, 6)}
 </svg>'''
 
 
@@ -197,14 +206,14 @@ def cost_chart(rows, w='100%', color='#1F4E79', bg='#FBFAF7', line='#DEDCD4'):
     ink3, ink4 = '#767E8A', '#A2A9B3'
 
     out = [f'<line x1="{pad_l}" y1="{top - 8}" x2="{width - right + 8}" y2="{top - 8}" '
-           f'stroke="{line}" stroke-width="1"/>']
+           f'stroke="{line}" stroke-width="1" vector-effect="non-scaling-stroke"/>']
     for k, row in enumerate(rows):
         label, infra, people, kept = row[0], row[1], row[2], kept_of(row)
         y = top + k * (bar_h + gap)
         wi, wp, wk = infra * scale, people * scale, kept * scale
         out.append(
             f'<text x="{pad_l - 12}" y="{y + bar_h * 0.68}" font-size="13" fill="{ink3}" '
-            f'text-anchor="end" font-family="Inter" font-weight="600">{label}</text>')
+            f'text-anchor="end" font-family="JetBrains Mono" font-weight="600">{label}</text>')
         out.append(f'<rect x="{pad_l}" y="{y}" width="{wi:.1f}" height="{bar_h}" '
                    f'fill="{color}" rx="2"/>')
         if wp > 0:
@@ -215,7 +224,7 @@ def cost_chart(rows, w='100%', color='#1F4E79', bg='#FBFAF7', line='#DEDCD4'):
                        f'height="{bar_h}" fill="{ink4}" rx="2"/>')
         out.append(
             f'<text x="{pad_l + wi + wp + wk + 10:.1f}" y="{y + bar_h * 0.7}" font-size="14" '
-            f'fill="{color}" font-family="Inter" font-weight="700">'
+            f'fill="{color}" font-family="JetBrains Mono" font-weight="700">'
             f'${(infra + people + kept) / 1000:,.1f}k</text>')
     # The legend goes under the last bar, where there is room for it.
     yk = top + (len(rows) - 1) * (bar_h + gap) + bar_h + 15
@@ -227,8 +236,8 @@ def cost_chart(rows, w='100%', color='#1F4E79', bg='#FBFAF7', line='#DEDCD4'):
     # argument became unreadable. Dropping the colliding label is worse than
     # the collision - the one it drops is the salary, which is the argument.
     # So: a swatch and a word each, laid out left to right on a line of their
-    # own, measured (Inter at 11px with 1.4 of tracking runs about 8.7px a
-    # character) so they cannot touch whatever the segment widths do.
+    # own. JetBrains Mono at 11px with 1.4 of tracking uses 8px per character;
+    # the 8.7px allowance keeps the labels apart whatever the segments do.
     keys = [(color, 'INFRASTRUCTURE'), (light, 'SALARIED TIME')]
     if any(kept_of(r) for r in rows):
         keys.append((ink4, 'STILL RENTED'))
@@ -237,7 +246,7 @@ def cost_chart(rows, w='100%', color='#1F4E79', bg='#FBFAF7', line='#DEDCD4'):
         out.append(f'<rect x="{xk:.1f}" y="{yk - 8}" width="12" height="8" '
                    f'fill="{swatch}" rx="1"/>')
         out.append(f'<text x="{xk + 17:.1f}" y="{yk}" font-size="11" '
-                   f'fill="{ink4}" font-family="Inter" letter-spacing="1.4">'
+                   f'fill="{ink4}" font-family="JetBrains Mono" letter-spacing="1.4">'
                    f'{label}</text>')
         xk += 17 + len(label) * 8.7 + 26
     return (f'<svg viewBox="0 0 {width} {height + 22}" width="{w}" '
