@@ -76,7 +76,7 @@ def main():
     sched = RM.schedule(moves, 2)
     out.append(f'| Work | {effort:,.0f} person-days |')
     out.append(f'| End to end, two engineers | {sched["weeks"]:.0f} weeks, '
-               f'most of it waiting for hardware |')
+               f'including procurement and observation waits |')
     out.append(f'| At zero downtime | {zero} of {len(moves)} |')
     out.append(f'| Whole book, end to end | {total_cut} minutes of user-visible outage |')
     out.append(f'| Cannot be undone | {oneway} |')

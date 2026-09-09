@@ -111,8 +111,8 @@ def back_panel_html(moves):
       is attempted as one decision, executed as one project, and abandoned in the middle with two
       platforms running and nobody able to say whether it is going well.</p>
       <p class="bk-p">This book is {len(moves)} Moves. Each is one job with a stated cutover, a
-      stated risk and a rollback that has been thought about. Each can be done on a Tuesday and
-      undone on a Wednesday, and you can stop after any of them and still be somewhere coherent.
+      stated risk and a rollback with explicit limits. Rehearse the return path before moving
+      traffic or data; purchases and account deletion have their own points of no return.
       One of them tells you to keep paying somebody else, and another gives you permission
       to read three Moves, do the arithmetic and stop.</p>
       <p class="bk-p">Every Move covers all three clouds: it names the real service on AWS,
@@ -120,7 +120,7 @@ def back_panel_html(moves):
       <div class="bk-rule"></div>
       <div class="bk-list">
         <div><b>{len(moves)}</b> Moves</div><div><b>{len({m['layer'] for m in moves})}</b> Stages</div>
-        <div><b>{zero}</b> at zero downtime</div><div><b>{effort:.0f}</b> days of work</div>
+        <div><b>{zero}</b> plan zero downtime</div><div><b>{effort:.0f}</b> person-days estimated</div>
         <div><b>3</b> clouds, every Move</div><div><b>1</b> closes the account</div>
       </div>
       <p class="bk-os"><b>The whole book is open source.</b> Every Move, and the software that

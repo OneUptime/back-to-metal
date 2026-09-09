@@ -36,7 +36,9 @@ BILL_MONTH = 100000
 # Savings Plan should substitute their own effective rate, and a reader without
 # one is genuinely paying this.
 AWS = {
-    'ec2_m7i_8xl_hour': 1.6128,       # 32 vCPU, 128 GB
+    # Verified 2026-09-09 against the official regional AmazonEC2 offer,
+    # SKU DFY9W427PBEXH8VY: Linux, shared, on-demand, us-east-1.
+    'ec2_m7i_8xl_hour': 1.6128,       # 32 vCPU, 128 GiB
     'ec2_vcpu_hour': 0.0504,          # m7i, per vCPU, derived
     'ebs_gp3_gb_month': 0.08,
     'ebs_io2_gb_month': 0.125,
@@ -50,7 +52,7 @@ AWS = {
     # off a pricing page: (up-to GB, USD per GB).
     'egress_tiers': ((10 * 1024, 0.09), (50 * 1024, 0.085),
                      (150 * 1024, 0.07), (float('inf'), 0.05)),
-    'egress_free_gb': 100,            # every month, every region, since 2021
+    'egress_free_gb': 100,            # shared across eligible services/regions
     'nat_gateway_hour': 0.045,
     'nat_gateway_gb': 0.045,
     'alb_hour': 0.0225,

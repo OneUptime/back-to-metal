@@ -6,7 +6,7 @@
 
 ## Leaving from
 - **AWS:** EC2 instance types — a vCPU is one SMT thread on many x86 families but a whole physical core on Graviton, labelled the same.
-- **Google Cloud:** Compute Engine machine types — custom shapes set memory apart from cores, within a per-core band that drags cores onto the bill.
+- **Google Cloud:** Compute Engine machine types — custom shapes have family-specific memory limits; supported families offer extended memory at a premium without adding vCPUs.
 - **Azure:** Virtual Machine sizes — the B-series meters CPU against a credit balance, so a saturated workload reads low once its credits run out.
 
 ## Why this works
@@ -26,17 +26,17 @@ Move 01's samples become a part number here. On many x86 families two vCPUs shar
 - Whoever signs the order in Move 06, present for the derate rather than shown it
 
 ## The runbook
-1. Group the instance inventory by family and mark each thread-per-vCPU or core-per-vCPU against the vendor documentation. On Graviton and the other Arm shapes a vCPU is already a whole core, and halving buys double.
-2. Pull the burstable families out of the measurement window. `B-series` and `t3` in standard mode meter against a credit balance, and once the balance is empty a saturated workload pins at its baseline — twenty per cent on a `t3.medium`. `t3` defaults to unlimited mode, where the number is honest and the burst above baseline arrives on the invoice instead. Re-measure either way before the figure reaches the sizing sheet.
+1. Group the instance inventory by family and record threads per physical core from the vendor documentation. Graviton and many Arm shapes expose one vCPU per core; some x86 families do too. Do not halve those counts as though they were SMT threads.
+2. Review burstable families separately. Azure `B-series` and EC2 `t3` in standard mode fall to their baseline after credits run out — twenty per cent per vCPU on a `t3.medium`. T3 normally defaults to unlimited, but account settings and Dedicated Hosts differ. Check actual credit mode, throttling and charges, then re-measure unconstrained demand before sizing.
 3. Enter the source topology in the sizing sheet, then benchmark a representative workload on the proposed CPU. Record peak demand and latency at that load; halving a vCPU count is not a performance test. Rebuild Arm applications for x86 before testing them on this reference hardware; an Arm disk image will not boot as an x86 KVM guest.
 4. For VMs, budget guest RAM plus Proxmox VE, QEMU and storage reserves; do not sell the same RAM twice through ballooning. For containers, use working sets plus kubelet reserve, page cache and eviction thresholds. In both cases prove that the surviving hosts carry peak load after the largest host is unavailable, without counting an unplugged spare.
-5. Take clock over count on the latency path — most of a Postgres query plan executes on one core — then turn capacity and write rate into drives. Record guest vCPU allocations separately from physical cores, and hand the specification to whoever signs the order in Move 06.
+5. Benchmark per-core performance on the latency path as well as fleet throughput. PostgreSQL can parallelise some queries; others remain serial. Turn capacity, sustained write rate and recovery headroom into drives. Record guest vCPU allocations separately from physical cores, and hand the specification to whoever signs the order in Move 06.
 
 ## Operator's notes
-- **Swap:** With the window unfinished, size against last quarter's billed peak and mark the sheet provisional. It lands a third high.
-- **Do it faster:** Most estates run five workload shapes wearing forty names. Cluster them and the conversion takes an afternoon.
+- **Swap:** With the window unfinished, use provisioned capacity as a provisional ceiling. It does not measure demand; finish the workload tests before approving the order.
+- **Do it faster:** Group workloads with similar resource profiles, then test representative examples and the outliers separately.
 - **Watch out:** Rightsizing advice optimises for a smaller rented instance, a different question from how much silicon to own.
-- **Leftovers:** Local NVMe delivers the provisioned IOPS line as a property of the drive. Check it against your measured write rate.
+- **Leftovers:** Drive IOPS depend on block size, queue depth, read/write mix and steady-state behaviour. Test the intended storage stack; a drive's peak specification is not the application's guaranteed rate.
 
 ## Rollback
 A specification is undone by writing a better one: change the derate and reissue it. Nothing has been bought. The point of no return is the signature in Move 06, after which a short memory line is a second purchase with a lead time. Keep the sheet in version control so a revision can be restored.

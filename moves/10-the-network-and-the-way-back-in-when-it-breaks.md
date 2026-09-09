@@ -5,8 +5,8 @@
 > Address ranges written down before anything is configured, two switches either of which may fail, and a way in that depends on neither.
 
 ## Leaving from
-- **AWS:** VPC and its subnets — a subnet is pinned to one Availability Zone and its block is fixed at creation, and frames run at 9001 bytes inside the VPC but 1500 through the internet gateway.
-- **Google Cloud:** VPC networks and subnets — the MTU belongs to the network rather than the instance, and every virtual machine must be restarted before it uses a changed value.
+- **AWS:** VPC and its subnets — a subnet occupies one Availability Zone; supported EC2 paths allow a 9001-byte MTU, but internet-gateway traffic is limited to 1500.
+- **Google Cloud:** VPC networks and subnets — changing network MTU requires stopping all attached VMs, then starting them; a guest reboot is insufficient, and Windows needs an explicit interface update.
 - **Azure:** Virtual Network and its subnets — no broadcast or multicast on the wire, so gratuitous ARP and VRRP never worked and a floating address had to be a load balancer.
 
 ## Why this works
@@ -26,11 +26,11 @@ The address plan is cheap to get right today and expensive to change in a year, 
 - Two engineers for the switch-pull drill, one at the rack and one watching the graphs
 
 ## The runbook
-1. Write the address plan before touching a switch. Reserve management, storage, host and guest networks, and the public block from Move 08, none overlapping the office, the cloud accounts or anything a partner routes. For Proxmox, also reserve cluster communication and migration paths; storage recovery must not starve quorum traffic. Store the plan in source control.
+1. Write the address plan before touching a switch. Reserve management, storage, host, guest, Kubernetes pod and service networks, and the public block from Move 08, none overlapping the office, cloud accounts or partner routes. For Proxmox, reserve cluster communication and migration paths; storage recovery must not starve quorum traffic. Store the plan in source control.
 2. Cable the two top-of-rack switches as a multi-chassis pair with a peer link, and run two uplinks from every node into different switches, bonded. One switch then fails as a component rather than as an outage.
 3. Build the controller VLAN with no route to the internet. Reach baseboard controllers and Proxmox administration through the independent jump host, with access rules separating controllers from host management. Guest networks cannot reach either; host updates use controlled outbound access. Prove it from outside the building with an `ipmitool` power status on every node.
-4. Set the MTU identically on every switch port, every bond, host bridge and guest interface on each path, and record the number beside the address plan. Undocumented mixed segments are how a fortnight disappears.
-5. Test with full-size packets that refuse fragmentation, on every path that will carry traffic. A mismatch breaks about five per cent of it and reads as an application bug for a week.
+4. Record the IP MTU for each path. Keep bonds, bridges and guest interfaces consistent, allow Ethernet and VLAN overhead in switch frame limits, and reduce tunnel-interface MTU for encapsulation. Internet and private storage paths need not share one MTU.
+5. Test full-size packets that refuse fragmentation on every traffic path, then application requests through tunnels. Permit the ICMP messages used by path MTU discovery. Small pings can pass while larger requests stall; there is no fixed percentage of traffic a mismatch breaks.
 6. Run the drill in daylight, with both engineers watching. Pull the power from one switch, confirm every bond keeps a member, then plug it back in and confirm the link rejoins. Nobody who declines this today will do it under load.
 
 ## Operator's notes

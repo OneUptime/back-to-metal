@@ -198,8 +198,7 @@ def main():
         notes_path.parent.mkdir(parents=True, exist_ok=True)
         notes_path.write_text(
             f'{notes}\n\n---\n\n'
-            f'The book is {IMP.TITLE}: a step-by-step roadmap off AWS, Google Cloud '
-            f'or Azure and onto Kubernetes you run yourself.\n\n'
+            f'The book is {IMP.TITLE}: {IMP.SUBTITLE.rstrip(".")}.\n\n'
             f'- Attached: the print interior `{IMP.PDF_NAME}`, the Kindle edition '
             f'`{IMP.EPUB_NAME}`, the paperback wrap and the Kindle cover.\n'
             f'- The website is rebuilt from the same Move files and published with '
