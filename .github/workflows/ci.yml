@@ -53,35 +53,28 @@ jobs:
       - name: Audit Move content
         run: make audit
 
-      - name: Build the book
-        run: make book
+      # One invocation builds the interior and covers once, generates the EPUB
+      # before the site copies it, and runs the browser and figure checks on
+      # those same artefacts. Separate make calls rebuild phony prerequisites.
+      - name: Build and check all artefacts
+        run: make artefacts
 
-      - name: Build the site
-        run: make site
-
-      - name: Drive the site in a browser
-        run: make webcheck
-
-      - name: Check the artefacts quote the same figures
-        run: make agree
-
-      # moves/ is the source of truth and site/ is generated from it, so a commit
-      # that changes one without regenerating the other has drifted. The PDF and
-      # EPUB are excluded: both carry a build timestamp, so they are not
-      # byte-reproducible. The HTML is.
-      - name: Check the committed site is up to date
+      # The site and the README's figures are generated from the sources.
+      # Regenerating them must reproduce what was committed. The PDF and EPUB
+      # are excluded: both carry a build timestamp and are not byte-reproducible.
+      - name: Check the committed site and README are up to date
         run: |
           # --porcelain rather than `git diff`, because a diff only sees files
           # git already tracks: a new page nobody committed would generate here
           # and pass silently. This catches a modified file and an uncommitted
           # new one alike.
-          CHANGED=$(git status --porcelain -- site/ ':(exclude)site/*.pdf' ':(exclude)site/*.epub')
+          CHANGED=$(git status --porcelain -- README.md site/ ':(exclude)site/*.pdf' ':(exclude)site/*.epub')
           if [ -n "$CHANGED" ]; then
-            echo "::error::site/ is out of date with moves/. Run 'make' and commit the result."
+            echo "::error::Generated site/ or README.md is out of date. Run 'make artefacts' and commit the result."
             echo "$CHANGED"
             exit 1
           fi
-          echo "site/ matches the sources."
+          echo "site/ and README.md match the sources."
 
       - name: Upload the built book
         uses: actions/upload-artifact@v4
@@ -95,11 +88,6 @@ jobs:
       # structural check on the EPUB. The hardback case is skipped here — it
       # needs dimensions measured by hand from KDP's Cover Calculator, and
       # cover.py refuses to guess.
-      - name: Build the covers and the Kindle edition
-        run: |
-          make covers
-          make epub
-
       - name: Upload the Amazon artefacts
         uses: actions/upload-artifact@v4
         with:
