@@ -36,6 +36,16 @@ class PricingTests(unittest.TestCase):
         self.assertGreaterEqual(P.kindle_row(20.01, floor)['margin'], 0)
         self.assertLess(P.kindle_row(20.01, floor - 0.01)['margin'], 0)
 
+    def test_kindle_requires_discount_from_every_physical_edition(self):
+        self.assertEqual(P.kindle_price_problems(8.99, {'paperback': 11.99, 'hardback': 33.99}), [])
+        self.assertTrue(P.kindle_price_problems(9.99, {'paperback': 11.99, 'hardback': 33.99}))
+        self.assertTrue(P.kindle_price_problems(9.99, {'paperback': 33.99, 'hardback': 11.99}))
+
+    def test_kindle_discount_boundary_and_unset_print_prices(self):
+        self.assertEqual(P.kindle_price_problems(8.00, {'paperback': 10.00}), [])
+        self.assertTrue(P.kindle_price_problems(8.01, {'paperback': 10.00}))
+        self.assertEqual(P.kindle_price_problems(8.99, {'paperback': None}), [])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -37,6 +37,7 @@ import mission as MISSION
 import costs as COSTS
 import roadmap as RM
 import why as WHY
+import worksheets as WS
 
 OUT = ROOT / 'dist' / IMP.EPUB_NAME
 
@@ -89,6 +90,23 @@ table { border-collapse: collapse; width: 100%; font-size: 0.8em; }
 th, td { text-align: left; padding: 0.25em 0.5em 0.25em 0; vertical-align: top;
          border-bottom: 1px solid #ccc; }
 """
+
+
+def worksheets_xhtml(moves):
+    def source(ref):
+        return (f'<p class="small"><a href="m/{ref["move"]}.xhtml">'
+                f'{esc(ref["source"])}</a></p>')
+    body = f'<h1>{esc(WS.HEADING)}</h1><p>{esc(WS.INTRO)}</p>'
+    for sheet in WS.records(moves):
+        body += (f'<section id="{sheet["id"]}"><h2>{esc(sheet["title"])}</h2>'
+                 f'<p>{rich(sheet["purpose"]["text"])}</p>'
+                 + source(sheet['purpose']) + '<ul>'
+                 + ''.join(f'<li>{esc(label)}:</li>' for label in WS.RECORD_FIELDS)
+                 + '</ul>'
+                 + ''.join(f'<h3>{esc(field["label"])}</h3><p>{rich(field["text"])}</p>'
+                           + source(field) for field in sheet['fields'])
+                 + '</section>')
+    return XHTML.format(title=esc(WS.HEADING), up='', body=body)
 
 
 def move_xhtml(m):
@@ -243,10 +261,9 @@ def build():
     files = {}
 
     # ---- front matter -------------------------------------------------------
-    files['OEBPS/cover.xhtml'] = XHTML.format(
-        title='Cover', up='',
-        body=f'<div style="text-align:center"><img src="img/cover.jpg" '
-             f'style="max-width:100%" alt="{esc(IMP.TITLE)}"/></div>').encode()
+    # KDP creates the internal cover from the designated cover-image. An extra
+    # HTML image page can produce duplicate covers or fail conversion.
+    # https://kdp.amazon.com/en_US/help/topic/G6GTK3T3NUHKLEFX
 
     files['OEBPS/titlepage.xhtml'] = XHTML.format(
         title=esc(IMP.TITLE), up='',
@@ -314,6 +331,7 @@ def build():
 
     for m in moves:
         files[f"OEBPS/m/{m['num']}.xhtml"] = move_xhtml(m).encode()
+    files['OEBPS/worksheets.xhtml'] = worksheets_xhtml(moves).encode()
     files['OEBPS/img/cover.jpg'] = cover_jpg.read_bytes()
     files['OEBPS/style.css'] = CSS.encode()
 
@@ -334,13 +352,21 @@ def build():
              ('rollback.xhtml', 'Before you touch anything'),
              ('kit.xhtml', 'The reference build'),
              ('replaces.xhtml', 'What replaces what')]
+    worksheet_nav = (
+        f'<li><a href="worksheets.xhtml">{esc(WS.HEADING)}</a><ol>'
+        + ''.join(f'<li><a href="worksheets.xhtml#{s["id"]}">{esc(s["title"])}</a></li>'
+                  for s in WS.TEMPLATES) + '</ol></li>\n')
     nav_body = ('<nav epub:type="toc" id="toc"><h1>Contents</h1>\n<ol>\n'
                 + ''.join(f'<li><a href="{h}">{esc(t)}</a></li>\n' for h, t in FRONT)
-                + nav_items + '</ol>\n</nav>')
+                + nav_items + worksheet_nav + '</ol>\n</nav>'
+                '<nav epub:type="landmarks" hidden="hidden"><h2>Navigation</h2><ol>'
+                '<li><a epub:type="toc" href="nav.xhtml#toc">Contents</a></li>'
+                '</ol></nav>')
     files['OEBPS/nav.xhtml'] = XHTML.format(title='Contents', up='', body=nav_body).encode()
 
     ncx_entries = FRONT + [(f'm/{m["num"]}.xhtml', f'{m["num"]} - {m["title"]}')
                            for m in moves]
+    ncx_entries += [(f'worksheets.xhtml#{s["id"]}', s['title']) for s in WS.TEMPLATES]
     ncx_points = ''.join(
         f'<navPoint id="n{i}" playOrder="{i}"><navLabel><text>{esc(title)}</text></navLabel>'
         f'<content src="{href}"/></navPoint>\n'
@@ -362,9 +388,8 @@ def build():
         '<item id="css" href="style.css" media-type="text/css"/>',
         '<item id="cover-img" href="img/cover.jpg" media-type="image/jpeg" '
         'properties="cover-image"/>',
-        '<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>',
     ]
-    spine = ['<itemref idref="cover"/>']
+    spine = []
     for i, (h, _) in enumerate(FRONT):
         fid = f'f{i}'
         manifest.append(f'<item id="{fid}" href="{h}" media-type="application/xhtml+xml"/>')
@@ -372,11 +397,14 @@ def build():
     manifest.append('<item id="copy" href="copyright.xhtml" '
                     'media-type="application/xhtml+xml"/>')
     spine.insert(1, '<itemref idref="copy"/>')
-    spine.append('<itemref idref="nav"/>')
+    spine.insert(2, '<itemref idref="nav"/>')
     for m in moves:
         manifest.append(f'<item id="m{m["num"]}" href="m/{m["num"]}.xhtml" '
                         f'media-type="application/xhtml+xml"/>')
         spine.append(f'<itemref idref="m{m["num"]}"/>')
+    manifest.append('<item id="worksheets" href="worksheets.xhtml" '
+                    'media-type="application/xhtml+xml"/>')
+    spine.append('<itemref idref="worksheets"/>')
 
     modified = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     files['OEBPS/content.opf'] = (
@@ -387,9 +415,9 @@ def build():
         f'<dc:identifier id="pub-id">{uid}</dc:identifier>\n'
         f'<dc:title>{esc(IMP.TITLE)}</dc:title>\n'
         f'<dc:creator>{esc(IMP.AUTHOR)}</dc:creator>\n'
+        f'<dc:publisher>{esc(IMP.PUBLISHER)}</dc:publisher>\n'
         '<dc:language>en</dc:language>\n'
         f'<dc:description>{esc(IMP.SUBTITLE)}</dc:description>\n'
-        f'<dc:date>{IMP.YEAR}-01-01</dc:date>\n'
         f'<meta property="dcterms:modified">{modified}</meta>\n'
         '</metadata>\n'
         f'<manifest>\n{chr(10).join(manifest)}\n</manifest>\n'

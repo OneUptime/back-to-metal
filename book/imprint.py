@@ -98,7 +98,7 @@ def on_amazon():
 # KDP charges a delivery fee per megabyte against the 70% royalty option, so file
 # weight comes straight off the margin. This book is text and vector, so it is
 # small; the figure matters far less here than on an illustrated title.
-KINDLE_LIST_USD = 9.99          # must sit inside the 70% band to earn that rate
+KINDLE_LIST_USD = 8.99          # also at least 20% below the paperback list
 KINDLE_ROYALTY_RATE = 0.70
 KDP_70_BAND = (2.99, 12.99)     # US
 KDP_DELIVERY_PER_MB = 0.15      # USD, charged on the CONVERTED file size, which is
@@ -135,12 +135,8 @@ INK = {
     'standard colour': (1.00, 0.0402),
 }
 
-# THE PAGE-COUNT BANDS, which were a comment on the line above and are now a
-# check. KDP will not print outside them at all, whatever the price works out
-# at, and this book is INSIDE only one of the three: at 68 pages it is four
-# short of a standard-colour paperback and seven short of any hardcover.
-# pricing.py used to compute a margin for an edition that could not be
-# manufactured, which is a submission rejected after the covers are drawn.
+# KDP will not print outside these page-count bands, regardless of price.
+# pricing.py checks eligibility against the built interior before its margins.
 # (min pages, max pages), Amazon.com, large trim.
 INK_PAGES = {
     'premium colour':  (24, 828),
@@ -157,22 +153,21 @@ INK_CHOICE = 'standard colour'
 # hardcover, so the hardback cannot be made cheaper the way the paperback can.
 HARDBACK_INK = 'premium colour'
 
-# Set these from KDP's calculator once the real page count is known. pricing.py
-# reports the minimum each edition needs to clear MIN_PRINT_MARGIN and fails the
-# build if a configured price misses it.
+# Publication prices prepared 2026-09-09 from the public KDP rates above, rounded
+# up to .99 and checked by pricing.py against the built page count. Confirm the
+# same costs in the live title setup before submission; PUBLISHING.md records
+# whether that check and the submission have happened.
 LIST_USD = {
-    'paperback': None,
-    'hardback': None,
+    'paperback': 11.99,
+    'hardback': 33.99,
 }
 
 # Hardcover, premium colour, large trim: $5.65 fixed plus $0.080 a page, read
 # off KDP's own Hardcover Printing Cost table. It is a rate for the trim and the
-# ink rather than for this title, so it carries - but the band above does not:
-# at 68 pages there is no hardcover to price, and this figure only becomes
-# usable if the interior reaches 75.
+# ink rather than for this title; pricing.py also checks the page-count band.
 HARDBACK_FIXED_USD = 5.65
 HARDBACK_PER_PAGE_USD = 0.080
-HARDBACK_PRINT_COST_USD = None      # set by pricing.py from the two above
+HARDBACK_PRINT_COST_USD = None      # calculator override; otherwise use the rates above
 
 # The content is CC BY 4.0, so the copyright page says that rather than the
 # "all rights reserved" boilerplate, which would contradict the LICENSE files.

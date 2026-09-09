@@ -29,6 +29,7 @@ import imprint as IMP
 import mission as MISSION
 import roadmap as RM
 import why as WHY
+import worksheets as WS
 
 ROOT = Path(__file__).resolve().parent.parent
 HERE = Path(__file__).resolve().parent
@@ -110,6 +111,32 @@ def page(cls, topcolor, inner, folio=None, slot=None, tabtext=''):
             f'<div class="inner">{inner}</div>{f}</section>')
 
 
+def worksheet_pages(moves):
+    """One ruled record per page, outside the numbered Move spreads."""
+    result = []
+    for sheet in WS.records(moves):
+        record = ''.join(
+            f'<div><b>{esc(label)}</b><span aria-hidden="true"></span></div>'
+            for label in WS.RECORD_FIELDS)
+        fields = ''.join(
+            f'<div class="worksheet-field"><h3>{esc(field["label"])}</h3>'
+            f'<p>{inline(field["text"])}</p>'
+            f'<p class="worksheet-source">{esc(field["source"])}</p>'
+            '<div class="worksheet-lines" aria-hidden="true">'
+            '<span></span><span></span></div></div>'
+            for field in sheet['fields'])
+        result.append(page('worksheetp', None,
+            f'<div class="pkicker">{esc(WS.HEADING)}</div>'
+            f'<h2 class="ptitle d" id="{sheet["id"]}">{esc(sheet["title"])}</h2>'
+            f'<p class="pintro">{inline(sheet["purpose"]["text"])}</p>'
+            f'<p class="worksheet-source">{esc(sheet["purpose"]["source"])}</p>'
+            f'<div class="worksheet-record">{record}</div>'
+            f'<div class="worksheet-fields">{fields}</div>'
+            f'<p class="worksheet-note">{esc(WS.INTRO)}</p>',
+            sheet['title'].upper()))
+    return result
+
+
 def hours_saved(ms):
     """Total user-visible downtime the whole book costs, in minutes."""
     return sum(m['cutover'] for m in ms)
@@ -164,7 +191,8 @@ def cover_front_html(moves):
     <div class="cover-rule"></div>
     <div style="margin-top:5mm" class="eyebrow">{len(moves)} Moves &nbsp;·&nbsp; AWS, Google Cloud and Azure out</div>
     <h1 class="d">{IMP.wordmark_html()}</h1>
-    <p class="cover-sub">{esc(IMP.SUBTITLE)}.</p>
+    <p class="cover-sub">{esc(IMP.SUBTITLE)}</p>
+    <p class="cover-author">{esc(IMP.AUTHOR)}</p>
     <p class="cover-by">{esc(IMP.BYLINE)}</p>
     <div style="flex:1"></div>
     <div class="promise d">
@@ -905,6 +933,9 @@ def build(moves):
             pages += move_pages(m, i)
         if i < len(keys) - 1:
             pages.append(page('blankp', None, ''))
+
+    # Records follow the last Move, preserving the facing-spread folios above.
+    pages.extend(worksheet_pages(moves))
 
     # ============================== ENDNOTE ==============================
     # Both totals are used by the endnote and the colophon below, and both are

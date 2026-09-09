@@ -5,6 +5,25 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [6.4.5] - 2026-09-09
+
+### Changed
+
+- Added operator worksheets drawn from existing runbook passages to the print
+  interior, Kindle edition and website; the interior now meets the hardcover
+  page minimum while preserving every Move's facing spread.
+- Added the author's name to the front covers, removed text from ineligible
+  spines and protected the back-cover ISBN barcode area.
+- Raised print labels and rules to KDP's minimum sizes and added rendered
+  typography checks. Replaced the font-file search with per-font PDF embedding
+  validation, including embedded Type 3 glyphs. Removed a duplicate Kindle cover
+  page, added its contents landmark and corrected the ebook's publisher and date
+  metadata.
+- Prepared colour print prices with at least a 25% margin, rounded up to .99.
+  Adjusted Kindle pricing and added a check for its required print-edition discount.
+- Updated the publication metadata and recorded the remaining Bowker and KDP
+  submission steps. ISBN registration and Amazon publication are still pending.
+
 ## [6.4.4] - 2026-09-09
 
 ### Fixed

@@ -37,6 +37,7 @@ import costs as COSTS
 import imprint as IMP
 import mission as MISSION
 import why as WHY
+import worksheets as WS
 
 SITE = ROOT / 'site'
 ASSETS = SITE / 'assets'
@@ -1333,6 +1334,32 @@ work, and what is still on the bill.{oneway_note}</p>
 
 
 # --------------------------------------------------------- 4. before you start
+def worksheet_templates(moves):
+    """The print records as copyable prompts, without storing operational data."""
+    intro = (f'<p>{esc(WS.INTRO)}</p>'
+             '<ul>' + ''.join(
+                 f'<li><a href="#{s["id"]}">{esc(s["title"])}</a></li>'
+                 for s in WS.TEMPLATES) + '</ul>')
+    by_number = {m['num']: m for m in moves}
+    def source(ref):
+        return (f'<p class="note"><a href="m/{page(by_number[ref["move"]])}">'
+                f'{esc(ref["source"])}</a></p>')
+    records = []
+    for sheet in WS.records(moves):
+        records.append(
+            f'<section id="{sheet["id"]}"><h3 class="d sub-h">{esc(sheet["title"])}</h3>'
+            f'<p>{inline(sheet["purpose"]["text"])}</p>'
+            + source(sheet['purpose']) + '<ul>'
+            + ''.join(f'<li>{esc(label)}:</li>' for label in WS.RECORD_FIELDS)
+            + '</ul><ol class="pts">'
+            + ''.join(f'<li class="pt"><b class="n">{i:02d}</b><div>'
+                      f'<h4>{esc(field["label"])}</h4><p>{inline(field["text"])}</p>'
+                      + source(field) + '</div></li>'
+                      for i, field in enumerate(sheet['fields'], 1))
+            + '</ol></section>')
+    return intro + ''.join(records)
+
+
 def build_start(moves, T):
     first = moves[0]
 
@@ -1367,6 +1394,8 @@ def build_start(moves, T):
       f'<p>{esc(rb_intro(T["oneway"]))}</p>'
       f'<ol class="pts">{pts}</ol>',
       margin=mg_note('What this page is not', esc(RB_DISC))
+      + '<p class="mg-x-w"><a class="mg-x" href="#worksheets">'
+        'Operator worksheets &rarr;</a></p>'
       + f'<p class="mg-x-w"><a class="mg-x" href="checklist.html">'
         f'Your checklist &rarr;</a></p>')}
 
@@ -1412,6 +1441,7 @@ def build_start(moves, T):
                 'A spare on the shelf and a second of everything that carries '
                 'state are what the runbooks assume. Halve those and the '
                 'rollbacks stop working.'))}
+{band('worksheets', WS.HEADING, worksheet_templates(moves))}
 </main>
 {foot(0)}"""
     (SITE / 'start.html').write_text(shell(

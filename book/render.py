@@ -16,6 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from playwright.async_api import async_playwright
 import imprint as IMP
+from printcheck import check_print
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'dist' / IMP.PDF_NAME
@@ -156,6 +157,7 @@ async def main(write_pdf=True):
 
         await pg.evaluate(JUSTIFY)
         await pg.wait_for_timeout(400)
+        await check_print(pg)
 
         over = await pg.evaluate(OVERFLOW)
         bad = [o for o in over if o['spill'] > 0.5 or o['scroll'] > 1]

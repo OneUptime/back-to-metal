@@ -114,7 +114,8 @@ make site       # markdown -> static website
 make            # all of it, and the tables in this README
 ```
 
-Python 3.9 or newer with `playwright` and a Chromium build available to it. The Makefile prefers
+Python 3.9 or newer with the packages in `requirements.txt` and Chromium; `make deps` installs
+the packages and browser. The Makefile prefers
 `.venv/bin/python3` when it exists, so `python3 -m venv .venv && make deps` works without
 activating anything.
 
