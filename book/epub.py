@@ -109,6 +109,17 @@ def worksheets_xhtml(moves):
     return XHTML.format(title=esc(WS.HEADING), up='', body=body)
 
 
+def mission_xhtml(count):
+    # This shared prose uses <b> for emphasis in print and web. Translate that
+    # explicit convention before the Markdown renderer escapes literal HTML.
+    paragraphs = [rich(p.replace('<b>', '**').replace('</b>', '**'))
+                  for p in MISSION.paras(IMP.REPO, count)]
+    return XHTML.format(
+        title=esc(MISSION.KICKER), up='',
+        body=(f'<div class="front"><h1>{esc(" ".join(MISSION.HEADING_LINES))}</h1>'
+              + ''.join(f'<p>{p}</p>' for p in paragraphs) + '</div>'))
+
+
 def move_xhtml(m):
     origins = '<ul>\n' + ''.join(
         f'<li><strong>{esc(o["cloud"])}:</strong> {rich(o["service"])} '
@@ -284,11 +295,7 @@ def build():
               + f'<p>{esc(IMP.DISCLAIMER)}</p><p>{esc(IMP.DISCLOSURE)}</p>'
               + f'<p>{esc(IMP.SITE)}</p></div>')).encode()
 
-    files['OEBPS/why.xhtml'] = XHTML.format(
-        title=esc(MISSION.KICKER), up='',
-        body=(f'<div class="front"><h1>{esc(" ".join(MISSION.HEADING_LINES))}</h1>'
-              + ''.join(f'<p>{rich(p)}</p>' for p in MISSION.paras(IMP.REPO, len(moves)))
-              + '</div>')).encode()
+    files['OEBPS/why.xhtml'] = mission_xhtml(len(moves)).encode()
 
     facts = financials(moves)
     files['OEBPS/decision.xhtml'] = decision_xhtml(facts).encode()
