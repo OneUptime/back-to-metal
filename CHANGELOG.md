@@ -5,6 +5,20 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [6.4.3] - 2026-09-09
+
+### Changed
+
+- Extended the operations-cost explanation across the cost comparison, book
+  introduction, staffing and facility guidance, and README. Existing cloud ops
+  engineers transition to on-premises work, with contracted physical support
+  already included in facility or rental charges.
+- Clarified that on-premises roles can cost less, while the reference model
+  conservatively retains the same hours and salary. Potential staffing savings
+  remain outside the published figures; actual budgets use local rates and
+  measured recurring work.
+- Regenerated the print and Kindle editions, covers and website.
+
 ## [6.4.2] - 2026-09-09
 
 ### Fixed

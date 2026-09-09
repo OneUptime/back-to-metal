@@ -107,8 +107,9 @@ GAINS = [
      'Your cloud-ops engineers already deploy, monitor, patch and recover services. '
      'Those skills move with the workload. Colocation remote hands carry out disk '
      'swaps, cabling and power cycles under your runbooks; a rented-metal provider '
-     'maintains its hardware under the support agreement. The reference model keeps '
-     'the same team and monthly operations hours across all three options.',
+     'maintains its hardware under the support agreement. Physical support is already '
+     'priced in facility charges or rent. The model retains the existing team, hours '
+     'and salary, without counting potential savings from lower-cost on-premises roles.',
      'judgement',
      'Agree the physical tasks, coverage and response times with the provider, then '
      'rehearse an incident together. Measure your team\u2019s hours before and after '
@@ -132,11 +133,13 @@ COSTS = [
      'waiting for circuits: {days} person-days of work across {weeks} weeks. Both '
      'routes keep the migration rehearsals and rollback windows.'),
 
-    ('The same team, the same operations hours',
+    ('The existing team, with no added salary in the model',
      'Cloud ops transitions into on-prem ops. Remote hands handles the physical '
      'interventions; your engineers keep responsibility for the platform and '
      'application. The model budgets {cloud_hours} hours a month in every option, '
-     'with remote hands in the facility bill. Migration work is counted separately.'),
+     'with remote hands in the facility bill. On-premises roles can cost less than '
+     'cloud specialist roles; that potential saving is excluded by keeping the '
+     'same salary. Validate local rates and hours. Migration work is counted separately.'),
 
     ('Three things that never come home',
      'A content delivery network, outbound mail deliverability and scrubbing at the edge '

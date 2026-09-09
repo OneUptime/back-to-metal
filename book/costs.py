@@ -106,6 +106,11 @@ HARDWARE = {
 # hands or the dedicated provider carry out the covered physical interventions.
 # Their work remains priced in facility charges or the server rental.
 #
+# On-premises operations roles can cost less than cloud specialist roles, but
+# this model takes no salary discount: the same loaded rate applies throughout.
+# Any saving from local pay rates must be supported by the actual staffing plan,
+# just as any extra recurring hours or support charges must be priced in.
+#
 # Setup, automation, training and cutover are one-time labour in the Move effort
 # figures and roadmap. Do not add that work again as a permanent monthly hire.
 # Move 03 asks readers to validate the recurring hours against their own team,

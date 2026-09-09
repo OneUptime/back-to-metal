@@ -45,11 +45,17 @@ Each is a business other people run better than you will, and each is cheap next
 replaces. Move 03 gives you permission to read three Moves, do the arithmetic and stop, which
 is a cheaper outcome than a programme abandoned in month five with two platforms running.
 
-The comparison keeps the existing operations salary in all three options. Cloud ops
-transitions into on-prem ops with the same monthly hours in the reference model; colocation
-remote hands handles contracted physical work, and rented-metal providers maintain their
-hardware. Migration effort is budgeted separately. Rent to preserve cash, or colocate owned
-machines for lower running costs and control over the fleet.
+The comparison keeps the existing operations team, hours and salary in all three options,
+so the reference model adds no staffing cost. Cloud ops engineers transition to on-premises
+platform work. Colocation remote hands handles contracted cabling, drive swaps and other
+physical tasks, already priced in facility charges; rented-metal providers maintain their
+hardware under the support agreement.
+
+On-premises operations roles can cost less than cloud specialist roles, offering further
+salary savings. The published figures keep the existing salary cost and count none of those
+potential savings. Price any recurring difference using your staffing plan, local pay rates,
+measured hours and support quotes. Migration effort is budgeted separately. Rent to preserve
+cash, or colocate owned machines for lower running costs and control over the fleet.
 
 ## Three clouds, one runbook
 

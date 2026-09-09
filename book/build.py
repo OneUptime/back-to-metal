@@ -540,9 +540,9 @@ def build(moves):
     pages.append(page('', '#8A6112', f"""
     <div class="pkicker">The arithmetic, with the salary in it</div>
     <h2 class="ptitle d">What It Actually Costs</h2>
-    <p class="pintro">The existing operations team carries
-    {COSTS.PEOPLE['cloud_ops_hours_month']} hours a month in every option; physical support
-    stays in the provider charges. Substitute your rates and hours. {esc(COST_SCOPE)}</p>
+    <p class="pintro">The model keeps the existing team, salary and
+    {COSTS.PEOPLE['cloud_ops_hours_month']} monthly hours in every option. Cloud ops
+    transitions to on-prem work; provider charges cover physical support. {esc(COST_SCOPE)}</p>
     <div class="hrule" style="margin:5.5mm 0"></div>
     <div class="pan">
       <div class="pcard"><h4>On AWS, compute alone</h4><p>{vcpu:,} vCPU of current-generation
@@ -551,20 +551,19 @@ def build(moves):
       arguments: 100 TB a month is {money(COSTS.egress_month(100))}, every month, for the privilege
       of your own traffic leaving.</p></div>
       <div class="pcard"><h4>Owned, in colocation</h4><p>{money(o['infrastructure'])} of
-      infrastructure covers metal amortised over five years, the spares, power, a full rack,
-      transit, the cross-connect and remote hands. Add {money(o['people'])} of additional
-      salaried time and {money(o['retained'])} of retained services: the edge, outbound mail,
-      scrubbing and the residue of later Moves. Those three are <b>{money(o['total'])}</b>
-      a month: what the {money(COSTS.BILL_MONTH)} line becomes, base salary unchanged on both
-      sides. Remote hands performs the agreed physical interventions; your existing team
-      runs the platform and applications within the same monthly hours.</p></div>
+      infrastructure covers amortised hardware, spares, rack, power, transit, cross-connects
+      and remote hands. Add {money(o['people'])} of additional staffing and
+      {money(o['retained'])} of retained services: the edge, mail, scrubbing and later Moves.
+      Those three are <b>{money(o['total'])}</b> a month on the bill,
+      with the existing salary on both sides. Your team takes on the platform; remote hands
+      handles cabling and drive swaps. On-premises roles can cost less than cloud specialists,
+      but no salary saving is assumed.</p></div>
       <div class="pcard"><h4>Rented by the month</h4><p>{money(d['infrastructure'])} buys the
-      reference fleet from a dedicated-host provider, with the machines, power, space, network
-      and physical maintenance in the rental. You keep the capital available and avoid a
-      separate facility lease. With retained services and no increase in operations hours,
-      the cloud bill line becomes <b>{money(d['total'])}</b> a month, base salary unchanged.
-      Available stock can shorten the move. Confirm delivery, bandwidth, support and notice
-      terms in the quote. Rent when preserving cash matters more than owning the fleet.</p></div>
+      reference fleet, including power, space, networking and physical maintenance.
+      Your existing team runs the platform with the same hours and salary, so potential
+      staffing savings remain excluded. With retained services, the cloud bill becomes
+      <b>{money(d['total'])}</b> a month. Renting preserves capital and avoids a facility
+      lease. Confirm delivery, bandwidth, support and notice terms against your quote.</p></div>
       <div class="pcard"><h4>What the difference buys</h4><p>{money(save)} a month, or
       {money(save * 12)} a year, for a capital outlay of {money(capex)} &mdash; {R['nodes'] + R['spares']} machines and
       a pair of switches &mdash; which pays for itself in about
@@ -599,8 +598,9 @@ def build(moves):
     <p class="pintro">Both metal options cut the cost of this reference estate over the life
     of the machines. Renting keeps the server purchase off the opening cash flow; colocation
     trades that purchase for lower monthly infrastructure costs. The table separates capital
-    from running costs and counts the same operations hours in all three options, so you can
-    choose the cash flow that suits the business.</p>
+    from running costs. All three options retain the same operations hours and salary;
+    physical support is priced in provider charges and potential staffing savings are
+    excluded. Choose the cash flow that suits the business.</p>
     <div class="hrule" style="margin:5mm 0"></div>
       <div class="pkicker" style="margin-bottom:3mm">The same computers, three ways, over
       {fy['months'] // 12} years</div>
