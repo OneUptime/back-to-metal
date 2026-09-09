@@ -1,195 +1,226 @@
 # Publishing
 
-Keep this record, `book/imprint.py`, Bowker and KDP in agreement. Prepared files
-are not evidence of registration or publication.
+As of **2026-09-09 17:56 UTC**, KDP confirmed submission of **Kindle, paperback
+and hardcover**. The Bookshelf shows all three formats together under **Back to
+Metal**, each **In review**, last modified September 9, 2026. No ASINs or Amazon
+product links were displayed. Submission is not confirmation that a retail
+listing is live; set `imprint.AMAZON` only after each edition is confirmed live.
 
-## Publication preparation — 2026-09-09
+The author authorized all three publications using owned Bowker ISBNs. This is
+retail edition **1**; **6.4.7** identifies the submitted book and website build.
 
-The author authorized Kindle, colour paperback and colour hardcover publication,
-using owned Bowker ISBNs, with at least 25% margin and prices rounded upward to
-amounts ending in .99. Margin is the share of the list price retained after
-Amazon's deduction and printing or delivery cost, excluding tax.
+| Edition | KDP setup identifier | ISBN | Submitted US list price | Status |
+|---|---|---|---:|---|
+| Kindle | `AZTAAK7S3HZ0G` | None | $8.99 | In review |
+| Paperback | `YHJP6H3BSP1` | 978-1-950600-03-8 | $11.99 | In review |
+| Hardcover | `YHJP6H3BSP1`, linked hardcover setup | 978-1-950600-04-5 | $33.99 | In review |
 
-Four worksheets drawn from the existing manuscript bring the interior to an even
-76 pages while preserving all Move spreads. The same templates appear in the
-EPUB and on the website. The final local build confirms 76 pages.
+Each format displayed its own successful submission confirmation before the
+final Bookshelf check. Kindle's confirmation advised allowing up to 72 hours.
+All three received the exact release files below. Final KDP preview evidence
+and observed prices are recorded in this document.
 
-| Edition | Ink | KDP page band | Prepared US list | Estimated US print cost |
-|---|---|---|---|---|
-| Paperback | Standard colour, white paper | 72–600 | $11.99 | $4.0552 |
-| Hardcover | Premium colour, white paper | 75–550 | $33.99 | $11.73 |
-| Kindle | Reflowable EPUB with colour artwork | Not applicable | $8.99 | Delivery based on converted file |
+## Release and website agreement — 2026-09-09
 
-Estimated print margins are 26.2% and 25.5%. Confirm the final costs and royalty
-in KDP before submission. The hardcover uses the official Cover Calculator
-template downloaded on 2026-09-09 for 8.25 × 11 in, 76 pages, case laminate,
-premium colour on white paper. `book/cover.py` records the measured guide geometry;
-the generated case cover has a blank spine and reserves KDP's barcode area.
+[Version 6.4.7](https://github.com/OneUptime/back-to-metal/releases/tag/v6.4.7)
+was released from commit `bd4ffa27c3504f8e7bb13db17ec39634d6a5c746` after
+[PR #6](https://github.com/OneUptime/back-to-metal/pull/6) merged. PR CI, main CI
+and production release workflow `34380110575` passed. KDP received these exact
+public release assets:
 
-Rates checked on 2026-09-09 against KDP's public tables:
-[paperback printing](https://kdp.amazon.com/en_US/help/topic/G201834340),
-[hardcover printing](https://kdp.amazon.com/en_US/help/topic/GHT976ZKSKUXBB6H), and
-[print royalties](https://kdp.amazon.com/en_US/help/topic/G201834330).
-This book's trim counts as large trim.
+| Asset | Bytes | SHA-256 |
+|---|---:|---|
+| `Back-to-Metal.epub` | 200,902 | `f47de6e0da9ef9963dabfb760d123b664cb860c18b4bdfdcaf733faba9408db3` |
+| `Back-to-Metal.pdf` | 3,606,789 | `a70330ba56002217a5637bbbca451561f4234ec64361e11da43faa4a5e9f8b25` |
+| `cover-hardback.pdf` | 220,778 | `258693339f2f936994e8fce0f0530a208e63ffbe2e42d73db69ab8f0706accdf` |
+| `cover-kindle.jpg` | 151,132 | `fccff7001cc1842d0174d3e42d9fba93a6dff3dbd2b471e4c6858a8dd1923b66` |
+| `cover-paperback.pdf` | 220,722 | `553165ecdc79f76500d3c41217bf7a772772aaf9c16e573cac67c65061888ab2` |
 
-Kindle is priced at least 20% below both print editions, as required by the
-[70% royalty option](https://kdp.amazon.com/en_US/help/topic/G200634500).
-Check KDP's converted delivery size and account eligibility before submission.
-The free online edition remains available. Amazon can price-match it, including
-to zero, so the list-price margin is not guaranteed on every Kindle transaction.
-Do not enable paperback Expanded Distribution at these prices: its royalty is 40%.
+The release passed 43 tests, `make verify audit artefacts pricing releasable
+amazon`, the print geometry, embedded-font, flattening, typography and safe-area
+checks, and agreement checks across editions. EPUBCheck 5.3.0 reported zero
+findings. The public files were downloaded and independently checked against
+their release sizes and hashes. Both print covers were visually inspected;
+the hardcover was also checked against the official Cover Calculator guides.
 
-## Prepared marketplace prices
+The PDF and EPUB downloads on both
+[backtometal.oneuptime.com](https://backtometal.oneuptime.com) and
+[backtometal.web.app](https://backtometal.web.app) were byte-identical to the
+corresponding release assets, with and without cache-busting parameters. The
+five top-level website pages and sampled Move pages displayed version 6.4.7.
 
-These exclude tax and need a final check in KDP. US-style decimal currencies use
-.99; whole-yen prices end in 99. Tax added by Amazon can change the storefront ending.
+The interior has an even 76 pages. Four worksheets drawn from existing
+manuscript material preserve the facing Move spreads and also appear in the
+EPUB and website. Version 6.4.7 corrects literal HTML markup around “open source”
+in the EPUB introduction. The EPUB identifier remains
+`urn:uuid:f021e81e-4b5f-4ecc-bc23-402193edac60` and must never change.
 
-| Currency | Paperback | Hardcover |
-|---|---:|---:|
-| USD | 11.99 | 33.99 |
-| GBP | 8.99 | 24.99 |
-| EUR | 9.99 | 28.99 |
-| CAD | 14.99 | Check distribution via Amazon.com |
-| PLN | 45.99 | 135.99 |
-| SEK | 110.99 | 322.99 |
-| JPY | 1599 | Not available |
-
-Standard-colour paperback is unavailable in Australia. Hardcover distribution to
-Canada and Australia uses Amazon.com; no local printing-cost table was available.
-Do not assume automatic Kindle currency conversion respects the print discount.
-With these print prices, .99-ending Kindle prices must not exceed GBP6.99,
-EUR7.99 or CAD11.99 to meet the 20% requirement; check other markets individually.
-
-## Status
-
-| Field | Status |
-|---|---|
-| Editions | Paperback, hardcover, Kindle |
-| Print trim | 8.25 × 11 in; bleed on top, bottom and outer edge |
-| Cover finish | Matte; hardcover case laminate |
-| Paperback ISBN | 978-1-950600-03-8 — submitted to Bowker; dashboard status Pending |
-| Hardcover ISBN | 978-1-950600-04-5 — submitted successfully; Bowker processing and dashboard verification pending |
-| Bowker publisher | HackerBay, Inc. — exact account and fixed publisher-field spelling |
-| Print preparation | Final 6.4.6 files validated locally; KDP uploads and previews pending |
-| KDP Kindle draft | AZTAAK7S3HZ0G — details complete; content settings saved |
-| KDP paperback draft | YHJP6H3BSP1 — details saved; print setup pending |
-| Amazon ASINs | Not published |
-| EPUB identifier | `urn:uuid:f021e81e-4b5f-4ecc-bc23-402193edac60` — never change |
-| KDP Select | Do not enroll: the ebook is openly available elsewhere |
-| DRM | Do not apply; the text is CC BY 4.0 |
-
-Direct computer access to Chrome is working. On 2026-09-09, both print records
-were submitted successfully in the **HackerBay, Inc.** Bowker account. The paperback
-dashboard shows **Back to Metal / Paperback / Pending**. The hardcover form confirmed
-a successful save; its dashboard status remains to be verified. These are submitted
-ISBN filings, not completed Bowker validation or Amazon publication. No KDP submission
-or ASIN has been confirmed in this record; KDP setup is ongoing.
-
-The final 6.4.6 files, including the filed ISBNs and exact publisher spelling, passed
-`make verify audit artefacts pricing releasable amazon`:
-41 tests, zero content findings, print geometry and embedded-font checks,
-rendered typography and safe-area checks, website checks and agreement across
-all editions. EPUBCheck 5.3.0 reported zero errors or warnings. The regenerated
-cover and affected interior pages, including all four worksheets, were visually
-reviewed. The hardcover was also overlaid against the official template guides.
-These local checks do not replace KDP's ingestion and previews.
-
-The saved Kindle draft has the matching title, subtitle, author, first-edition
-number, description and seven keywords. It records author-owned rights, no
-sexually explicit content, no AI-generated content, no DRM, and publisher
-HackerBay, Inc. No ISBN is assigned to Kindle. The linked paperback inherited
-the matching title, author, description and keywords; its edition number is 1.
-Amazon requested a fresh sign-in when opening the paperback content page after
-saving its details. Neither format has been submitted for publication.
-
-Amazon Kindle Previewer 3.107 was obtained from KDP's official download and its
-Apple signature was verified. Its command-line startup produced no conversion
-output in this environment, so Kindle conversion is not marked as validated.
-Use KDP's online previewer during title setup before submission.
-
-On 2026-09-09 the author confirmed that the original manuscript and artwork were
-not AI-generated; AI helped with editing. Worksheets reformat existing manuscript
-excerpts. Answer the current KDP disclosure form using this provenance.
-
-## ISBNs
-
-The live Bowker inventory was inspected on 2026-09-09 in the **HackerBay, Inc.**
-account. The publisher field uses that exact spelling and is fixed; the imprint
-dropdown has no custom entries.
-
-| ISBN | Title / intended format | Observed status |
-|---|---|---|
-| 978-1-950600-00-7 | Simplified JavaScript | Existing incomplete record |
-| 978-1-950600-01-4 | The 20-Minute Table | Already assigned to that title |
-| 978-1-950600-02-1 | The 20-Minute Table | Already assigned to that title |
-| 978-1-950600-03-8 | Back to Metal — Paperback | Submitted successfully; Pending |
-| 978-1-950600-04-5 | Back to Metal — Hardback | Submitted successfully; dashboard verification pending |
-
-The earlier inventory history incorrectly described the block's first two
-numbers as belonging to *The 20-Minute Table*: that title uses **01-4 and 02-1**,
-while **00-7** belongs to *Simplified JavaScript*. Kindle needs no ISBN.
-Both print entries in `imprint.ISBN` now hold their submitted numbers. The hardcover
-number was verified unused before the paperback record was cloned into it.
-
-## Paperback metadata filed with Bowker — 2026-09-09
+## Shared metadata and settings
 
 | Field | Value |
 |---|---|
 | Title | Back to Metal |
 | Subtitle | How a company leaves the cloud, one move at a time |
-| Contributor | Nawaz Dhandala — Author |
+| Author | Nawaz Dhandala |
 | Publisher | HackerBay, Inc. |
 | Language | English |
 | Copyright year | 2026 |
-| Format | Print — Paperback |
-| Pages | 76 |
-| Dimensions | Inches; Length 11, Width 8.25; depth and weight left blank |
-| Genre | COMPUTERS |
-| Audience | Scholarly & Professional |
-| Planned publication date | September 9, 2026 |
-| Publication status | Forthcoming |
-| US retail price | $11.99 |
-| Front-cover image | Existing `dist/cover-kindle.jpg`, uploaded successfully |
-| Dashboard result | Back to Metal / Paperback / Pending |
+| Edition number | 1 |
+| Rights | Author-owned copyright; worldwide publishing rights |
+| Content rating | No sexually explicit content |
+| Text licence | Creative Commons Attribution 4.0; not public-domain content |
+| Software licence | MIT |
+| Release choice | Available for sale upon publication; no preorder |
+| AI-generated content | No |
+| Kindle ISBN | None |
+| KDP Select | Not enrolled; the ebook remains openly available elsewhere |
+| Kindle DRM | Not applied |
+| Kindle image accessibility declaration | Unknown; cover-image accessibility could not be confirmed |
 
-The planned publication date and Forthcoming status were filed metadata, not
-evidence that an edition was released that day. The publication remains the
-first edition, with author-owned copyright, CC BY 4.0 text and MIT software;
-it is not public-domain content. These rights and edition statements remain
-the metadata basis for the KDP setup.
+On 2026-09-09 the author confirmed that the original manuscript and artwork were
+not AI-generated; AI helped with editing. Worksheets reformat existing
+manuscript excerpts. The no-AI-generated-content answers follow that provenance.
 
-## Hardcover metadata filed with Bowker — 2026-09-09
+| Print setting | Paperback | Hardcover |
+|---|---|---|
+| Owned ISBN | 978-1-950600-03-8 | 978-1-950600-04-5 |
+| Ink and paper | Standard colour, white paper | Premium colour, white paper |
+| Trim | 8.25 × 11 in, custom entry | 8.25 × 11 in, KDP preset |
+| Interior | Same 76-page bleed PDF | Same 76-page bleed PDF |
+| Bleed | Top, bottom and outer edge | Top, bottom and outer edge |
+| Cover | Matte paperback wrap | Matte case laminate |
+| Barcode | KDP adds it in the reserved area | KDP adds it in the reserved area |
+| Spine text | None | None |
 
-The paperback record was cloned into the verified unused ISBN
-**978-1-950600-04-5**. Bowker confirmed
-`Congratulations! Your form is complete and has been saved successfully!`
-after submission. The record is submitted and awaiting Bowker processing;
-the dashboard status has not yet been verified.
+The hardcover cover uses the official KDP Cover Calculator template downloaded
+on 2026-09-09 for this trim, page count, binding, ink and paper. Its geometry is
+recorded in `book/cover.py`. The interior trim is not the physical case size.
 
-| Field | Value |
-|---|---|
-| Title | Back to Metal |
-| Subtitle | How a company leaves the cloud, one move at a time |
-| Description and short author bio | Same as the paperback filing, retained through Clone |
-| Contributor | Nawaz Dhandala — Author |
-| Publisher | HackerBay, Inc. |
-| Language | English, explicitly set |
-| Copyright year | 2026, explicitly set |
-| Format | Print — Hardback |
-| Pages | 76, explicitly set |
-| Dimensions and weight | Left blank; the physical hardcover case has not been measured |
-| Genre | COMPUTERS |
-| Audience | Scholarly & Professional |
-| Planned publication date | September 9, 2026 |
-| Publication status | Forthcoming |
-| US retail price | $33.99 |
-| Front-cover image | Same `dist/cover-kindle.jpg`, uploaded with success confirmation |
-| Submission result | Form saved successfully; dashboard verification pending |
+## Prices and margin
 
-The 8.25 × 11 in interior trim is not a filed hardcover case dimension. The
-planned publication date and Forthcoming status do not establish a live edition.
+The author requested at least 25% margin, rounded upward to prices ending in
+.99, or whole-currency amounts ending in 99 where KDP requires integers.
+Margin is the share of list price retained after Amazon's deduction and
+printing or delivery costs, excluding tax. Final prices were saved and displayed
+royalties checked before submission. Every observed royalty exceeds 25% of its
+corresponding list price.
 
-## Description prepared for KDP
+Print prices exclude tax; Amazon's added tax can change the storefront ending.
+Kindle fields include local tax where applicable. The saved Kindle prices use
+a conservative check against numeric print list prices for the required 20%
+discount under the
+[70% royalty option](https://kdp.amazon.com/en_US/help/topic/G200634500).
+The free edition remains available. Amazon can price-match it, including to
+zero, so list-price margin is not guaranteed on every Kindle transaction.
+
+### Kindle prices confirmed at submission — 2026-09-09
+
+The table records KDP's displayed royalties for the final **6.4.7 conversion**,
+confirmed immediately before submission. Its converted size was **0.24 MB**, with
+a **$0.04 US delivery charge**. All 13 prices and royalties persisted unchanged
+after the final replacement upload.
+
+| Marketplace | Currency | Saved list price | Displayed royalty |
+|---|---|---:|---:|
+| Amazon.com | USD | 8.99 | 6.26 |
+| Amazon.in | INR | 599 | 178 |
+| Amazon.co.uk | GBP | 6.99 | 4.88 |
+| Amazon.de | EUR | 7.99 | 5.21 |
+| Amazon.fr | EUR | 7.99 | 5.28 |
+| Amazon.es | EUR | 7.99 | 5.36 |
+| Amazon.it | EUR | 7.99 | 4.56 |
+| Amazon.nl | EUR | 7.99 | 5.11 |
+| Amazon.co.jp | JPY | 1199 | 382 |
+| Amazon.com.br | BRL | 31.99 | 11.20 |
+| Amazon.ca | CAD | 11.99 | 8.36 |
+| Amazon.com.mx | MXN | 152.99 | 53.55 |
+| Amazon.com.au | AUD | 12.99 | 8.24 |
+
+KDP required whole rupees, so the Indian price is INR599. Worldwide rights and
+the 70% royalty option are selected. India, Japan, Brazil and Mexico receive
+35% without KDP Select. Every observed royalty exceeds 25% of its displayed
+list price.
+
+### Paperback prices confirmed at submission — 2026-09-09
+
+All final prices, costs and royalties persisted after the 6.4.7 replacement.
+Worldwide rights are selected, royalties are 60% in all supported marketplaces,
+and Expanded Distribution is disabled.
+
+| Currency | Saved list price | Printing cost | Displayed royalty |
+|---|---:|---:|---:|
+| USD | 11.99 | 4.06 | 3.14 |
+| CAD | 14.99 | 5.21 | 3.78 |
+| JPY | 1599 | 548 | 411 |
+| GBP | 8.99 | 2.90 | 2.49 |
+| EUR | 9.99 | 3.41 | 2.58 |
+| PLN | 45.99 | 15.97 | 11.62 |
+| SEK | 110.99 | 36.42 | 30.17 |
+
+The EUR entries cover Belgium, Germany, Spain, France, Ireland, Italy and the
+Netherlands. Every observed royalty exceeds 25% of the tax-exclusive list price.
+Standard-colour paperback is unavailable in Australia. Expanded Distribution
+must remain disabled at these prices because its royalty rate is 40%.
+
+### Hardcover prices confirmed at submission — 2026-09-09
+
+These are the final KDP values, with 60% royalties in every displayed market.
+Worldwide rights are selected.
+
+| Marketplace / currency | List price | Printing cost | Displayed royalty |
+|---|---:|---:|---:|
+| United States / USD | 33.99 | 11.73 | 8.66 |
+| Canada / USD, based on Amazon.com | 33.99 | 11.73 | 8.66 |
+| United Kingdom / GBP | 24.99 | 8.71 | 6.28 |
+| Euro marketplaces / EUR | 28.99 | 10.12 | 7.27 |
+| Poland / PLN | 135.99 | 47.39 | 34.20 |
+| Sweden / SEK | 322.99 | 113.01 | 80.78 |
+
+The EUR entries cover Belgium, Germany, Spain, France, Ireland, Italy and the
+Netherlands. KDP explicitly displayed the Canadian row in USD based on
+Amazon.com, rather than as a CAD price. Hardcover distribution to Canada and
+Australia uses Amazon.com; no local printing-cost table was available. Japanese
+hardcover distribution was not available. The lowest displayed hardcover
+margin is Sweden at approximately 25.01%.
+
+Rates were checked on 2026-09-09 against KDP's
+[paperback printing costs](https://kdp.amazon.com/en_US/help/topic/G201834340),
+[hardcover printing costs](https://kdp.amazon.com/en_US/help/topic/GHT976ZKSKUXBB6H)
+and [print royalties](https://kdp.amazon.com/en_US/help/topic/G201834330).
+The 8.25 × 11 in format uses large-trim rates.
+
+## Bowker filings — 2026-09-09
+
+Both records were submitted successfully in the **HackerBay, Inc.** account.
+Both dashboard entries were observed as **Pending** with the correct title
+and format. The hardcover's saved registration was independently checked.
+Pending describes Bowker processing; it does not establish a live Amazon title.
+
+| Field | Paperback | Hardcover |
+|---|---|---|
+| ISBN | 978-1-950600-03-8 | 978-1-950600-04-5 |
+| Format | Print — Paperback | Print — Hardback |
+| Dashboard entry | Back to Metal / Paperback / Pending | Back to Metal / Hardback / Pending |
+| Pages | 76 | 76 |
+| Filed dimensions | Length 11 in, width 8.25 in; depth and weight blank | Dimensions and weight blank |
+| Planned publication date | September 9, 2026 | September 9, 2026 |
+| Publication status | Forthcoming | Forthcoming |
+| US retail price | $11.99 | $33.99 |
+| Front-cover image | Existing Kindle cover uploaded successfully | Same Kindle cover uploaded successfully |
+
+Both filings carry the shared title, subtitle, author and publisher above,
+English language, copyright year 2026, genre **COMPUTERS**, audience
+**Scholarly & Professional**, and the same description and short author bio.
+The publisher spelling is fixed by the Bowker account. Planned publication
+dates and Forthcoming status are metadata, not proof of release on that date.
+
+The hardcover record was cloned from the paperback into an ISBN verified unused
+before registration. Other numbers in the block were left unchanged:
+**978-1-950600-00-7** is the existing incomplete *Simplified JavaScript* record;
+**978-1-950600-01-4** and **978-1-950600-02-1** belong to *The 20-Minute Table*.
+Kindle has no ISBN. The ISBNs in `imprint.ISBN` match these submitted filings.
+
+## Submitted KDP description
 
 Back to Metal is a practical handbook for deciding whether to leave the cloud,
 then moving workloads onto hardware you control. It covers AWS, Google Cloud and
@@ -206,16 +237,17 @@ Written by Nawaz Dhandala, founder of OneUptime. The book discloses that interes
 where it recommends OneUptime. The text is licensed under Creative Commons
 Attribution 4.0.
 
-## Categories and keywords
+## Submitted categories and keywords
 
-Bowker's submitted genre is COMPUTERS. The saved KDP categories are:
+Bowker's genre is COMPUTERS. The KDP categories are:
 
 - Kindle: Computers & Technology → Networking & Communications → Cloud Computing;
   Computer Science → Systems Analysis & Design; Operating Systems → Linux.
-- Paperback: Computers & Technology → Networking & Cloud Computing → Cloud Computing;
-  Operating Systems → Linux → Networking & System Administration and Servers.
+- Paperback and hardcover: Computers & Technology → Networking & Cloud Computing
+  → Cloud Computing; Operating Systems → Linux → Networking & System
+  Administration and Servers.
 
-Prepared search phrases:
+The seven saved search phrases are:
 
 - cloud repatriation
 - leaving AWS
@@ -225,14 +257,21 @@ Prepared search phrases:
 - cloud cost comparison
 - colocation planning
 
-## Remaining submission work
+## KDP preview evidence
 
-1. Confirm the hardcover record's actual dashboard status and any Bowker processing updates.
-2. Keep this record and `imprint.py` aligned with the filed metadata; inspect KDP
-   for existing drafts before creating another.
-3. Resume the saved KDP drafts after the fresh Amazon sign-in; create the linked hardcover.
-4. Upload the validated 6.4.6 files with standard-colour paperback and premium-colour hardcover settings.
-5. Inspect KDP's ebook and print previews.
-6. Verify each marketplace's royalty, tax handling and .99 price. Automatic currency
-   conversion may violate either the margin or the Kindle-to-print price relationship.
-7. Submit all formats, record the actual statuses and add ASIN links once live.
+The final 6.4.7 Kindle files completed processing and the manuscript check.
+KDP's online preview showed “open source” correctly emphasized in the
+introduction, with no literal HTML tags. Navigation was checked. The recovery
+worksheet was inspected at tablet location 1292 and phone location 1291, with
+clean layouts. No issues were listed. The separate spelling/image quality scan
+was still running and is not recorded as completed. KDP accepted the submission
+after these checks.
+
+The final paperback preview, `PSFWSJN70PA`, confirmed 76 pages and was approved.
+The cover displayed version 6.4.7, with the paperback ISBN barcode inside its
+reserved area. The cover and Move 05 spread at pages 34–35 were clean.
+
+The final hardcover preview, `6K4GF7AFMWQ`, confirmed 76 pages and was approved.
+The cover displayed version 6.4.7, with the hardcover ISBN barcode inside its
+reserved area. The cover, PostgreSQL spread at pages 60–61 and worksheets at
+pages 72–73 were clean.
