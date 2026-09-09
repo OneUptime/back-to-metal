@@ -160,7 +160,9 @@ body{font-family:'Archivo',Helvetica,Arial,sans-serif;color:var(--ink);
   font-variation-settings:'wdth' 92;font-weight:500;}
 .fw .sign{color:var(--ink);font-weight:600;font-size:9.4pt;line-height:1.5;}
 .anat{margin-top:auto;padding-top:4.5mm;border-top:.3mm solid var(--rule);
-  display:grid;grid-template-columns:54mm 1fr;gap:9mm;align-items:start;}
+  display:grid;grid-template-columns:54mm minmax(0,1fr);gap:9mm;align-items:start;}
+.anat-fig,.anat-key{min-width:0;}
+.anat-fig>svg{width:100%;height:auto;}
 .anat-cap{font-family:'JetBrains Mono',monospace;font-size:6.2pt;letter-spacing:.14em;
   text-transform:uppercase;color:var(--ink4);margin-top:2.4mm;text-align:center;}
 .kitem{display:flex;gap:3mm;margin-bottom:2.4mm;}
@@ -307,15 +309,18 @@ body{font-family:'Archivo',Helvetica,Arial,sans-serif;color:var(--ink);
 
 /* The specification strip: key over value, in mono, divided by hairlines.
    This replaces a row of coloured pills. */
-.spec{display:flex;margin-top:4mm;border-top:.3mm solid var(--rule);
+.spec{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  margin-top:4mm;border-top:.3mm solid var(--rule);
   border-bottom:.3mm solid var(--rule);}
-.spec>div{flex:1 1 0;min-width:0;padding:2.2mm 3mm 2.2mm 0;
+.spec>div{min-width:0;padding:2.2mm 2.5mm;
   border-right:.18mm solid var(--rule2);}
+.spec>div:first-child{padding-left:0;}
 .spec>div:last-child{border-right:0;padding-right:0;}
 .spec .k{font-family:'JetBrains Mono',monospace;font-size:5.8pt;letter-spacing:.18em;
   text-transform:uppercase;color:var(--ink4);margin-bottom:1.2mm;}
 .spec .v{font-family:'JetBrains Mono',monospace;font-size:8pt;color:var(--ink);
-  display:flex;align-items:center;gap:1.4mm;line-height:1.15;}
+  display:flex;align-items:center;gap:1.4mm;line-height:1.25;}
+.spec .v>span{display:flex;}
 .spec .v.wide{font-family:'Archivo',sans-serif;font-size:8.2pt;font-weight:600;
   font-variation-settings:'wdth' 88;text-transform:uppercase;letter-spacing:.02em;}
 
