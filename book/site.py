@@ -609,7 +609,20 @@ def hero_index(T, first):
     <dl class="bal-l">
       <div><dt>Cloud infrastructure</dt><dd class="was">{mny(T['bill'])}</dd></div>
       <div><dt>Machines you own</dt><dd>{mny(T['owned']['infrastructure'])}</dd></div>
-      <div><dt>Additional ops cost</dt><dd>{mny(T['owned']['people'])}</dd></div>
+      <div class="ops-row" data-tooltip><dt>Additional ops cost
+        <button class="ops-help-trigger" type="button" hidden
+          aria-label="Why this additional ops cost?" aria-expanded="false"
+          aria-controls="ops-cost-note" aria-describedby="ops-cost-note">?</button>
+        <span class="ops-help-note" id="ops-cost-note" role="tooltip">
+          The model assumes your existing cloud ops engineers transition to
+          running the on-premises platform, with no additional permanent hires.
+          The colo facility&rsquo;s remote hands can handle physical tasks such
+          as cabling and drive swaps; their cost is already included in
+          infrastructure. On-premises operations roles can cost less than cloud
+          specialist roles, offering further salary savings. To keep the estimate
+          conservative, this model retains the same staffing cost and counts
+          none of those potential savings.
+        </span></dt><dd>{mny(T['owned']['people'])}</dd></div>
       <div><dt>Still somebody else&rsquo;s invoice</dt>
         <dd>{mny(T['owned']['retained'])}</dd></div>
       <div class="tot"><dt>What the bill becomes</dt>

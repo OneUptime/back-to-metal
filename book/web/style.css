@@ -700,6 +700,19 @@ html.scrolled .wm{font-size:16px}
   gap:var(--s5);padding:var(--s3) 0;border-bottom:1px solid var(--rule2)}
 .bal-l dt{margin:0;text-align:left;font-size:var(--t-fine);color:var(--ink2)}
 .bal-l dd{margin:0;font:400 var(--m-fig)/1 var(--mono);color:var(--ink)}
+/* The explanation remains inline until its hover, focus and tap controls
+   are ready. Its floating width follows the ledger, including on phones. */
+.bal-l>.ops-row{position:relative}
+.ops-help-trigger{padding:0;margin-left:var(--s1);min-width:var(--s5);
+  min-height:var(--s5);border:0;background:none;color:var(--accent);
+  font:500 var(--t-fine)/1 var(--mono);text-decoration:underline;
+  text-underline-offset:var(--s1);cursor:pointer}
+.ops-help-note{display:block;text-align:left;color:var(--ink2);
+  font:400 var(--t-fine)/var(--lh-sub) var(--fam)}
+.ops-row[data-tooltip-ready] .ops-help-note{display:none;position:absolute;
+  z-index:10;top:100%;left:0;width:100%;padding:var(--s4);
+  border-block:1px solid var(--accent);background:var(--bg)}
+.ops-row[data-tooltip-open] .ops-help-note{display:block}
 /* A line you no longer pay is a line a ledger has SETTLED, and a ledger
    settles a line by striking it. The strike is ink, never the accent:
    a struck figure is a state of a quantity, and the accent is never a
@@ -1634,6 +1647,9 @@ html.js .sn:hover{color:var(--ink)}
      meaningless on paper. */
   body::before,.rail{display:none}
   .bar,.foot,.skip,.cta,.actions,.prog-bar{display:none}
+  .ops-help-trigger{display:none!important}
+  .ops-row[data-tooltip-ready] .ops-help-note{display:block;position:static;
+    width:auto;padding:0;border:0;background:none}
   .bar::after{display:none}
   /* The twenty is a picture of the book and it prints well, so it
      stays - but flat, and at a fixed height. */

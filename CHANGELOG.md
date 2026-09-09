@@ -5,6 +5,16 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [6.4.1] - 2026-09-09
+
+### Changed
+
+- Added a tooltip beside the homepage's additional operations cost explaining
+  the existing team's transition to on-premises work and colocation remote
+  hands. Potential staffing savings remain outside the conservative estimate.
+- The explanation supports hover, keyboard focus and tap, and remains readable
+  without JavaScript and when printing the page.
+
 ## [6.4.0] - 2026-09-09
 
 Existing cloud VMs now have an explicit route to KVM guests on Proxmox VE hosts.

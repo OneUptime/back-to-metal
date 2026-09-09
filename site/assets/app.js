@@ -19,6 +19,44 @@
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
+  /* The ops assumption: readable on hover or focus, pinned by click/tap,
+     and dismissible without moving the pointer or the keyboard focus. */
+  $$('[data-tooltip]').forEach(row => {
+    const trigger = $('.ops-help-trigger', row);
+    let pinned = false;
+    const open = () => {
+      row.dataset.tooltipOpen = '';
+      trigger.setAttribute('aria-expanded', 'true');
+    };
+    const close = () => {
+      delete row.dataset.tooltipOpen;
+      trigger.setAttribute('aria-expanded', 'false');
+      pinned = false;
+    };
+    row.addEventListener('pointerenter', e => {
+      if (e.pointerType === 'mouse') open();
+    });
+    row.addEventListener('pointerleave', () => {
+      if (!pinned && !row.contains(document.activeElement)) close();
+    });
+    trigger.addEventListener('focus', open);
+    trigger.addEventListener('click', () => {
+      if (pinned) close();
+      else { pinned = true; open(); }
+    });
+    row.addEventListener('focusout', e => {
+      if (!row.contains(e.relatedTarget)) close();
+    });
+    document.addEventListener('pointerdown', e => {
+      if (!row.contains(e.target)) close();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') close();
+    });
+    row.dataset.tooltipReady = '';
+    trigger.hidden = false;
+  });
+
   const DONE = 'btm.done.v1';   /* Move numbers ticked */
   const STEPS = 'btm.steps.v1'; /* runbook steps ticked, by Move number */
   const KIT = 'btm.kit.v1';     /* kit rows ticked, by shelf and position */
