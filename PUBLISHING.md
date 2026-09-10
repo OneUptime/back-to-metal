@@ -249,7 +249,8 @@ Margin is the share of list price retained after Amazon's deduction and
 printing or delivery costs, excluding tax. The September 9 prices were saved
 and displayed royalties checked before the initial submissions. Every observed
 royalty exceeded 25% of its corresponding list price. These are dated KDP
-observations; recheck the paperback after uploading the corrected interior.
+observations; the paperback values were confirmed again after the September 10
+correction, as recorded above.
 
 Print prices exclude tax; Amazon's added tax can change the storefront ending.
 Kindle fields include local tax where applicable. The saved Kindle prices use
