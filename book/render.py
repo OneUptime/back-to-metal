@@ -16,7 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from playwright.async_api import async_playwright
 import imprint as IMP
-from printcheck import check_print
+from printcheck import check_print, check_text_margins
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'dist' / IMP.PDF_NAME
@@ -110,7 +110,8 @@ OVERFLOW = """() => {
 
 # Measured from the TRIM edge. The gutter carries no bleed, so the page box edge
 # is the trim edge there; the outer, top and bottom edges each sit 3.175mm of
-# bleed outside trim. Measures real ink rather than trusting the padding.
+# bleed outside trim. This measures inner content/diagram bounds. The separate
+# text-margin gate covers every printed text fragment, including page furniture.
 SAFE = """() => {
   const MM = 96 / 25.4, BLEED = 3.175, out = [];
   document.querySelectorAll('.page').forEach((p, i) => {
@@ -158,6 +159,7 @@ async def main(write_pdf=True):
         await pg.evaluate(JUSTIFY)
         await pg.wait_for_timeout(400)
         await check_print(pg)
+        await check_text_margins(pg)
 
         over = await pg.evaluate(OVERFLOW)
         bad = [o for o in over if o['spill'] > 0.5 or o['scroll'] > 1]
@@ -183,7 +185,7 @@ async def main(write_pdf=True):
         tight = [s for s in safe if s['gutter'] < GUTTER_MIN or s['outer'] < OUTER_MIN]
         g = min(s['gutter'] for s in safe)
         o = min(s['outer'] for s in safe)
-        print(f'safe area mm from trim | tightest gutter {g} (min {GUTTER_MIN})'
+        print(f'inner content bounds mm from trim | tightest gutter {g} (min {GUTTER_MIN})'
               f' | tightest outer {o} (min {OUTER_MIN})')
         if tight:
             print(f'  KDP SAFE AREA VIOLATED on {len(tight)} page(s):')

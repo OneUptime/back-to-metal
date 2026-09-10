@@ -1,32 +1,65 @@
 # Publishing
 
-As of **2026-09-09 17:56 UTC**, KDP confirmed submission of **Kindle, paperback
-and hardcover**. The Bookshelf shows all three formats together under **Back to
-Metal**, each **In review**, last modified September 9, 2026. No ASINs or Amazon
-product links were displayed. Submission is not confirmation that a retail
-listing is live; set `imprint.AMAZON` only after each edition is confirmed live.
+As of **2026-09-10**, KDP's Bookshelf shows **Kindle Live**, **paperback Draft**
+after a margin rejection, and **hardcover In review**. The hardcover cannot
+currently be edited while Amazon's review is in progress.
 
-The author authorized all three publications using owned Bowker ISBNs. This is
-retail edition **1**; **6.4.7** identifies the submitted book and website build.
-
-| Edition | KDP setup identifier | ISBN | Submitted US list price | Status |
+| Edition | KDP setup identifier | ISBN / ASIN | Last submitted US list price | Current status |
 |---|---|---|---:|---|
-| Kindle | `AZTAAK7S3HZ0G` | None | $8.99 | In review |
-| Paperback | `YHJP6H3BSP1` | 978-1-950600-03-8 | $11.99 | In review |
-| Hardcover | `YHJP6H3BSP1`, linked hardcover setup | 978-1-950600-04-5 | $33.99 | In review |
+| Kindle | `AZTAAK7S3HZ0G` | ASIN [B0HJB4M8NZ](https://www.amazon.com/dp/B0HJB4M8NZ) | $8.99 | Live |
+| Paperback | `YHJP6H3BSP1` | ISBN 978-1-950600-03-8 | $11.99 | Draft; correction pending resubmission |
+| Hardcover | `YHJP6H3BSP1`, linked hardcover setup | ISBN 978-1-950600-04-5 | $33.99 | In review; edits unavailable |
 
-Each format displayed its own successful submission confirmation before the
-final Bookshelf check. Kindle's confirmation advised allowing up to 72 hours.
-All three received the exact release files below. Final KDP preview evidence
-and observed prices are recorded in this document.
+All three formats were initially submitted successfully on **2026-09-09** using
+version **6.4.7**. At 17:56 UTC that day, each appeared as In review and no ASINs
+were displayed. This remains retail edition **1**. Version **6.4.8** is being
+prepared for the print-margin correction; no replacement submission is yet
+confirmed. The live Kindle and the hardcover under review still refer to the
+initial uploads until a later update is explicitly recorded.
 
-## Release and website agreement — 2026-09-09
+## Paperback margin correction — 2026-09-10
+
+KDP rejected the paperback because content on **PDF pages 36–39** was outside
+the permitted margins. The earlier automated safe-area check excluded page
+furniture, so it did not inspect the text in the fore-edge tabs. Passing that
+check and approving the online preview did not establish that every text label
+was inside KDP's safe area.
+
+The source correction removes **all 40 Move-page edge-tab labels**, retaining
+colour-only tabs and adding an automated margin check for all page text. The
+rebuilt interior remains **76 pages**, preserving the existing facing spreads. This shared
+interior correction also applies to hardcover; its submitted file cannot
+currently be replaced while the format remains In review.
+
+| Correction milestone | Status |
+|---|---|
+| Source layout correction and all-text margin check | Complete locally; zero text-margin violations across all 76 PDF pages |
+| Version 6.4.8 release and exact asset hashes | Pending |
+| Website agreement with the corrected release | Pending verification |
+| Corrected paperback KDP upload and preview | Pending |
+| Paperback prices and royalties after replacement | Pending confirmation against the September 9 observations below |
+| Paperback resubmission and resulting status | Not yet confirmed |
+| Hardcover replacement | Awaiting an editable KDP status |
+
+The local build passed 48 tests and `make verify audit artefacts pricing
+releasable amazon`. Browser measurement placed every text fragment at least
+12.7 mm from the PDF edge. An independent scan of the generated PDF found no
+violations of that stricter floor; its smallest glyph clearances were 15.499 mm
+at the gutter, 15.999 mm outside, 13.358 mm at the top and 12.927 mm at the
+bottom. Pages 36–39 were rendered and visually inspected after correction.
+
+Record the released commit, exact asset sizes and SHA-256 hashes, final
+margin-check results, KDP preview approval and actual resubmission confirmation
+before marking this correction complete. Preserve the initial submission,
+pricing and Bowker observations below as dated history.
+
+## Initial release and website agreement — 2026-09-09
 
 [Version 6.4.7](https://github.com/OneUptime/back-to-metal/releases/tag/v6.4.7)
 was released from commit `bd4ffa27c3504f8e7bb13db17ec39634d6a5c746` after
 [PR #6](https://github.com/OneUptime/back-to-metal/pull/6) merged. PR CI, main CI
-and production release workflow `34380110575` passed. KDP received these exact
-public release assets:
+and production release workflow `34380110575` passed. The September 9 KDP
+submissions used these exact public release assets:
 
 | Asset | Bytes | SHA-256 |
 |---|---:|---|
@@ -55,7 +88,7 @@ EPUB and website. Version 6.4.7 corrects literal HTML markup around “open sour
 in the EPUB introduction. The EPUB identifier remains
 `urn:uuid:f021e81e-4b5f-4ecc-bc23-402193edac60` and must never change.
 
-## Shared metadata and settings
+## Metadata and settings submitted on 2026-09-09
 
 | Field | Value |
 |---|---|
@@ -96,14 +129,15 @@ The hardcover cover uses the official KDP Cover Calculator template downloaded
 on 2026-09-09 for this trim, page count, binding, ink and paper. Its geometry is
 recorded in `book/cover.py`. The interior trim is not the physical case size.
 
-## Prices and margin
+## Prices and margin observed on 2026-09-09
 
 The author requested at least 25% margin, rounded upward to prices ending in
 .99, or whole-currency amounts ending in 99 where KDP requires integers.
 Margin is the share of list price retained after Amazon's deduction and
-printing or delivery costs, excluding tax. Final prices were saved and displayed
-royalties checked before submission. Every observed royalty exceeds 25% of its
-corresponding list price.
+printing or delivery costs, excluding tax. The September 9 prices were saved
+and displayed royalties checked before the initial submissions. Every observed
+royalty exceeded 25% of its corresponding list price. These are dated KDP
+observations; recheck the paperback after uploading the corrected interior.
 
 Print prices exclude tax; Amazon's added tax can change the storefront ending.
 Kindle fields include local tax where applicable. The saved Kindle prices use
@@ -220,7 +254,7 @@ before registration. Other numbers in the block were left unchanged:
 **978-1-950600-01-4** and **978-1-950600-02-1** belong to *The 20-Minute Table*.
 Kindle has no ISBN. The ISBNs in `imprint.ISBN` match these submitted filings.
 
-## Submitted KDP description
+## KDP description submitted on 2026-09-09
 
 Back to Metal is a practical handbook for deciding whether to leave the cloud,
 then moving workloads onto hardware you control. It covers AWS, Google Cloud and
@@ -237,7 +271,7 @@ Written by Nawaz Dhandala, founder of OneUptime. The book discloses that interes
 where it recommends OneUptime. The text is licensed under Creative Commons
 Attribution 4.0.
 
-## Submitted categories and keywords
+## Categories and keywords submitted on 2026-09-09
 
 Bowker's genre is COMPUTERS. The KDP categories are:
 
@@ -257,7 +291,7 @@ The seven saved search phrases are:
 - cloud cost comparison
 - colocation planning
 
-## KDP preview evidence
+## Initial KDP preview evidence — 2026-09-09
 
 The final 6.4.7 Kindle files completed processing and the manuscript check.
 KDP's online preview showed “open source” correctly emphasized in the
@@ -267,11 +301,13 @@ clean layouts. No issues were listed. The separate spelling/image quality scan
 was still running and is not recorded as completed. KDP accepted the submission
 after these checks.
 
-The final paperback preview, `PSFWSJN70PA`, confirmed 76 pages and was approved.
+The initial paperback preview, `PSFWSJN70PA`, confirmed 76 pages and was approved.
 The cover displayed version 6.4.7, with the paperback ISBN barcode inside its
-reserved area. The cover and Move 05 spread at pages 34–35 were clean.
+reserved area. The cover and Move 05 spread at pages 34–35 appeared clean. The later rejection
+identified pages 36–39; the initial checks did not detect the edge-tab text
+margin issue.
 
-The final hardcover preview, `6K4GF7AFMWQ`, confirmed 76 pages and was approved.
+The initial hardcover preview, `6K4GF7AFMWQ`, confirmed 76 pages and was approved.
 The cover displayed version 6.4.7, with the hardcover ISBN barcode inside its
 reserved area. The cover, PostgreSQL spread at pages 60–61 and worksheets at
 pages 72–73 were clean.
