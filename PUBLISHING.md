@@ -1,21 +1,23 @@
 # Publishing
 
-As of **2026-09-10**, KDP's Bookshelf shows **Kindle Live**, **paperback Draft**
-after a margin rejection, and **hardcover In review**. The hardcover cannot
-currently be edited while Amazon's review is in progress.
+As of **2026-09-10 at 11:54 UTC**, the corrected version **6.4.8 paperback has
+been resubmitted successfully**. KDP confirmed “Your paperback has been
+submitted,” and the Bookshelf shows **In review**, modified September 10.
+The Kindle edition remains **Live** and the hardcover remains **In review**
+from its September 9 submission. The hardcover cannot currently be edited while
+Amazon's review is in progress.
 
 | Edition | KDP setup identifier | ISBN / ASIN | Last submitted US list price | Current status |
 |---|---|---|---:|---|
-| Kindle | `AZTAAK7S3HZ0G` | ASIN [B0HJB4M8NZ](https://www.amazon.com/dp/B0HJB4M8NZ) | $8.99 | Live |
-| Paperback | `YHJP6H3BSP1` | ISBN 978-1-950600-03-8 | $11.99 | Draft; correction pending resubmission |
-| Hardcover | `YHJP6H3BSP1`, linked hardcover setup | ISBN 978-1-950600-04-5 | $33.99 | In review; edits unavailable |
+| Kindle | `AZTAAK7S3HZ0G` | ASIN [B0HJB4M8NZ](https://www.amazon.com/dp/B0HJB4M8NZ) | $8.99 | Live; initial 6.4.7 upload |
+| Paperback | `YHJP6H3BSP1` | ISBN 978-1-950600-03-8 | $11.99 | In review; corrected 6.4.8 resubmitted September 10 |
+| Hardcover | `YHJP6H3BSP1`, linked hardcover setup | ISBN 978-1-950600-04-5 | $33.99 | In review; initial 6.4.7 upload, edits unavailable |
 
 All three formats were initially submitted successfully on **2026-09-09** using
 version **6.4.7**. At 17:56 UTC that day, each appeared as In review and no ASINs
-were displayed. This remains retail edition **1**. Version **6.4.8** is being
-prepared for the print-margin correction; no replacement submission is yet
-confirmed. The live Kindle and the hardcover under review still refer to the
-initial uploads until a later update is explicitly recorded.
+were displayed. This remains retail edition **1**. The live Kindle and the
+hardcover under review still refer to those initial uploads until a later
+update is explicitly recorded.
 
 ## Paperback margin correction — 2026-09-10
 
@@ -23,35 +25,145 @@ KDP rejected the paperback because content on **PDF pages 36–39** was outside
 the permitted margins. The earlier automated safe-area check excluded page
 furniture, so it did not inspect the text in the fore-edge tabs. Passing that
 check and approving the online preview did not establish that every text label
-was inside KDP's safe area.
+was inside KDP's safe area. An independent scan of the exact 6.4.7 public PDF
+used for the initial submission found the same problem on all **40 Move pages**:
+the only offending text was the stage labels in the edge tabs.
 
-The source correction removes **all 40 Move-page edge-tab labels**, retaining
-colour-only tabs and adding an automated margin check for all page text. The
-rebuilt interior remains **76 pages**, preserving the existing facing spreads. This shared
-interior correction also applies to hardcover; its submitted file cannot
-currently be replaced while the format remains In review.
+The source correction removes all 40 Move-page edge-tab labels while retaining
+the colour bands. Footer text has also been moved farther from the PDF edge.
+The new automated margin check measures every rendered text fragment, including
+page furniture outside the main text area, transformed SVG labels and preserved
+spaces. It checks both mirrored sides and the top and bottom edges, with a
+conservative **12.7 mm (0.5 in) PDF-edge floor**. On edges carrying 3.175 mm
+(0.125 in) bleed, that leaves 9.525 mm (0.375 in) inside the finished trim.
+Thicker books also receive the larger KDP gutter minimum for their page count.
+
+The rebuilt interior remains **76 pages**, preserving the existing facing
+spreads. This shared interior correction also applies to hardcover; its
+submitted file cannot currently be replaced while the format remains In review.
+
+### Corrected files uploaded to KDP
+
+The following **validated local version 6.4.8 files** were uploaded to the
+existing paperback draft while GitHub CI/release was queued. Their exact sizes
+and hashes identify the files in the **September 10 paperback resubmission**.
+KDP's corrected preview was approved and submission succeeded at 11:54 UTC.
+
+| Uploaded asset | Purpose | Bytes | SHA-256 |
+|---|---|---:|---|
+| `Back-to-Metal.pdf` | Paperback interior | 4,028,461 | `b1c72fd01fdfeed2e6b113d7f68f67d61f278d807c02abd55addb0d95fb22cee` |
+| `cover-paperback.pdf` | Paperback cover | 257,789 | `9d8ab28e3f879e6320e3b2df9d51d8a4eff6766f0faba727a4a6024513eaa02b` |
+
+These uploads use the corrected version 6.4.8 sources. The public release
+assets are recorded separately below: PDF bytes can differ between Chromium
+environments and because of timestamps even when source version, content and
+geometry agree. The uploaded-file hashes above identify the actual KDP submission.
+
+### Completed local validation
+
+The local build passed **48 tests** and `make verify audit artefacts pricing
+releasable amazon`. All eight browser print checks passed, including the new
+regressions for fore-edge text outside the main text area, top/bottom page
+furniture, both mirrored sides, rotated SVG text, preserved spaces and increased
+gutter requirements for thicker books.
+
+Browser measurement placed all **4,614 rendered text fragments** at least
+12.7 mm from the PDF edge. A separate Poppler scan of the uploaded interior
+checked all **76 pages and 27,646 PDF word boxes**, independently of the HTML
+margin gate. It found zero text-margin or page-geometry failures at the same
+stricter floor. Its minimum text-box clearances were:
+
+| PDF edge | Minimum clearance |
+|---|---:|
+| Gutter | 15.499 mm |
+| Outside | 15.999 mm |
+| Top | 13.358 mm |
+| Bottom | 12.927 mm |
+
+All 76 pages were visually reviewed in contact sheets, with the rejected pages
+36–39 inspected at larger size. No clipping, layout anomalies or unexpected
+blank pages were found. Blank pages 22, 32, 42, 52 and 62 are intentional versos
+before stage dividers; every Move still occupies its even/odd facing pair.
+Worksheets on pages 72–75 and the colophon on page 76 were also checked.
+
+The uploaded paperback cover was checked for version **6.4.8**, readable front
+and back copy, its blank spine and the reserved barcode area. Its raster was
+identical to the previously inspected version 6.4.8 cover. The 76-page standard
+colour wrap is calculated as 16.921152 × 11.25 in with a 0.171152 in spine; the
+rendered PDF is 1218 × 810 pt. Its width differs by 0.323 pt from the calculated
+width, within the build's 0.5 pt geometry tolerance.
+
+The generated About page now links to the confirmed live Kindle ASIN from
+`imprint.amazon_url('kindle')`. It retains the EPUB download and omits the store
+link when the ASIN is unset. Website checks passed on all seven representative
+pages: no hidden content, screen/print contrast failures or sideways scrolling.
+Live deployment verification is recorded in the release section below.
+
+### Corrected KDP preview, prices and resubmission
+
+KDP preview **`PSFWSJN70PA`** confirmed **76 pages** and listed no issues. It was
+approved after checking the cover's version **6.4.8** and paperback ISBN barcode,
+the originally rejected spreads on pages **36–39**, the PostgreSQL spread on
+pages **60–61**, and the worksheets on pages **72–73**. No text remained in the
+edge tabs; body text and the revised page furniture stayed inside the preview's
+safety guides.
+
+All **13 paperback marketplace rows**, including their list prices, printing
+costs and displayed royalties, were checked after the replacement and exactly
+matched the **September 9 paperback table** preserved below. Worldwide rights
+remained selected and Expanded Distribution remained disabled. The lowest
+observed margin was Canada: **CAD3.78 / CAD14.99 = 25.2168%**, satisfying the
+author's 25% target. The US list price remained **$11.99**.
+
+At **11:54 UTC on September 10, 2026**, KDP confirmed **“Your paperback has been
+submitted.”** The subsequent Bookshelf state was **In review**, with a September
+10 modification date. This establishes successful resubmission for Amazon's
+review; it does not yet establish that the corrected paperback is available
+for sale.
+
+At the same check, Kindle ASIN **B0HJB4M8NZ** remained **Live** on the original
+version 6.4.7 upload. The hardcover remained **In review** with its September 9
+modification date, and its editing controls were unavailable. No replacement
+hardcover upload or resubmission has been performed.
+
+### Correction status
 
 | Correction milestone | Status |
 |---|---|
-| Source layout correction and all-text margin check | Complete locally; zero text-margin violations across all 76 PDF pages |
-| Version 6.4.8 release and exact asset hashes | Pending |
-| Website agreement with the corrected release | Pending verification |
-| Corrected paperback KDP upload and preview | Pending |
-| Paperback prices and royalties after replacement | Pending confirmation against the September 9 observations below |
-| Paperback resubmission and resulting status | Not yet confirmed |
+| Source layout correction and all-text margin check | Complete; 76-page PDF passed independent geometry and text-box checks |
+| Whole-manuscript and paperback-cover visual review | Complete; no issues found |
+| Corrected paperback interior and cover upload | Complete; exact uploaded-file hashes recorded above |
+| Corrected KDP preview | Approved; `PSFWSJN70PA`, 76 pages, no issues listed |
+| Paperback prices and royalties after replacement | All 13 rows match September 9; minimum displayed margin 25.2168% |
+| Paperback resubmission and resulting status | Confirmed at 11:54 UTC September 10; Bookshelf In review |
+| Version 6.4.8 release and public asset hashes | Published and independently verified; evidence below |
+| Live website agreement with the corrected release | Verified on both hosts, including canonical and cache-busted downloads |
 | Hardcover replacement | Awaiting an editable KDP status |
 
-The local build passed 48 tests and `make verify audit artefacts pricing
-releasable amazon`. Browser measurement placed every text fragment at least
-12.7 mm from the PDF edge. An independent scan of the generated PDF found no
-violations of that stricter floor; its smallest glyph clearances were 15.499 mm
-at the gutter, 15.999 mm outside, 13.358 mm at the top and 12.927 mm at the
-bottom. Pages 36–39 were rendered and visually inspected after correction.
+The hardcover still needs the corrected interior after Amazon makes its editing
+controls available. No replacement upload or resubmission is recorded for it.
 
-Record the released commit, exact asset sizes and SHA-256 hashes, final
-margin-check results, KDP preview approval and actual resubmission confirmation
-before marking this correction complete. Preserve the initial submission,
-pricing and Bowker observations below as dated history.
+## Release 6.4.8 — verified 2026-09-10 at 12:33 UTC
+
+[Version 6.4.8](https://github.com/OneUptime/back-to-metal/releases/tag/v6.4.8) was published at 12:32:37 UTC from `ba9b1f237843a1e7fe0700c8acd18df0d631cb2e`, the merge of [PR #8](https://github.com/OneUptime/back-to-metal/pull/8). [PR CI](https://github.com/OneUptime/back-to-metal/actions/runs/34472825323) and [main CI](https://github.com/OneUptime/back-to-metal/actions/runs/34473523398) passed.
+
+The [Release build](https://github.com/OneUptime/back-to-metal/actions/runs/34474322538/job/102861337608) passed at 12:29:24 UTC. Its Publish job remained queued with no runner or executed steps, so it was cancelled at 12:31:26 UTC before direct publication with existing Firebase authentication. The exact checked `release-bundle` artifact (`10151899969`, ZIP SHA-256 `d15976dbbe1de175d665e70422ee73639eda0c321c6c838d3e000f3898b36242`) supplied all website files, release notes and edition files. Firebase CLI 15.29.0 deployed that bundle to the configured `backtometal` site; no content was rebuilt. The workflow therefore records a successful build and a cancelled Publish job, rather than a successful workflow deployment.
+
+Every public asset was downloaded afresh and matched GitHub's published size and SHA-256, as well as the corresponding checked bundle bytes. The tag resolves to the merge commit above.
+
+| Public release file | Bytes | SHA-256 |
+|---|---:|---|
+| `Back-to-Metal.pdf` | 3,604,928 | `3d8c896880415b7aff565682a8de48e18611d411f0f5dc413e683053ace424ff` |
+| `Back-to-Metal.epub` | 200,957 | `ea17dffea587ecb86ea1ddd0b58bdc45f002c33aaaca03b8af79cdfc5c0d1f15` |
+| `cover-paperback.pdf` | 221,279 | `fbc1dce6ead73be350b2efea7847049ea2c1f6472fd65b9b3f035ab99c1789ae` |
+| `cover-hardback.pdf` | 221,334 | `6fb3a20a45ef9fcbbe385bc97c57666d2fee79a71d3feddfae473949d629809c` |
+| `cover-kindle.jpg` | 151,186 | `2a63403323c404e3c33fa35090177bf46ce3aa5ec861c6e29871bb674b791eea` |
+
+The released interior has 76 pages and 27,646 word boxes. Independent PDF checks found zero page-geometry or text-margin problems: minimum gutter/outer/top/bottom text clearances were 15.499 / 15.999 / 13.358 / 12.927 mm, all above the 12.7 mm floor. Fonts are embedded and the interior is flattened. Rendered pages 36–39 and both print covers retain the corrected layout with no clipping; the Kindle cover also passed visual review.
+
+KDP received the local files recorded in the paperback resubmission section, whose bytes differ from this public release. A per-page comparison confirmed the same content in all 76 interior pages and the paperback cover, allowing PDF text emission and line-wrap differences; both versions passed their margin and visual checks. The live Kindle edition and the hardcover still under review remain the earlier 6.4.7 submissions.
+
+Both [the custom domain](https://backtometal.oneuptime.com/) and [Firebase Hosting](https://backtometal.web.app/) passed the final checks: all eight canonical/cache-busted PDF and EPUB downloads matched the release bytes, all sixteen page checks visibly showed v6.4.8, and both About pages displayed exactly one Kindle purchase link to [ASIN B0HJB4M8NZ](https://www.amazon.com/dp/B0HJB4M8NZ). No stale-cache, page-identity or link discrepancies were found.
 
 ## Initial release and website agreement — 2026-09-09
 
