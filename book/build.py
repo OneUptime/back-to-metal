@@ -99,13 +99,15 @@ def plural(n, one, many=None):
 TAB_TOP, TAB_H, TAB_GAP = 42.0, 24.0, 4.0
 
 
-def page(cls, topcolor, inner, folio=None, slot=None, tabtext=''):
+def page(cls, topcolor, inner, folio=None, slot=None):
     bar = f'<div class="topbar" style="background:{topcolor}"></div>' if topcolor else ''
     tab = ''
     if slot is not None and topcolor:
         top = TAB_TOP + slot * (TAB_H + TAB_GAP)
-        tab = (f'<div class="tab" style="top:{top}mm;background:{topcolor}">'
-               f'<span>{tabtext}</span></div>')
+        # Only colour may bleed. Stage names already appear in the setup and
+        # runbook, so no text is placed in the fore-edge trim allowance.
+        tab = (f'<div class="tab" aria-hidden="true" '
+               f'style="top:{top}mm;background:{topcolor}"></div>')
     f = ('<div class="folio">%s</div><div class="pageno">{{PN}}</div>' % folio) if folio else ''
     return (f'<section class="page {cls}">{bar}{tab}'
             f'<div class="inner">{inner}</div>{f}</section>')
@@ -795,7 +797,6 @@ def build(moves):
         """A Move is a spread: the setup page, then the runbook page."""
         c = m['l']['color']
         num, title = m['num'], esc(m['title'])
-        tabtext = m['l']['label'].upper()
 
         pres = ''
         for g in m['pre_groups']:
@@ -859,7 +860,7 @@ def build(moves):
           <div class="turnoff"><b style="color:{c}">Turn off</b>
             <span>{inline(m['turnoff'])}</span></div>
           {needs_html}
-        </div>""", f"{num} &nbsp;·&nbsp; {title.upper()}", slot, tabtext)
+        </div>""", f"{num} &nbsp;·&nbsp; {title.upper()}", slot)
 
         steps = ''.join(
             f'<div class="mstep"><div class="mmark">'
@@ -884,7 +885,7 @@ def build(moves):
             <span class="mf-facts">{m['l']['label']} &nbsp;·&nbsp; {m['cutover']} min
               &nbsp;·&nbsp; {m['risk']} risk</span>
             <span class="mf-off">{inline(m['turnoff'])}</span></div>
-        </div>""", f"{num} &nbsp;·&nbsp; RUNBOOK", slot, tabtext)
+        </div>""", f"{num} &nbsp;·&nbsp; RUNBOOK", slot)
 
         return [p.replace('<section class="page ', f'<section data-move="{num}" class="page ', 1)
                 for p in (page_a, page_b)]

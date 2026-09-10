@@ -5,6 +5,24 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [6.4.8] - 2026-09-10
+
+### Fixed
+
+- Removed stage text from the outer colour tabs after KDP rejected the paperback
+  for insufficient outside margins. The colour tabs remain; stage names appear
+  in the page headings and footers.
+- Extended print margin checks to every visible text element, including page
+  furniture and SVG labels, on all four edges. Added a conservative clearance
+  beyond KDP's minimum and regression checks for the missed edge text.
+- Regenerated the print interior, covers, Kindle edition and website while
+  preserving the page count, trim, ISBNs and list prices.
+
+### Changed
+
+- Linked the website to the confirmed live Kindle edition. Paperback correction
+  and hardcover review statuses are recorded separately in `PUBLISHING.md`.
+
 ## [6.4.7] - 2026-09-09
 
 ### Fixed

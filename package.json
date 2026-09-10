@@ -1,6 +1,6 @@
 {
   "name": "back-to-metal",
-  "version": "6.4.7",
+  "version": "6.4.8",
   "private": true,
   "description": "A practical cloud exit handbook covering Proxmox VMs and Talos/Kubernetes on hardware you control, compiled into print, EPUB and a static site.",
   "scripts": {

@@ -81,7 +81,7 @@ EPUB_ID = 'urn:uuid:f021e81e-4b5f-4ecc-bc23-402193edac60'
 AMAZON = {
     'paperback': None,
     'hardback': None,
-    'kindle': None,
+    'kindle': 'B0HJB4M8NZ',
 }
 AMAZON_DP = 'https://www.amazon.com/dp/'
 
