@@ -1473,6 +1473,10 @@ def build_about(moves, T):
             f'<a class="dl" href="{EPUB_NAME}" download><b class="dl-t">The Kindle '
             f'edition</b><span class="dl-m">EPUB &middot; reflowable &middot; '
             f'{T["n"]} Moves</span></a>')
+    kindle_url = IMP.amazon_url('kindle')
+    kindle_store = (f'<p class="note"><a href="{attr(kindle_url)}">'
+                    'Buy the Kindle edition on Amazon &rarr;</a></p>'
+                    if kindle_url else '')
 
     # Version, text and software are in the footer of this and every other
     # page now, so the about page states what only it can: the shape of the
@@ -1502,7 +1506,7 @@ def build_about(moves, T):
 {band('download', 'Take it with you',
       f'<p>The same {T["n"]} Moves, typeset. The print interior is the one to read on '
       f'paper beside a rack; the Kindle edition reflows.</p>'
-      f'<div class="dls">{"".join(dls)}</div>',
+      f'<div class="dls">{"".join(dls)}</div>{kindle_store}',
       margin=mg_note('Both editions are the same Moves',
                      'One markdown source, three renderers. Nothing is written '
                      'for the web and cut for print, or the other way round.')
