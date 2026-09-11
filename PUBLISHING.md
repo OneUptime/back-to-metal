@@ -1,23 +1,95 @@
 # Publishing
 
-As of **2026-09-10 at 11:54 UTC**, the corrected version **6.4.8 paperback has
-been resubmitted successfully**. KDP confirmed “Your paperback has been
-submitted,” and the Bookshelf shows **In review**, modified September 10.
-The Kindle edition remains **Live** and the hardcover remains **In review**
-from its September 9 submission. The hardcover cannot currently be edited while
-Amazon's review is in progress.
+As of **2026-09-11 at 06:27 UTC**, the corrected version
+**6.4.8 hardcover has been resubmitted successfully**. KDP confirmed
+“Your hardcover has been submitted,” and the Bookshelf shows **In review**,
+modified September 11. The corrected paperback remains **In review** from its
+September 10 resubmission. The Kindle edition remains **Live**.
 
 | Edition | KDP setup identifier | ISBN / ASIN | Last submitted US list price | Current status |
 |---|---|---|---:|---|
 | Kindle | `AZTAAK7S3HZ0G` | ASIN [B0HJB4M8NZ](https://www.amazon.com/dp/B0HJB4M8NZ) | $8.99 | Live; initial 6.4.7 upload |
 | Paperback | `YHJP6H3BSP1` | ISBN 978-1-950600-03-8 | $11.99 | In review; corrected 6.4.8 resubmitted September 10 |
-| Hardcover | `YHJP6H3BSP1`, linked hardcover setup | ISBN 978-1-950600-04-5 | $33.99 | In review; initial 6.4.7 upload, edits unavailable |
+| Hardcover | `YHJP6H3BSP1`, linked hardcover setup | ISBN 978-1-950600-04-5 | $33.99 | In review; corrected 6.4.8 resubmitted September 11 |
 
 All three formats were initially submitted successfully on **2026-09-09** using
 version **6.4.7**. At 17:56 UTC that day, each appeared as In review and no ASINs
-were displayed. This remains retail edition **1**. The live Kindle and the
-hardcover under review still refer to those initial uploads until a later
-update is explicitly recorded.
+were displayed. This remains retail edition **1**. Kindle still uses the
+initial 6.4.7 upload; the paperback and hardcover correction records below
+identify their later 6.4.8 submissions.
+
+## Hardcover margin correction — 2026-09-11
+
+The author reported the same margin rejection for the hardcover. On September
+11, KDP showed the hardcover as **Draft**, making its content editable. The
+existing hardcover setup and ISBN were retained. Its interior and cover were
+replaced with the exact public version **6.4.8** release files, which already
+contain the shared margin correction described in the paperback record below.
+No manuscript rebuild or new retail edition was needed.
+
+### Corrected files uploaded to KDP
+
+Both files were downloaded from the published 6.4.8 release and their sizes and
+SHA-256 hashes matched GitHub's release metadata before upload. These hashes
+identify the actual files in the **September 11 hardcover resubmission**.
+
+| Uploaded asset | Purpose | Bytes | SHA-256 |
+|---|---|---:|---|
+| `Back-to-Metal.pdf` | Hardcover interior | 3,604,928 | `3d8c896880415b7aff565682a8de48e18611d411f0f5dc413e683053ace424ff` |
+| `cover-hardback.pdf` | Hardcover cover | 221,334 | `6fb3a20a45ef9fcbbe385bc97c57666d2fee79a71d3feddfae473949d629809c` |
+
+### File validation
+
+The interior has **76 pages** with one consistent **603.12 × 810 pt** bleed page
+box. The PDF check confirms embedded fonts and a flattened interior. An
+independent scan of all **27,646 word boxes** found no text inside the 12.7 mm
+PDF-edge safety floor. Minimum gutter/outside/top/bottom clearances were
+**15.499 / 15.999 / 13.358 / 12.927 mm**. Pages **36–39** were rendered and
+visually checked again: the fore-edge tabs contain colour only, and the text
+and footers remain clear of the page edges.
+
+The hardcover cover is one page, **1327.91992 × 894 pt**. Its dimensions differ
+from the official KDP template geometry recorded in `book/cover.py` by less
+than **0.031 mm**, within the build's geometry tolerance. Visual inspection
+confirmed version **6.4.8**, the correct author and imprint, a blank spine and
+an unobstructed **2 × 1.2 in** barcode reservation. KDP adds the barcode. Interior
+copyright page 4 identifies **HackerBay, Inc.** and hardcover ISBN
+**978-1-950600-04-5**.
+
+At **06:22 UTC on September 11**, the PDF linked from the generated About page
+was downloaded from [the public website](https://backtometal.oneuptime.com/Back-to-Metal.pdf).
+It returned HTTP 200 and matched the hardcover interior upload byte for byte:
+**3,604,928 bytes**, SHA-256 as recorded above.
+
+### KDP preview, prices and resubmission
+
+KDP preview **`6K4GF7AFMWQ`** confirmed **76 pages** and listed no issues.
+It was approved at approximately **06:26 UTC** after checking the version
+**6.4.8** cover and hardcover ISBN barcode **9781950600045**, with no overlap
+in the reserved area. The previously rejected pages **36–39** showed
+colour-only edge tabs and text inside the safety guides. The PostgreSQL spread
+on pages **60–61** and worksheets on pages **72–73** were also inspected.
+
+The saved settings remained **premium colour on white paper**, **8.25 × 11 in**,
+**bleed**, and a **matte** hardcover. The owned ISBN **978-1-950600-04-5** and
+publisher **HackerBay, Inc.** were retained. KDP adds the barcode; no
+AI-generated content was declared, consistent with the author's provenance
+statement. Worldwide rights remained selected.
+
+All **12 hardcover marketplace rows**, including list prices, printing costs
+and displayed royalties, exactly matched the **September 9 hardcover table**
+preserved below. The Canadian row remained in **USD based on Amazon.com**.
+The lowest displayed margin was Sweden: **SEK80.78 / SEK322.99 = 25.0101%**,
+meeting the author's 25% target. The US list price remained **$33.99**.
+
+At **06:27 UTC on September 11, 2026**, KDP confirmed
+**“Your hardcover has been submitted.”** The subsequent Bookshelf state was
+**In review**, with a September 11 modification date. This records successful
+resubmission for Amazon's review; it does not establish that the corrected
+hardcover is available for sale.
+
+At that check, the corrected paperback remained **In review** from September
+10, and Kindle ASIN **B0HJB4M8NZ** remained **Live** on the initial 6.4.7 upload.
 
 ## Paperback margin correction — 2026-09-10
 
@@ -39,8 +111,9 @@ conservative **12.7 mm (0.5 in) PDF-edge floor**. On edges carrying 3.175 mm
 Thicker books also receive the larger KDP gutter minimum for their page count.
 
 The rebuilt interior remains **76 pages**, preserving the existing facing
-spreads. This shared interior correction also applies to hardcover; its
-submitted file cannot currently be replaced while the format remains In review.
+spreads. This shared interior correction also applies to hardcover. On September
+10, the hardcover remained In review and its submitted file could not be replaced;
+its later correction is recorded in the September 11 section above.
 
 ### Corrected files uploaded to KDP
 
@@ -121,12 +194,12 @@ submitted.”** The subsequent Bookshelf state was **In review**, with a Septemb
 review; it does not yet establish that the corrected paperback is available
 for sale.
 
-At the same check, Kindle ASIN **B0HJB4M8NZ** remained **Live** on the original
-version 6.4.7 upload. The hardcover remained **In review** with its September 9
-modification date, and its editing controls were unavailable. No replacement
-hardcover upload or resubmission has been performed.
+At the same September 10 check, Kindle ASIN **B0HJB4M8NZ** remained **Live** on
+the original version 6.4.7 upload. The hardcover remained **In review** with its
+September 9 modification date, and its editing controls were unavailable. No
+replacement hardcover upload or resubmission had been performed at that time.
 
-### Correction status
+### Paperback correction status — 2026-09-10
 
 | Correction milestone | Status |
 |---|---|
@@ -138,10 +211,10 @@ hardcover upload or resubmission has been performed.
 | Paperback resubmission and resulting status | Confirmed at 11:54 UTC September 10; Bookshelf In review |
 | Version 6.4.8 release and public asset hashes | Published and independently verified; evidence below |
 | Live website agreement with the corrected release | Verified on both hosts, including canonical and cache-busted downloads |
-| Hardcover replacement | Awaiting an editable KDP status |
+| Hardcover replacement | Unavailable at the September 10 check; completed September 11 as recorded above |
 
-The hardcover still needs the corrected interior after Amazon makes its editing
-controls available. No replacement upload or resubmission is recorded for it.
+The hardcover became editable after its later rejection. Its corrected-file
+upload, preview and resubmission are recorded in the September 11 section above.
 
 ## Release 6.4.8 — verified 2026-09-10 at 12:33 UTC
 
@@ -161,7 +234,7 @@ Every public asset was downloaded afresh and matched GitHub's published size and
 
 The released interior has 76 pages and 27,646 word boxes. Independent PDF checks found zero page-geometry or text-margin problems: minimum gutter/outer/top/bottom text clearances were 15.499 / 15.999 / 13.358 / 12.927 mm, all above the 12.7 mm floor. Fonts are embedded and the interior is flattened. Rendered pages 36–39 and both print covers retain the corrected layout with no clipping; the Kindle cover also passed visual review.
 
-KDP received the local files recorded in the paperback resubmission section, whose bytes differ from this public release. A per-page comparison confirmed the same content in all 76 interior pages and the paperback cover, allowing PDF text emission and line-wrap differences; both versions passed their margin and visual checks. The live Kindle edition and the hardcover still under review remain the earlier 6.4.7 submissions.
+The September 10 paperback resubmission used the local files recorded above, whose bytes differ from this public release. A per-page comparison confirmed the same content in all 76 interior pages and the paperback cover, allowing PDF text emission and line-wrap differences; both versions passed their margin and visual checks. At the September 10 release check, the live Kindle edition and hardcover under review still used their initial 6.4.7 submissions. The September 11 hardcover resubmission uses the exact public 6.4.8 interior and hardcover cover identified in its correction record.
 
 Both [the custom domain](https://backtometal.oneuptime.com/) and [Firebase Hosting](https://backtometal.web.app/) passed the final checks: all eight canonical/cache-busted PDF and EPUB downloads matched the release bytes, all sixteen page checks visibly showed v6.4.8, and both About pages displayed exactly one Kindle purchase link to [ASIN B0HJB4M8NZ](https://www.amazon.com/dp/B0HJB4M8NZ). No stale-cache, page-identity or link discrepancies were found.
 
@@ -250,6 +323,7 @@ printing or delivery costs, excluding tax. The September 9 prices were saved
 and displayed royalties checked before the initial submissions. Every observed
 royalty exceeded 25% of its corresponding list price. These are dated KDP
 observations; the paperback values were confirmed again after the September 10
+correction. The hardcover values were confirmed again after the September 11
 correction, as recorded above.
 
 Print prices exclude tax; Amazon's added tax can change the storefront ending.
