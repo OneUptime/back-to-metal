@@ -80,7 +80,7 @@ EPUB_ID = 'urn:uuid:f021e81e-4b5f-4ecc-bc23-402193edac60'
 # instead of to a product page that does not exist.
 AMAZON = {
     'paperback': None,
-    'hardback': None,
+    'hardback': '1950600041',
     'kindle': 'B0HJB4M8NZ',
 }
 AMAZON_DP = 'https://www.amazon.com/dp/'
