@@ -5,6 +5,15 @@ nothing else; `book/version.py` reads it.
 
 ## [Unreleased]
 
+## [6.4.9] - 2026-09-12
+
+### Changed
+
+- Linked the website's About page to the confirmed live hardcover edition on
+  Amazon, alongside the existing Kindle listing and downloadable editions.
+- Regenerated the print interior, covers, Kindle edition and website so every
+  published artefact carries version 6.4.9.
+
 ## [6.4.8] - 2026-09-10
 
 ### Fixed

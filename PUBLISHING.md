@@ -1,22 +1,32 @@
 # Publishing
 
-As of **2026-09-11 at 06:27 UTC**, the corrected version
-**6.4.8 hardcover has been resubmitted successfully**. KDP confirmed
-“Your hardcover has been submitted,” and the Bookshelf shows **In review**,
-modified September 11. The corrected paperback remains **In review** from its
-September 10 resubmission. The Kindle edition remains **Live**.
+As of **2026-09-12 at 11:38 UTC**, the corrected hardcover has a live public
+Amazon product page. The corrected paperback status has not been rechecked; it
+was last observed **In review** after its September 10 resubmission. The Kindle
+edition remains **Live**.
 
 | Edition | KDP setup identifier | ISBN / ASIN | Last submitted US list price | Current status |
 |---|---|---|---:|---|
 | Kindle | `AZTAAK7S3HZ0G` | ASIN [B0HJB4M8NZ](https://www.amazon.com/dp/B0HJB4M8NZ) | $8.99 | Live; initial 6.4.7 upload |
 | Paperback | `YHJP6H3BSP1` | ISBN 978-1-950600-03-8 | $11.99 | In review; corrected 6.4.8 resubmitted September 10 |
-| Hardcover | `YHJP6H3BSP1`, linked hardcover setup | ISBN 978-1-950600-04-5 | $33.99 | In review; corrected 6.4.8 resubmitted September 11 |
+| Hardcover | `YHJP6H3BSP1`, linked hardcover setup | ISBN [978-1-950600-04-5](https://www.amazon.com/dp/1950600041) | $33.99 | Public Amazon product page live; corrected 6.4.8 resubmitted September 11 |
 
 All three formats were initially submitted successfully on **2026-09-09** using
 version **6.4.7**. At 17:56 UTC that day, each appeared as In review and no ASINs
 were displayed. This remains retail edition **1**. Kindle still uses the
 initial 6.4.7 upload; the paperback and hardcover correction records below
 identify their later 6.4.8 submissions.
+
+## Hardcover Amazon listing — 2026-09-12
+
+The public [hardcover product page](https://www.amazon.com/dp/1950600041) was
+verified at 11:38 UTC. It identifies *Back to Metal: How a company leaves the
+cloud, one move at a time*, Nawaz Dhandala as the author, HackerBay, Inc. as the
+publisher, 76 pages, publication date September 9, 2026, ISBN-10 1950600041 and
+ISBN-13 978-1950600045. The page selected Hardcover as the format. The observed
+United Kingdom delivery location was not eligible for shipment; this check
+establishes that the public detail page exists, not availability in every
+marketplace or delivery region.
 
 ## Hardcover margin correction — 2026-09-11
 
